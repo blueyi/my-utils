@@ -1,0 +1,195 @@
+"3.14.0 (created: 2016/06/07 23:58:16)
+" 参考：https://github.com/helmuthdu/pentadactyl/blob/master/vimperatorrc
+source! "C:\\Users\\blueyi\\_vimperatorrc.local"
+
+" vim: set ft=vimperator:
+
+"===[ Settings ]========================================================
+" Autocomplete search engin suguest
+set complete=lsb
+
+" use home row letters for hints instead of numbers
+set hintchars=sadfjklewcmpgh
+
+" open things at new tab
+set newtab=all
+
+" only follow hints when press enter
+set followhints=1
+
+" highlight all search matches, not just the first
+set hlsearch
+" find as you type
+set incsearch
+" ignorecase
+set ignorecase
+" set wild mode to show completions as you type
+set wildmode=list:longest,full
+" turn off the freakin' bell
+set novisualbell
+" enable animation
+set animations
+
+set gui=nomenu,tabs,navigation,bookmarks,addons
+
+"set noautocomplete
+"set defsearch=g
+" 设置编码
+set fileencoding=gbk
+set nextpattern=\b下一页|下一张|下页\b,\bnext,^>$,^(>>|»)$,^(>|»),(>|»)$,\bmore\b
+set previouspattern=\b上一页|上一张|上页\b,\bprev|previous\b,^<$,^(<<|«)$,^(<|«),(<|«)$
+"set popups=window
+"set titlestring="Blueyi Browser"
+"set editor=gvim
+
+" "配色方案，使用脚本配色，默认关闭
+" THEME {{{
+  hi Hint               text-transform: uppercase; font-family : "Helvetica Neue", "Helvetica", "Arial", "Sans"; font-weight: bold; font-size: 11px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6); color: #302505; padding: 1px 3px 0px 3px; background: -moz-linear-gradient(top, #FFF785, #FFC542); border: 1px #E3BE23 solid; border-radius: 2px; -moz-box-shadow: 0 3px 7px 0px rgba(0,0,0,0.3);
+  hi HintElem           background-color: inherit !important;
+  hi HintActive	        background-color: inherit !important;
+  hi HintImage          opacity: .7 !important;
+
+  "hi CompIcon           display: none;
+  hi CompItem[selected] background: #FFC542 !important;
+  hi CompTitle          text-transform: uppercase; font-family : "Helvetica Neue", "Helvetica", "Arial", "Sans"; font-weight: bold; font-size: 11px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6); color: #302505; padding: 1px 3px 0px 3px; background: -moz-linear-gradient(top, #FFF785, #FFC542);
+" }}}
+
+"set editor=D:/GreenSoftware/Vim/gvim.exe -f
+"set runtimepath=C:\\Users\\orz\\vimperator
+"source! C:\\Users\\orz\\_vimperatorrc.local
+
+
+"===[ Auto commands ]===================================================
+
+" 忽略的网站
+" IGNOREKEYS {{{
+  ignorekeys add 'mail.google.com'
+  ignorekeys add 'drive.google.com'
+  ignorekeys add 'www.google.com/calendar'
+  ignorekeys add 'www.google.com/reader'
+"}}}
+
+"===[ Custom commands ]=================================================
+
+" Run :vimperatortoggle to enable or disable Vimperator as needed.
+javascript function vimperatortoggle() { if (is_vimperator_active) { liberator.execute(':disable') } else { liberator.execute(':enable') }; }
+command! vimperatortoggle javascript vimperatortoggle()
+
+" Run :disable to disable Vimperator and resume normal Firefox behavior.
+javascript function disable() { is_vimperator_active = false; liberator.execute(':set gui=all,nomenu'); modes.passAllKeys = true; }
+command! disable javascript disable()
+
+" Run :enable to enable Vimperator.
+javascript function enable() { is_vimperator_active = true; liberator.execute('set gui=nomenu,tabs,navigation,bookmarks,addons') }
+command! enable javascript enable()
+:enable
+
+" Load configuration file into current browser, useful for updating after editing this file.
+command! sourcerc :source ~/.vimperatorrc
+
+" Show properties of an object within JavaScript.
+javascript <<EOB
+function inspect(what) {
+    var nodes = [];
+    for (var node in what)
+        nodes.push(node);
+    liberator.echo(nodes.sort().join(', '));
+}
+EOB
+
+"command noimg set! premissions.default.image=2
+"command ysimg set! premissions.default.image=1
+"command nojs set! javascript.enabled=false
+"command ysjs set! javascript.enabled=true
+
+"===[ Mappings ]========================================================
+
+" Press 'F10' to toggle Vimperator
+noremap <F10> :vimperatortoggle<CR>
+let mapleader=";"
+
+" disable highlight
+map <Leader>/ :set hlf!<CR>
+" yank selected text to clipboard
+nmap Y <yank-selection>
+" open addons manager
+nmap <Leader>a :dialog addons<CR>
+" private mode
+nmap <Leader>p :set private!<CR>
+" add bookmarks
+nmap <Leader>d :dialog addbookmark<CR>
+" history
+nmap <Leader>h :history<CR>
+" list closed tabs
+nmap <Leader>u :undo<Space>
+" list bookmarks
+nmap <Leader>b :bmarks<Space>
+
+"重定义t和o：如果有文字链接被选中，则直接打开链接；如果被选中的是一般文字，则用默认搜索引擎搜索；否则打开:tabopen或者:open命令行，手动输入关键字搜索。
+map st :execute(content.getSelection()!=""?":tabopen "+content.getSelection():":tabopen ")<CR>
+"map o -js content.getSelection().toString()!=""?execute(":open "+ content.getSelection()):CommandExMode().open("open ")
+command! -nargs=* -complete=search search execute 'tabopen <args> ' + content.getSelection().toString()
+map s :search<Space>
+command! -nargs=? -complete=search switchSearch execute 'open <args> ' + (buffer.lastInputField?buffer.lastInputField.value:'')
+map S gi<ESC> :switchSearch<Space>
+command! -nargs=* siteSearch execute "tabopen <args> site:" + window.content.location.hostname
+
+" Defines commands to open new tab to right of current tab
+" Example keybinding: xt
+nmap xt :newtabright<SPACE>
+command! newtabright -nargs=1 -description "Open new tab to right of current tab" :js newTabRight("<args>");
+:js <<EOF
+function newTabRight(args) {
+    var origOrd = gBrowser.selectedTab._tPos;
+    var numTabs = tabs.count;
+    liberator.open(args, liberator.NEW_TAB)
+    var newTab = tabs.getTab();
+    tabs.move(newTab, origOrd+1);
+}
+EOF
+
+
+" " 页面操作
+" 一次移动5行
+noremap j 5j
+noremap k 5k
+" 上下滚动
+noremap J <C-d>
+noremap K <C-u>
+" 将停止映射至s
+map <Leader>s :stop<cr>
+
+" " 标签操作
+" 激活左/右标签
+noremap h gT
+noremap l gt
+" 移至最左/最右标签
+map < <C-6>
+noremap > g$
+" 寻找上下页链接并翻页
+"noremap ] ]]
+"noremap [ [[
+
+
+" " 恢复WINDOWS常用快捷键
+" 普通模式全选，复制
+noremap <C-a> <C-v><C-a>
+noremap <C-c> <C-v><C-c>
+noremap <C-v> <C-v><C-v>
+noremap <C-x> <C-v><C-x>
+noremap <C-z> <C-v><C-z>
+noremap <C-y> <C-v><C-y>
+noremap <S-Insert> <C-v><C-v>
+
+
+" " PASSTHOUGH
+" 将passthrough映射至p
+map p <C-z>
+" 将下次按键passthrough映射至v
+map v <C-v>
+
+" " URL数字操作，有闲功能，默认关闭
+" 将URL数字+1映射至C-n
+" map <C-n> <C-a>
+" 将URL数字-1映射至C-b
+" map <C-b> <C-x>

@@ -1,0 +1,111 @@
+"hg7226
+
+loadplugins '\.(js|penta)$'
+group user
+set cdpath=''
+set guioptions=bBCrsNT
+" B   Bookmark bar
+" C   Always show the command line outside of the status line
+" M   Always show messages outside of the status line
+" N   Tab number over image
+" T   Toolbar
+" b   Bottom scrollbar
+" c   Always show the command line, even when empty
+" l   Left scrollbar (l and r are mutually exclusive)
+" m   Menu bar
+" n   Tab number
+" r   Right scrollbar
+" s   Status bar
+
+
+set hintkeys=asdfglkjhmnowe
+
+" 更改Hints等UI显示，也可指定colors内的主题，而不用写进这里
+highlight -link=FontFixed CmdLine font-family: "Lucida Grande", "Arial", "Sans"; font-size: 12px;
+highlight CompDesc padding-left: 6px;
+highlight CompIcon display: none;
+highlight CompItem[selected] background: #FFC542 !important;
+highlight CompTitle text-transform: uppercase; background: -moz-linear-gradient(top, #FFF785, #FFC542); font-size: 11px; padding: 1px 3px 0px 3px; font-family : "Helvetica Neue", "Helvetica", "Arial", "Sans"; font-weight: bold; color: #302505;
+highlight CompTitleSep height: 1px; background: #C38A22;
+highlight ErrorMsg background: #a00 !important; color: #fff !important; font: 11px "Menlo" !important; padding: 2px 4px !important;
+highlight Hint text-transform: uppercase; font-family : "Helvetica Neue", "Helvetica", "Arial", "Sans"; font-weight: bold; font-size: 11px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6); color: #302505; padding: 1px 3px 0px 3px; background: -moz-linear-gradient(top, #FFF785, #FFC542); border: 1px #C38A22 solid; -moz-border-radius: 3px; -moz-box-shadow: 0 3px 7px 0px rgba(0,0,0,0.3);
+highlight HintActive background-color: inherit !important
+highlight HintElem background-color: inherit !important
+highlight HintImage opacity: .5 !important;
+highlight Normal background-color: #FFF; color: black; font-family: "Lucida Grande", "Arial", "Sans"; font-size: 12px;
+highlight WarningMsg background: #a00 !important; color: #fff !important; font: 11px "Menlo" !important; padding: 2px 4px !important;
+
+" vim: set ft=pentadactyl:
+
+
+" 显隐导航栏，书签栏
+map x :set go!=T<CR>
+map s :set go!=B<CR>
+
+" 链接信息在命令行显示
+set showstatuslinks=command
+
+" 映射 j 到6下j，加快页面的翻转，-builtin：不递归映射
+map -count j -builtin <count>6j
+map -count k -builtin <count>6k
+
+"设置搜索高亮
+set hlfind
+
+"设置zd打开下载列表
+map -builtin zd :downloads<cr>
+
+" 设置编码，诸如「:! ping 」 不再乱码
+set fileencoding=gbk
+
+"重定义t和o：如果有文字链接被选中，则直接打开链接；如果被选中的是一般文字，则用默认搜索引擎搜索；否则打开:tabopen或者:open命令行，手动输入关键字搜索。
+map t -js content.getSelection().toString()!=""?dactyl.execute(":tabopen "+ content.getSelection()):CommandExMode().open("tabopen ")
+map o -js content.getSelection().toString()!=""?dactyl.execute(":open "+ content.getSelection()):CommandExMode().open("open ")
+
+"pentadactyl中给map相关命令引入了一个特殊字符 – <Pass>
+"映射ctrl+c
+"map -modes=n,v,i,c <C-c> -builtin <C-v><C-c>
+map -m n,v,i,c,t <C-c> <Pass>
+
+"ctrl+v只有在insert和command line才需要
+"inoremap <C-v> <C-v><C-v> :cnoremap <C-v> <C-v><C-v> 
+map -m i,c,t <C-v> <Pass>
+
+"ctrl+x剪切
+"inoremap <C-x> <C-v><C-x> :cnoremap <C-x> <C-v><C-x> 
+map -m i,c,t <C-x> <Pass>
+
+"ctrl+z撤销
+"inoremap <C-z> <C-v><C-z> :cnoremap <C-z> <C-v><C-z> 
+map -m i,c,t <C-z> <Pass>
+
+"ctrl+a全选
+"noremap <C-a> <C-v><C-a> :inoremap <C-a> <C-v><C-a> :cnoremap <C-a> <C-v><C-a>
+map -m n,v,i,c,t <C-a> <Pass>
+
+"p键将在新标签页中搜索粘贴板中的内容
+map -builtin p P
+map -builtin P p
+
+" 按此键，解决buffer.jsm: 1607: TypeError问题。禁止平滑滚动的不用担心这个问题。
+"map J :open <esc>
+
+
+map -modes=n l -builtin <count><C-n>
+map -modes=n h -builtin <count><C-p>
+map -modes=n J -builtin <count><Down>
+map -modes=n K -builtin <count><Up>
+
+map -modes=n w -builtin <count>H
+map -modes=n e -builtin <count>L
+
+"map -modes=n s -builtin <count>:stop<Return>
+
+map -modes=n vr -builtin <count>:restart<Return>
+map -modes=n vv -builtin <count>ZZ<Return>
+
+
+set nextpattern='\s*下页\s*','\s*下一页\s*','\bnext\b',^>$,'^(>>|»)$','^(>|»)','(>|»)$','\bmore,'
+set previouspattern='\s*上页\s*','\s*上一页\s*','\bprev|previous\b',^<$,'^(<<|«)$','^(<|«)','(<|«)$'
+
+set titlestring='Mozilla Firefox'
