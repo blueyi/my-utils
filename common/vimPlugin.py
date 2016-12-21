@@ -53,6 +53,8 @@ if not os.path.exists(userPath() + '/.vimbak'):
 if not os.path.exists(userPath() + '/.vim/bundle'):
     run_cmd('mkdir -p ~/.vim/bundle', error_log)
 
+welcomePrint(plugin_list)
+
 # install vim plugin 
 for plugin in plugin_list:
     plu_url = 'https://github.com/' + plugin
@@ -62,6 +64,9 @@ for plugin in plugin_list:
     else:
         plu_dir = plu_dir + plugin[plugin.rfind('/') + 1 :]
     gitClone(plu_url, plu_dir)
+    os.chdir(plu_dir)
+    run_cmd('git submodule update --init --recursive', error_log)
+    os.chdir(curPath())
 
 # ---Youcompleteme install---
 def installYCM():
@@ -76,7 +81,7 @@ def installYCM():
 if isInstallYCM:
     installYCM()
 
-print(plugin_list)
+welcomePrint(plugin_list)
 
 error_log.close()
 if delBlankFile(error_log_file):
