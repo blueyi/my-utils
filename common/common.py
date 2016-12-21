@@ -76,7 +76,7 @@ def run_cmd(tcall_cmd, errOpened, goOnRun = True):
 def run_cmd(tcall_cmd, goOnRun = True):
     return_code = subprocess.call(tcall_cmd, shell=True)
     if return_code != 0 and ('grep' not in tcall_cmd):
-        printToFile(tcall_cmd)
+        printToFile(tcall_cmd, errOpened)
         if not goOnRun :
             sys.exit(1)
     return return_code
