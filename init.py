@@ -14,6 +14,10 @@ import sys
 sys.path.append('common')
 from common import *
 
+if os.geteuid == 0:
+    print('Do Not Run As Root!!!')
+    sys.exit(1)
+
 call_cmd('sudo python common/installPack.py')
 call_cmd('python common/createSoft.py')
 call_cmd('python common/misc.py')
