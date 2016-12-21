@@ -5,6 +5,9 @@
 # git config --global user.name "blueyi"
 # git config --global user.email "blueyiniu@qq.com"
 
+# fonts
+git clone https://github.com/blueyi/myfonts.git ~/.fonts
+
 # some useful ppa
 # sudo add-apt-repository -y ppa:wiznote-team/ppa   # wiznote client for ubuntu
 # sudo add-apt-repository -y ppa:graphics-drivers/ppa  # nvidia graphic drivers
