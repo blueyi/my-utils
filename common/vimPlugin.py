@@ -85,6 +85,6 @@ welcomePrint(plugin_list)
 
 error_log.close()
 if delBlankFile(error_log_file):
-    welcomePrint('vim plugin install success!')
+    welcomePrint('vim plugin install success!\n Total:' + str(len(plugin_list)))
 else:
-    welcomePrint('some vim plugin install failed!')
+    welcomePrint('some vim plugin install failed!\n Total:' + str(len(plugin_list)))
