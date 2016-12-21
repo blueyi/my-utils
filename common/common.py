@@ -44,8 +44,8 @@ def printToFile(msg, file_opened):
 
 # error log file name
 def errLogFileName(file):
-    file_str = file[file.rfind('/') + 1 :]
-    return file_str.replace('.', '_') + '_' + curTimeStr() + '.log'
+    file_name = file[file.rfind('/') + 1 :]
+    return curPath() + '/' + file_name.replace('.', '_') + '_' + curTimeStr() + '.log'
 
 # run an shell command in subprocess
 def run_cmd_reout(tcall_cmd, errOpened, goOnRun = True, isOutPut = True, isReturnCode = False):
