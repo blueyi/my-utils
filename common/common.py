@@ -62,10 +62,21 @@ def run_cmd_reout(tcall_cmd, errOpened, goOnRun = True, isOutPut = True, isRetur
     else :
         return toutput
 
+# run shell command and return command return code
+# if error, write comman to error log
 def run_cmd(tcall_cmd, errOpened, goOnRun = True):
     return_code = subprocess.call(tcall_cmd, shell=True)
-    if p.returncode != 0 and ('grep' not in tcall_cmd):
+    if return_code != 0 and ('grep' not in tcall_cmd):
         printToFile(tcall_cmd, errOpened)
+        if not goOnRun :
+            sys.exit(1)
+    return return_code
+
+# just run shell command
+def run_cmd(tcall_cmd, goOnRun = True):
+    return_code = subprocess.call(tcall_cmd, shell=True)
+    if return_code != 0 and ('grep' not in tcall_cmd):
+        printToFile(tcall_cmd)
         if not goOnRun :
             sys.exit(1)
     return return_code
