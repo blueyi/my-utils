@@ -6,6 +6,15 @@
 git config --global user.name "blueyi"
 git config --global user.email "blueyiniu@qq.com"
 
+# some useful ppa
+# sudo add-apt-repository -y ppa:wiznote-team/ppa   # wiznote client for ubuntu
+# sudo add-apt-repository -y ppa:graphics-drivers/ppa  # nvidia graphic drivers
+# sudo add-apt-repository -y ppa:webupd8team/java  # Oracle JAVA
+# sudo add-apt-repository -y ppa:hzwhuang/ss-qt5  # shadowsocks-qt5 client
+
+# Another soft
+# http://meetfranz.com/  # Franz support multil messaging app, eg: wechat
+
 # chmod +x app/ss/shadowsocks-local-linux64
 
 # hexo install
