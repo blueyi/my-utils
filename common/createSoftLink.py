@@ -14,7 +14,7 @@ from common import *
 
 welcomePrint('Create soft link from file')
 
-link_file = 'link.ini'
+link_file = curPath() + '/link.ini'
 
 error_log_file = errLogFileName(__file__)
 error_log = open(error_log_file, 'w')
@@ -32,17 +32,14 @@ def config_link(file_path):
     for key, value in link_dict.items():
         if os.path.isfile(value):
             run_cmd('mv ' + value + ' ' + value + '_' + curTimeStr() + '.bak', error_log)
-        print(value + ' -> ' + key)
+        print(value + ' -> ' + os.path.abspath(curPath() + '/../' + key))
         run_cmd(link_cmd(os.path.abspath(curPath() + '/../' + key), value), error_log)
 
-config_link(link_file)
 
+config_link(link_file)
 
 error_log.close()
 if delBlankFile(error_log_file):
     welcomePrint('Create link success!')
 else:
     welcomePrint('Some soft link be created failed!')
-
-
-

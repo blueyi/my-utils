@@ -19,7 +19,7 @@ if os.geteuid == 0:
     sys.exit(1)
 
 call_cmd('sudo python common/installPack.py')
-call_cmd('python common/createSoft.py')
+call_cmd('python common/createSoftLink.py')
 call_cmd('python common/misc.py')
 call_cmd('python common/vimPlugin.py')
 
