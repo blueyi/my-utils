@@ -26,7 +26,7 @@ print(error_log_file)
 error_log = open(error_log_file, 'w')
 
 # install pip
-pip_install_cmd = 'sudo apt-get install python-pip'
+pip_install_cmd = 'sudo apt-get install -y python-pip'
 run_cmd(pip_install_cmd, error_log)
 
 # install shadowsocks
