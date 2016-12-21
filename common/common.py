@@ -117,4 +117,15 @@ def is_list_in_str(tlist, tstr):
             return True
     return False
 
+# get key, value of dict from file, # as the comment
+def getKeyValue(file_name):
+    arg_dict = {}
+    with open(file_name, 'r') as text:
+        for tline in text:
+            if len(tline.strip()) != 0 and tline[0] != '#':
+                tlink = tline.strip().split('#')[0].split()
+                if len(tlink) > 1:
+                    arg_dict[tlink[0]] = tlink[1]
+    return arg_dict
+
 

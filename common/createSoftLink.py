@@ -33,7 +33,7 @@ def config_link(file_path):
         if os.path.isfile(value):
             run_cmd('mv ' + value + ' ' + value + '_' + curTimeStr() + '.bak', error_log)
         print(value + ' -> ' + key)
-        run_cmd(link_cmd(curPath() + '/../' + key, value), error_log)
+        run_cmd(link_cmd(os.path.abspath(curPath() + '/../' + key), value), error_log)
 
 config_link(link_file)
 
