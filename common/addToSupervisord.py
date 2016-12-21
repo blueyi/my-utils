@@ -62,9 +62,9 @@ def addToSupervisord(cmdName, cmd) :
 
     configFileOpened.write(config_content)
     configFileOpened.close()
-    run_cmd('systemctl enable supervisor', error_log)
-    run_cmd('systemctl start supervisor', error_log)
-    run_cmd('supervisorctl reload', error_log)
+    run_cmd('systemctl enable supervisor', error_log, goOnRun=False)
+    run_cmd('systemctl start supervisor', error_log, goOnRun=False)
+    run_cmd('supervisorctl reload', error_log, goOnRun=False)
 
 addToSupervisord(cmdName, cmd)
 

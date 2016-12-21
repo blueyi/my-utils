@@ -27,17 +27,22 @@ error_log = open(error_log_file, 'w')
 
 # install pip
 pip_install_cmd = 'sudo apt-get install -y python-pip'
-run_cmd(pip_install_cmd, error_log)
+run_cmd(pip_install_cmd, error_log, goOnRun=False)
 
 # install shadowsocks
 install_ssserver_cmd = 'sudo pip install shadowsocks'
-run_cmd(install_ssserver_cmd, error_log)
+run_cmd(install_ssserver_cmd, error_log, goOnRun=False)
+
+
+# install supervisor
+install_ssserver_cmd = 'sudo apt-get install -y supervisor'
+run_cmd(install_ssserver_cmd, error_log, goOnRun=False)
 
 # add to supervisord
 cmd = 'ssserver -p ' + str(port) + ' -k ' + passwd + ' -m ' + pass_method
 cmdName = 'ssserver'
 ats_cmd = 'sudo python addToSupervisord.py ' + cmdName + ' ' + '"' + cmd + '"'
-run_cmd(ats_cmd, error_log)
+run_cmd(ats_cmd, error_log, goOnRun=False)
 
 error_log.close()
 if delBlankFile(error_log_file):
