@@ -48,10 +48,10 @@ def errLogFileName(file):
     return file_str.replace('.', '_') + '_' + curTimeStr() + '.log'
 
 # run an shell command in subprocess
-def run_cmd(tcall_cmd, errOpened, goOnRun = True, isOutPut = True, isReturnCode = False):
+def run_cmd_reout(tcall_cmd, errOpened, goOnRun = True, isOutPut = True, isReturnCode = False):
     p = subprocess.Popen(tcall_cmd, shell=True, stdout=subprocess.PIPE, executable='/bin/bash')
     toutput = p.communicate()[0]
-    if p.returncode != 0:
+    if p.returncode != 0 and ('grep' not in tcall_cmd):
         printToFile(tcall_cmd, errOpened)
         if not goOnRun :
             sys.exit(1)
@@ -62,19 +62,13 @@ def run_cmd(tcall_cmd, errOpened, goOnRun = True, isOutPut = True, isReturnCode 
     else :
         return toutput
 
-def run_cmd(tcall_cmd, goOnRun = True, isOutPut = True, isReturnCode = False):
-    p = subprocess.Popen(tcall_cmd, shell=True, stdout=subprocess.PIPE, executable='/bin/bash')
-    toutput = p.communicate()[0]
-    if p.returncode != 0:
-        print(tcall_cmd)
+def run_cmd(tcall_cmd, errOpened, goOnRun = True):
+    return_code = subprocess.call(tcall_cmd, shell=True)
+    if p.returncode != 0 and ('grep' not in tcall_cmd):
+        printToFile(tcall_cmd, errOpened)
         if not goOnRun :
             sys.exit(1)
-    if isOutPut :
-        print(toutput)
-    if isReturnCode :
-        return p.returncode
-    else :
-        return toutput
+    return return_code
 
 # delete itselft
 def delSelf():
