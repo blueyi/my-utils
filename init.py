@@ -1,0 +1,22 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+#
+# Copyright © 2016 blueyi <blueyi@ubuntu>
+#
+# Distributed under terms of the MIT license.
+
+"""
+Execute script from common to initial linux system
+"""
+
+import sys
+sys.path.append('common')
+from common import *
+
+call_cmd('sudo python common/installPack.py')
+call_cmd('python common/createSoft.py')
+call_cmd('python common/misc.py')
+call_cmd('python common/vimPlugin.py')
+
+
