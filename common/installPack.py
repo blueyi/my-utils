@@ -53,7 +53,7 @@ def package_query_cmd(soft):
     return package_query_str
 
 def depend_install(soft):
-    toutput = run_cmd_reout(package_query_cmd(soft))
+    toutput = run_cmd_reout(package_query_cmd(soft), error_log)
     if soft in toutput.__str__():
         print(soft + ' -- You have installed!')
         return
