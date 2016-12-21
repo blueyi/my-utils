@@ -41,7 +41,7 @@ def gitClone(turl, tdir):
         git_cmd = 'git clone ' + turl + ' ' + tdir
         run_cmd(git_cmd, error_log)
     else:
-        print('git clone error, destionation has existed')
+        print('git clone error, destination has existed: ' + tdir)
 
 
 # vim config
@@ -85,6 +85,6 @@ welcomePrint(str(plugin_list))
 
 error_log.close()
 if delBlankFile(error_log_file):
-    welcomePrint('vim plugin install success!\n Total:' + str(len(plugin_list)))
+    welcomePrint('vim plugin install success! Total:' + str(len(plugin_list)))
 else:
-    welcomePrint('some vim plugin install failed!\n Total:' + str(len(plugin_list)))
+    welcomePrint('some vim plugin install failed! Total:' + str(len(plugin_list)))
