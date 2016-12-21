@@ -58,7 +58,7 @@ welcomePrint(str(plugin_list))
 # install vim plugin 
 for plugin in plugin_list:
     plu_url = 'https://github.com/' + plugin
-    plu_dir = '~/.vim/bundle/'
+    plu_dir = userPath() + '/.vim/bundle/'
     if plugin[len(plugin) - 4 : ] == '.git':
         plu_dir = plu_dir + plugin[plugin.rfind('/') + 1 : len(plugin) - 4]
     else:
