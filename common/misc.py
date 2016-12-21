@@ -31,5 +31,5 @@ error_log.close()
 if delBlankFile(error_log_file):
     welcomePrint('misc.cmd config success!')
 else:
-    welcomePrint('misc.cmd config failed!')
+    welcomePrint('some misc.cmd config failed!')
 
