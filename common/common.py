@@ -72,8 +72,8 @@ def run_cmd(tcall_cmd, errOpened, goOnRun = True):
             sys.exit(1)
     return return_code
 
-# just run shell command
-def run_cmd(tcall_cmd, goOnRun = True):
+# just run shell command，No error log
+def call_cmd(tcall_cmd, goOnRun = True):
     return_code = subprocess.call(tcall_cmd, shell=True)
     if return_code != 0 and ('grep' not in tcall_cmd):
         print(tcall_cmd)
@@ -83,7 +83,7 @@ def run_cmd(tcall_cmd, goOnRun = True):
 
 # delete itselft
 def delSelf():
-    run_cmd('rm -f ' + sys.argv[0])
+    call_cmd('rm -f ' + sys.argv[0])
 
 # if no error log, then delete error log file
 def delBlankFile(error_log_file):
@@ -94,7 +94,7 @@ def delBlankFile(error_log_file):
                 no_error = False
                 break
     if no_error:
-        run_cmd('rm -f ' + error_log_file)
+        call_cmd('rm -f ' + error_log_file)
         return True
     return False
 

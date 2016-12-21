@@ -37,6 +37,8 @@ run_cmd(install_ssserver_cmd, error_log, goOnRun=False)
 # install supervisor
 install_ssserver_cmd = 'sudo apt-get install -y supervisor'
 run_cmd(install_ssserver_cmd, error_log, goOnRun=False)
+run_cmd('systemctl enable supervisor', error_log, goOnRun=False)
+run_cmd('systemctl start supervisor', error_log, goOnRun=False)
 
 # add to supervisord
 cmd = 'ssserver -p ' + str(port) + ' -k ' + passwd + ' -m ' + pass_method
