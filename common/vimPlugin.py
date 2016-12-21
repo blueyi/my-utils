@@ -53,7 +53,7 @@ if not os.path.exists(userPath() + '/.vimbak'):
 if not os.path.exists(userPath() + '/.vim/bundle'):
     run_cmd('mkdir -p ~/.vim/bundle', error_log)
 
-welcomePrint(plugin_list)
+welcomePrint(str(plugin_list))
 
 # install vim plugin 
 for plugin in plugin_list:
@@ -81,7 +81,7 @@ def installYCM():
 if isInstallYCM:
     installYCM()
 
-welcomePrint(plugin_list)
+welcomePrint(str(plugin_list))
 
 error_log.close()
 if delBlankFile(error_log_file):
