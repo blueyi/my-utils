@@ -58,7 +58,7 @@ def depend_install(soft):
         print(soft + ' -- You have installed!')
         return
     print('---Installing ' + soft + ' ---')
-    run_cmd(install_cmd, soft + ' -y', error_log)
+    run_cmd(install_cmd + ' ' +  soft + ' -y', error_log)
 
 depend_install('vim')
 
