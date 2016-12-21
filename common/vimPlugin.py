@@ -19,7 +19,7 @@ isInstallYCM = True
 error_log_file = errLogFileName(__file__)
 error_log = open(error_log_file, 'w')
 
-vimrc = curPath() + '/../' + 'config/_vimrc'
+vimrc = os.path.abspath(curPath() + '/../' + 'config/_vimrc')
 plugin_list = []
 
 if isInstallYCM:
