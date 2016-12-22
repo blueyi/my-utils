@@ -1,3 +1,4 @@
 *.log
 *.pyc
 common/*.pyc
+common/.ropeproject
