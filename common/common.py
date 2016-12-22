@@ -119,12 +119,12 @@ def is_list_in_str(tlist, tstr):
 
 # get key, value of dict from file, # as the comment
 # file content must be key = value
-def getKeyValue(file_name):
+def getKeyValue(file_name, sep='='):
     arg_dict = {}
     with open(file_name, 'r') as text:
         for tline in text:
             if len(tline.strip()) != 0 and tline[0] != '#':
-                tlink = tline.strip().split('#')[0].split('=')
+                tlink = tline.strip().split('#')[0].split(sep)
                 if len(tlink) > 1:
                     arg_dict[tlink[0].strip()] = tlink[1].strip()
     return arg_dict
