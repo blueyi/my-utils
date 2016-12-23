@@ -1,1 +1,2 @@
-https://developer.android.com/studio
+# https://developer.android.com/studio
+https://www.johnlamp.net/    # cmake tutorial
