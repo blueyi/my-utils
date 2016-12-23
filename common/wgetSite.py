@@ -10,22 +10,26 @@ from common import *
 
 """
 make a mirror site from url
-wget --no-check-certificate -r -p -np -k   https://developer.android.com/studio/intro/ -e use_proxy=yes -e https_proxy=127.0.0.1:1081
+http://www.labnol.org/software/wget-command-examples/28750/
 """
 
 
 https = True
 proxy = False
 proxy_site = '127.0.0.1:1081'
-url_file = 'url.txt'
+url_file = curPath() + '/url.txt'
 down_dir = '~/Downloads/cmake_tutorial'
-
-error_log_file = errLogFileName(__file__)
-error_log = open(error_log_file, 'w')
 
 welcomePrint('Make a mirror site by wget, powered by blueyi')
 
-wget_cmd = 'wget -r -p -np -k '
+wget_cmd = 'wget --mirror --page-requisites --adjust-extension --convert-links --execute robots=off --continue --no-parent '
+# --mirror: turn on recursion to get whole site, equivalent -r -N -l inf --no-remove-listing
+# --page-requisites: download all prerequisties(supporting media, css etc..)
+# --adjust-extension: adds proper extension to downloaded files
+# --convert-links: convert links for offline viewing
+# --execute robots=off: ignore site robots.txt to force downloaded
+# --wait=30: be gentle, wait between fetch requests
+# --user-agent=Mozilla: fake the user Agent
 
 if https :
     wget_cmd = wget_cmd + ' --no-check-certificate '
@@ -41,12 +45,7 @@ with open(url_file, 'r') as text:
         if len(tline.strip()) != 0 and tline.strip()[0] != '#' and 'http' in tline:
             tline = tline.strip().split('#')[0]
             welcomePrint('Downloading ' + tline)
-            run_cmd(wget_cmd + tline, error_log)
+            call_cmd(wget_cmd + tline)
 
 
-error_log.close()
-if delBlankFile(error_log_file):
-    welcomePrint('All site download success!')
-else:
-    welcomePrint('Some site download failed!')
-
+welcomePrint('All site download success!')
