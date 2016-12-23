@@ -69,7 +69,9 @@ def run_cmd(tcall_cmd, errOpened, goOnRun = True):
     if return_code != 0 and ('grep' not in tcall_cmd):
         printToFile(tcall_cmd, errOpened)
         if not goOnRun :
-            sys.exit(1)
+            sys.exit(-1)
+    if return_code != 0:
+        return -1
     return return_code
 
 # just run shell command，No error log
