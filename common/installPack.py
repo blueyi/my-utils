@@ -52,17 +52,19 @@ def package_query_cmd(soft):
         package_query_str = "rpm -qa | grep '\\b" + soft + "'"
     return package_query_str
 
+
 def depend_install(soft):
     toutput = run_cmd_reout(package_query_cmd(soft), error_log)
     if soft in toutput.__str__():
         print(soft + ' -- You have installed!')
-        return
+        return 1
     print('---Installing ' + soft + ' ---')
-    run_cmd(install_cmd + ' ' +  soft + ' -y', error_log)
+    return run_cmd(install_cmd + ' ' +  soft + ' -y', error_log)
 
-depend_install('vim')
 
 soft_list = []
+old_installed_list = []
+failed_list = []
 with open(soft_list_file, 'r') as text:
     for tline in text:
         if tline[0] != '#' and len(tline.strip()) != 0:
@@ -71,12 +73,14 @@ with open(soft_list_file, 'r') as text:
 welcomePrint('You have ' + len(soft_list).__str__()  + ' softwares need to be installed')
 
 for app in soft_list:
-    depend_install(app)
+    dep_code = depend_install(app)
+    if dep_code == 1:
+        old_installed_list.append(app)
+    elif dep_code == -1:
+        failed_list.append(app)
 
 error_log.close()
 if delBlankFile(error_log_file):
-    welcomePrint('All package Install Success!')
+    welcomePrint('All package Install Success!\n   ' + str(len(old_installed_list)) + '/' + str(len(soft_list)) + ' packages already have been installed')
 else:
-    welcomePrint('Some package Install Failed!')
-
-
+    welcomePrint('Some package Install Failed!\n   ' + 'Install Failed:' + str(failed_list))
