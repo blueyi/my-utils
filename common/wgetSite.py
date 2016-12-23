@@ -15,10 +15,10 @@ wget --no-check-certificate -r -p -np -k   https://developer.android.com/studio/
 
 
 https = True
-proxy = True;
-proxy = '127.0.0.1:1081'
+proxy = False
+proxy_site = '127.0.0.1:1081'
 url_file = 'url.txt'
-down_dir = 'F:\\Download'
+down_dir = '~/Downloads/cmake_tutorial'
 
 error_log_file = errLogFileName(__file__)
 error_log = open(error_log_file, 'w')
@@ -31,19 +31,22 @@ if https :
     wget_cmd = wget_cmd + ' --no-check-certificate '
 
 if proxy :
-    wget_cmd = wget_cmd + ' -e use_proxy=yes -e https_proxy=' + proxy + ' '
+    wget_cmd = wget_cmd + ' -e use_proxy=yes -e https_proxy=' + proxy_site + ' '
 
 if len(down_dir) != 0 :
     wget_cmd = wget_cmd + ' -P ' + down_dir + ' '
 
 with open(url_file, 'r') as text:
     for tline in text:
-        if len(tline.strip()) !=0 and 'http' in tline:
-            tline = tline.strip()
+        if len(tline.strip()) != 0 and tline.strip()[0] != '#' and 'http' in tline:
+            tline = tline.strip().split('#')[0]
             welcomePrint('Downloading ' + tline)
             run_cmd(wget_cmd + tline, error_log)
 
 
 error_log.close()
-delBlankFile(error_log_file)
+if delBlankFile(error_log_file):
+    welcomePrint('All site download success!')
+else:
+    welcomePrint('Some site download failed!')
 

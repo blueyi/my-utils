@@ -20,7 +20,7 @@ error_log = open(error_log_file, 'w')
 welcomePrint('misc.cmd')
 with open(misc_cmd_file, 'r') as text:
     for tline in text:
-        if len(tline.strip()) != 0 and tline[0] != '#':
+        if len(tline.strip()) != 0 and tline.strip()[0] != '#':
             if '~/' in tline:
                 tline = tline.replace('~', userPath())
             tcmd = tline.strip().split('#')[0]
