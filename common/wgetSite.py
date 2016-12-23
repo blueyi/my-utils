@@ -19,10 +19,13 @@ proxy = False
 proxy_site = '127.0.0.1:1081'
 url_file = curPath() + '/url.txt'
 down_dir = '~/Downloads/cmake_tutorial'
+exclude_directories = '/_sources'
 
 welcomePrint('Make a mirror site by wget, powered by blueyi')
 
-wget_cmd = 'wget --mirror --page-requisites --adjust-extension --convert-links --execute robots=off --continue --no-parent '
+wget_cmd = 'wget --mirror --page-requisites --adjust-extension ' + \
+    '--convert-links --execute robots=off --continue --no-parent ' + \
+    '--exclude-directories ' + exclude_directories + ' '
 # --mirror: turn on recursion to get whole site, equivalent -r -N -l inf --no-remove-listing
 # --page-requisites: download all prerequisties(supporting media, css etc..)
 # --adjust-extension: adds proper extension to downloaded files
