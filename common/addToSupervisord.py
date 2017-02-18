@@ -18,6 +18,7 @@ runAsRoot()
 
 cmdName = ''
 cmd = ''
+cmd = cmd + ' > /dev/null 2>&1 & '
 
 if len(sys.argv) >= 3:
     cmdName = sys.argv[1]
