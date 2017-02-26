@@ -17,7 +17,7 @@ runAsRoot()
 
 welcomePrint('Installing shadowsocks python server')
 
-port = 10320
+port = 8320
 passwd = 'blueyiniu'
 pass_method = 'aes-128-cfb'
 
