@@ -12,7 +12,7 @@ call ntfsfix to fix ntfs partion
 
 from common import runAsRoot, call_cmd, welcomePrint
 
-runAsRoot()
+# runAsRoot()
 
 sd_list = ['sda5', 'sda6', 'sda7']
 
