@@ -127,7 +127,7 @@ export JRE_HOME
 export CLASSPATH
 export PATH
 
-
+#nvm
 export NVM_DIR="/home/blueyi/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
@@ -135,3 +135,7 @@ export NVM_DIR="/home/blueyi/.nvm"
 export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
 export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
+# my bin
+MY_BIN=~/my-utils/common
+PATH=$PATH:$MY_BIN
+export PATH
