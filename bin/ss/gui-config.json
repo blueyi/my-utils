@@ -1,0 +1,117 @@
+{
+  "configs": [
+    {
+      "server": "104.236.152.45",
+      "server_port": 10320,
+      "password": "1blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "dg-ss-ubuntu",
+      "auth": false
+    },
+    {
+      "server": "45.78.21.210",
+      "server_port": 10320,
+      "password": "1blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "",
+      "auth": false
+    },
+    {
+      "server": "45.78.47.242",
+      "server_port": 10320,
+      "password": "1blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "",
+      "auth": false
+    },
+    {
+      "server": "104.238.222.123",
+      "server_port": 10320,
+      "password": "1blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "",
+      "auth": false
+    },
+    {
+      "server": "198.199.109.221",
+      "server_port": 10320,
+      "password": "1blueyiniu",
+      "method": "aes-256-cfb",
+      "remarks": "ss.getworld.in",
+      "auth": false
+    },
+    {
+      "server": "202.118.75.93",
+      "server_port": 10321,
+      "password": "blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "",
+      "auth": false
+    },
+    {
+      "server": "192.168.1.102",
+      "server_port": 10323,
+      "password": "blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "",
+      "auth": false
+    },
+    {
+      "server": "n.getworld.in",
+      "server_port": 8320,
+      "password": "blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "ngrok",
+      "auth": false
+    },
+    {
+      "server": "202.118.75.93",
+      "server_port": 8320,
+      "password": "blueyiniu",
+      "method": "aes-128-cfb",
+      "remarks": "kkyy",
+      "auth": false
+    }
+  ],
+  "strategy": null,
+  "index": 0,
+  "global": true,
+  "enabled": false,
+  "shareOverLan": false,
+  "isDefault": false,
+  "localPort": 1081,
+  "pacUrl": "https://github.com/gfwlist/gfwlist/raw/master/gfwlist.txt",
+  "useOnlinePac": false,
+  "availabilityStatistics": false,
+  "autoCheckUpdate": false,
+  "isVerboseLogging": false,
+  "logViewer": {
+    "fontName": "Consolas",
+    "fontSize": 8.25,
+    "bgColor": "Black",
+    "textColor": "White",
+    "topMost": false,
+    "wrapText": false,
+    "toolbarShown": true,
+    "width": 600,
+    "height": 400,
+    "top": 460,
+    "left": 840,
+    "maximized": false
+  },
+  "proxy": {
+    "useProxy": false,
+    "proxyType": 0,
+    "proxyServer": "",
+    "proxyPort": 0
+  },
+  "hotkey": {
+    "SwitchSystemProxy": "",
+    "ChangeToPac": "",
+    "ChangeToGlobal": "",
+    "SwitchAllowLan": "",
+    "ShowLogs": "",
+    "ServerMoveUp": "",
+    "ServerMoveDown": ""
+  }
+}
