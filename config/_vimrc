@@ -563,7 +563,7 @@ Plugin 'VundleVim/Vundle.vim'
             if g:iswindows
                 exe ":!%<.exe"
             else
-                exe ":!%<.o"
+                exe ":!./%<.o"
             endif
         endif
     endfunc
@@ -580,7 +580,7 @@ Plugin 'VundleVim/Vundle.vim'
             if g:iswindows
                 exe ":!%<.exe"
             else
-                exe ":!%<.o"
+                exe ":!./%<.o"
             endif
         endif
     endfunc
