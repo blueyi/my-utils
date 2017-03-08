@@ -104,6 +104,6 @@ welcomePrint(str(plugin_list))
 
 error_log.close()
 if delBlankFile(error_log_file):
-    welcomePrint('vim plugin install success!\n   ' + str(len(old_plugin)) + '/' + str(len(plugin_list)) + ' already have been installed!')
+    welcomePrint('vim plugin install success!\n   ' + str(len(plugin_list) - len(old_plugin) - len(failed_plugin)) + '/' + str(len(plugin_list)) + ' already have been installed!')
 else:
     welcomePrint('some vim plugin install failed!\n   Failed:' + str(failed_plugin))
