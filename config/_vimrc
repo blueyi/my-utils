@@ -389,7 +389,7 @@ Plugin 'VundleVim/Vundle.vim'
     set noautowriteall  "这样退出时会提示保存
     set autoread        "当文件在外部被修改，自动更新该文件
     set backspace=indent,eol,start      " 设置退格键在插入模式下可作用于这三处
-    "set clipboard=unnamed   "所有的复制操作都会覆盖"*寄存器，该处存放外部粘贴板内容
+    set clipboard=unnamed   "所有的复制操作都会覆盖"*寄存器，该处存放外部粘贴板内容
     set hidden          "允许不保存buffer而切换buffer，此时buffer被暂存在内存中
     set mousemodel=popup    "设置GUI下鼠标右键显示菜单
     set history=100        "历史记录条数
@@ -557,7 +557,7 @@ Plugin 'VundleVim/Vundle.vim'
         if g:iswindows
             exe ':!nvcc --ptxas-options=-v % -I "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\inc" -o %<.exe'
         else
-            exe ':!nvcc --ptxas-options=-v % -I "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\inc" -o %<.o'
+            exe ':!nvcc --ptxas-options=-v % -I "/usr/local/cuda-8.0/samples/common/inc" -o %<.o'
         endif
         if v:shell_error == 0
             if g:iswindows
@@ -574,7 +574,7 @@ Plugin 'VundleVim/Vundle.vim'
         if g:iswindows
             exe ':!nvcc --ptxas-options=-v % -o %<.exe'
         else
-            exe ':!nvcc --ptxas-options=-v % -o %<.o'
+            exe ':!nvcc --ptxas-options=-v % -I "/usr/local/cuda-8.0/samples/common/inc" -o %<.o'
         endif
         if v:shell_error == 0
             if g:iswindows
