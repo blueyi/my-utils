@@ -6,8 +6,8 @@
 # git config --global user.email "blueyiniu@qq.com"
 
 # fonts
-git clone https://github.com/blueyi/myfonts.git ~/.fonts
-sudo fc-cache -f -v
+# git clone https://github.com/blueyi/myfonts.git ~/.fonts
+# sudo fc-cache -f -v
 
 # some useful ppa
 # sudo add-apt-repository -y ppa:wiznote-team/ppa   # wiznote client for ubuntu

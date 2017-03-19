@@ -181,8 +181,9 @@ Plugin 'VundleVim/Vundle.vim'
 
     " Auto complete
     if g:islinux
-       Plugin 'Valloric/YouCompleteMe.git'
+       "Plugin 'Valloric/YouCompleteMe.git'
 "       Plugin 'rdnetto/YCM-Generator.git'
+        Plugin 'Shougo/neocomplete.vim.git'
     else
        Plugin 'blueyi/YouCompleteMe.git'
 
