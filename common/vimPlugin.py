@@ -14,8 +14,9 @@ from common import *
 
 welcomePrint('Installing vim Plugin')
 
-# isInstallYCM = False
-isInstallYCM = True
+isInstallYCM = False
+if len(sys.argv) > 1 and sys.argv[1] == '-ycm':
+    isInstallYCM = True
 
 error_log_file = errLogFileName(__file__)
 error_log = open(error_log_file, 'w')
