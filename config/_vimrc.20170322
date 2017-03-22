@@ -3,7 +3,7 @@
 " =============================================================================
 " 推荐使用这个编译版本https://tuxproject.de/projects/vim/，这个版本对lua等支持都有，或者官方版本，官网版本暂时发现不支持lua，很多插件需要vim
 " 对lua的支持，例如neocomplete
-" 该配置文件在：https://github.com/blueyi/my-utils/blob/master/config/_vimrc
+" 默认下载的vim或者vim绿色版本可以需要的文件在https://github.com/blueyi/vim_misc.git
 "
 " 1.建立自动备份文件夹"~/.vimbak"，不管是win还是linux都创建在个人用户下。vim自动
 " 生成的后缀为"~"和"un~"的备份文件和undo文件、swap文件、tags文件等将统一存放在该文件夹
@@ -379,7 +379,7 @@ Plugin 'VundleVim/Vundle.vim'
     set incsearch       "输入字符串就显示匹配点
     set ignorecase      "搜索模式里忽略大小写
     set smartcase       "如果搜索模式包含大写字符，不使用 'ignorecase' 选项。只有在输入搜索模式并且打开 'ignorecase' 选项时才会使用。
-    " set mouse=a         "在任何模式下启用鼠标
+    set mouse=a         "在任何模式下启用鼠标
     set scrolloff=4     "当光标位于屏幕最上或最下面时保持其上面或下面有可见的4行
     set sidescroll=5    "保持左右至少有5列
 
@@ -389,7 +389,7 @@ Plugin 'VundleVim/Vundle.vim'
     set noautowriteall  "这样退出时会提示保存
     set autoread        "当文件在外部被修改，自动更新该文件
     set backspace=indent,eol,start      " 设置退格键在插入模式下可作用于这三处
-    " set clipboard=unnamed   "所有的复制操作都会覆盖"*寄存器，该处存放外部粘贴板内容
+    set clipboard=unnamed   "所有的复制操作都会覆盖"*寄存器，该处存放外部粘贴板内容
     set hidden          "允许不保存buffer而切换buffer，此时buffer被暂存在内存中
     set mousemodel=popup    "设置GUI下鼠标右键显示菜单
     set history=100        "历史记录条数
@@ -517,30 +517,15 @@ Plugin 'VundleVim/Vundle.vim'
     "F4调用Gundo插件
     nnoremap <F4> :GundoToggle<CR>
 
-    "-- compile single program --
-    autocmd filetype c nnoremap <F9> :call Run_c() <CR>
-    autocmd filetype c imap <F9> <ESC> :call Run_c() <CR>
-
-    autocmd filetype cpp nnoremap <F9> :call Run_cpp() <CR>
-    autocmd filetype cpp imap <F9> <ESC> :call Run_cpp() <CR>
-
-    autocmd filetype python nnoremap <F9> :call Run_py() <CR>
-    autocmd filetype python imap <F9> <ESC> :call Run_py() <CR>
-
-    autocmd filetype ruby nnoremap <F9> :call Run_ruby() <CR>
-    autocmd filetype ruby imap <F9> <ESC> :call Run_ruby() <CR>
-
-    autocmd filetype java nnoremap <F9> :call Run_java() <CR>
-    autocmd filetype java imap <F9> <ESC> :call Run_java() <CR>
-
-    autocmd filetype cuda nnoremap <F9> :call Run_cuda() <CR>
-    autocmd filetype cuda imap <F9> <ESC> :call Run_cuda() <CR>
-
-    autocmd filetype cs nnoremap <F9> :call Run_cs() <CR>
-    autocmd filetype cs imap <F9> <ESC> :call Run_cs() <CR>
+    "-- For C# development setting --
+    " F5 compile cs file
+    map <F5> :!csc % <CR>
+    imap <F5> <ESC>!csc % <CR>
 
     "-- For java development setting --
-    func! Run_java()
+    map <F7> :call RunJava() <CR>
+    imap <F7> <ESC> :call RunJava() <CR>
+    func! RunJava()
         exe ":ccl"
         exe ":update"
         if g:iswindows
@@ -557,9 +542,16 @@ Plugin 'VundleVim/Vundle.vim'
         endif
     endfunc
 
+
     "-- For CUDA development setting --
-    " compile, link and execute .cu file with Samples header file
-    func! Run_cuda()
+    " Ctrl + F8 compile, link and execute .cu file with Samples header file
+    map <C-F8> :call Nvcc_S() <CR>
+    imap <C-F8> <ESC> :call Nvcc_S() <CR>
+    " F8 compile, link and execute .cu file without Samples header file
+    map <F8> :call Nvcc() <CR>
+    imap <F8> <ESC> :call Nvcc() <CR>
+    "将CUDA Samples中的头文件加入编译路径
+    func! Nvcc_S()
         exe ":ccl"
         exe ":update"
         if g:iswindows
@@ -576,8 +568,28 @@ Plugin 'VundleVim/Vundle.vim'
         endif
     endfunc
 
+    func! Nvcc()
+        exe ":ccl"
+        exe ":update"
+        if g:iswindows
+            exe ':!nvcc --ptxas-options=-v % -o %<.exe'
+        else
+            exe ':!nvcc --ptxas-options=-v % -I "/usr/local/cuda-8.0/samples/common/inc" -o %<.o'
+        endif
+        if v:shell_error == 0
+            if g:iswindows
+                exe ":!%<.exe"
+            else
+                exe ":!./%<.o"
+            endif
+        endif
+    endfunc
+
     "-- For python development setting --
-    func! Run_py()
+    " F9 run python
+    map <F9> :call Py_run() <CR>
+    imap <F9> <ESC> :call Py_run() <CR>
+    func! Py_run()
         exe ":ccl"
         exe ":update"
         exe ":!python %"
@@ -599,56 +611,185 @@ Plugin 'VundleVim/Vundle.vim'
                 \ set shiftwidth=2 |
     let python_highlight_all = 1
 
-    "-- For ruby development setting --
-    func! Run_ruby()
-        exe ":ccl"
-        exe ":update"
-        exe ":!ruby -w %"
-    endfunc
-    
-    "autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
-    "autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
-    "autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
 
     "--For C/C++ setting--
-    func! Run_c()
+    " F10 一键保存、编译、连接存并运行
+    map <F10> :call Run()<CR>
+    imap <F10> <ESC>:call Run()<CR>
+
+    " Ctrl + F9 一键保存并编译
+    map <c-F9> :call Compile()<CR>
+    imap <c-F9> <ESC>:call Compile()<CR>
+
+    " Ctrl + F10 一键保存并连接
+    map <c-F10> :call Link()<CR>
+    imap <c-F10> <ESC>:call Link()<CR>
+
+    let s:LastShellReturn_C = 0
+    let s:LastShellReturn_L = 0
+    let s:ShowWarning = 1
+    let s:Obj_Extension = '.o'
+    let s:Head_Extension = '.h'
+    let s:Exe_Extension = '.exe'
+    let s:Sou_Error = 0
+
+    let s:windows_CFlags = 'gcc\ -fexec-charset=gbk\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o'
+    let s:linux_CFlags = 'gcc\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o'
+
+    let s:windows_CPPFlags = 'g++\ -fexec-charset=gbk\ -Wall\ -std=gnu++11\ -g\ -O0\ -c\ %\ -o\ %<.o'
+    let s:linux_CPPFlags = 'g++\ -Wall\ -std=gnu++11\ -g\ -O0\ -c\ %\ -o\ %<.o'
+
+    func! Compile()
         exe ":ccl"
         exe ":update"
-        if g:iswindows
-            exe ':!gcc -fexec-charset=gbk -Wall -g -O0 % -o %<.exe'
-        else
-            exe ':!gcc -Wall -g -O0 % -o %<.o'
-        endif
-        if v:shell_error == 0
-            if g:iswindows
-                exe ":!%<.exe"
+        let s:Sou_Error = 0
+        let s:LastShellReturn_C = 0
+        let Sou = expand("%:p")
+        let v:statusmsg = ''
+        if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
+            let Obj = expand("%:p:r").s:Obj_Extension
+            let Head = expand("%:p:r").s:Head_Extension
+            let Obj_Name = expand("%:p:t:r").s:Obj_Extension
+            "if !filereadable(Obj) || (filereadable(Obj) && (getftime(Obj) < getftime(Sou)) || (getftime(Obj) < getftime(Head)))
+            if !filereadable(Obj) || (filereadable(Obj))
+                redraw!
+                if expand("%:e") == "c"
+                    if g:iswindows
+                        exe ":setlocal makeprg=".s:windows_CFlags
+                    else
+                        exe ":setlocal makeprg=".s:linux_CFlags
+                    endif
+                    echohl WarningMsg | echo " compiling..."
+                    silent make
+                elseif expand("%:e") == "cpp" || expand("%:e") == "cxx"
+                    if g:iswindows
+                        exe ":setlocal makeprg=".s:windows_CPPFlags
+                    else
+                        exe ":setlocal makeprg=".s:linux_CPPFlags
+                    endif
+                    echohl WarningMsg | echo " compiling..."
+                    silent make
+                endif
+                redraw!
+                if v:shell_error != 0
+                    let s:LastShellReturn_C = v:shell_error
+                endif
+                if g:iswindows
+                    if s:LastShellReturn_C != 0
+                        exe ":bo cope"
+                        echohl WarningMsg | echo " compilation failed"
+                    else
+                        if s:ShowWarning
+                            exe ":bo cw"
+                        endif
+                        echohl WarningMsg | echo " compilation successful"
+                    endif
+                else
+                    if empty(v:statusmsg)
+                        echohl WarningMsg | echo " compilation successful"
+                    else
+                        exe ":bo cope"
+                    endif
+                endif
             else
-                exe ":!./%<.o"
+                echohl WarningMsg | echo ""Obj_Name"is up to date"
             endif
+        else
+            let s:Sou_Error = 1
+            echohl WarningMsg | echo " please choose the correct source file"
         endif
+        exe ":setlocal makeprg=make"
     endfunc
-    func! Run_cpp()
-        exe ":ccl"
-        exe ":update"
-        if g:iswindows
-            exe ':!g++ -fexec-charset=gbk -Wall -std=gnu++11 -g -O0 % -o %<.exe'
-        else
-            exe ':!g++ -Wall -std=gnu++11 -g -O0 % -o %<.o'
+
+    func! Link()
+        call Compile()
+        if s:Sou_Error || s:LastShellReturn_C != 0
+            return
         endif
-        if v:shell_error == 0
+        if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
+            let s:LastShellReturn_L = 0
+            let Sou = expand("%:p")
+            let Obj = expand("%:p:r").s:Obj_Extension
             if g:iswindows
-                exe ":!%<.exe"
+                let Exe = expand("%:p:r").s:Exe_Extension
+                let Exe_Name = expand("%:p:t:r").s:Exe_Extension
             else
-                exe ":!./%<.o"
+                let Exe = expand("%:p:r")
+                let Exe_Name = expand("%:p:t:r")
             endif
+            let v:statusmsg = ''
+            if filereadable(Obj) && (getftime(Obj) >= getftime(Sou))
+                redraw!
+                if !executable(Exe) || (executable(Exe) && getftime(Exe) < getftime(Obj))
+                    if expand("%:e") == "c"
+                        setlocal makeprg=gcc\ -o\ %<\ %<.o
+                        echohl WarningMsg | echo " linking..."
+                        silent make
+                    elseif expand("%:e") == "cpp" || expand("%:e") == "cxx"
+                        setlocal makeprg=g++\ -o\ %<\ %<.o
+                        echohl WarningMsg | echo " linking..."
+                        silent make
+                    endif
+                    redraw!
+                    if v:shell_error != 0
+                        let s:LastShellReturn_L = v:shell_error
+                    endif
+                    if g:iswindows
+                        if s:LastShellReturn_L != 0
+                            exe ":bo cope"
+                            echohl WarningMsg | echo " linking failed"
+                        else
+                            if s:ShowWarning
+                                exe ":bo cw"
+                            endif
+                            echohl WarningMsg | echo " linking successful"
+                        endif
+                    else
+                        if empty(v:statusmsg)
+                            echohl WarningMsg | echo " linking successful"
+                        else
+                            exe ":bo cope"
+                        endif
+                    endif
+                else
+                    echohl WarningMsg | echo ""Exe_Name"is up to date"
+                endif
+            endif
+            setlocal makeprg=make
         endif
     endfunc
 
-    "-- For c# development setting --
-    func! Run_cs()
-        exe ":ccl"
-        exe ":update"
-        exe ":!csc %"
+    func! Run()
+        let s:ShowWarning = 0
+        call Link()
+        let s:ShowWarning = 1
+        if s:Sou_Error || s:LastShellReturn_C != 0 || s:LastShellReturn_L != 0
+            return
+        endif
+        let Sou = expand("%:p")
+        if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
+            let Obj = expand("%:p:r").s:Obj_Extension
+            if g:iswindows
+                let Exe = expand("%:p:r").s:Exe_Extension
+            else
+                let Exe = expand("%:p:r")
+            endif
+            if executable(Exe) && getftime(Exe) >= getftime(Obj) && getftime(Obj) >= getftime(Sou)
+                redraw!
+                echohl WarningMsg | echo " running..."
+                if g:iswindows
+                    exe ":!%<.exe"
+                else
+                    if g:isGUI
+                        exe ":!gnome-terminal -x bash -c './%<; echo; echo 请按 Enter 键继续; read'"
+                    else
+                        exe ":!clear; ./%<"
+                    endif
+                endif
+                redraw!
+                echohl WarningMsg | echo " running finish"
+            endif
+        endif
     endfunc
 
     "使用make编译
