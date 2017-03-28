@@ -850,7 +850,7 @@ Plugin 'VundleVim/Vundle.vim'
     let g:syntastic_cpp_compiler_options = ' -std=c++11'
     "忽略检查的文件
     let g:syntastic_mode_map = {
-             \ "mode": "passive",
+             \ "mode": "active",
              \ "active_filetypes": ["c", "cpp", "py"],
              \ "passive_filetypes": ["java"]}
     "如果使用clang++则需要以下
