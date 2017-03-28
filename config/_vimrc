@@ -251,7 +251,7 @@ Plugin 'VundleVim/Vundle.vim'
     Plugin 'blueyi/a.vim'
 
     "A vim plugin to display the indention levels with thin vertical lines
-    Plugin 'Yggdroot/indentLine'
+    "Plugin 'Yggdroot/indentLine'
 
     "A tree explorer plugin for vim.
     Plugin 'scrooloose/nerdtree'
@@ -823,6 +823,8 @@ Plugin 'VundleVim/Vundle.vim'
 
     "***************
     "--Syntastic configure--
+    "强制使用F5进行语法检查
+    nnoremap <F5> :SyntasticCheck<CR>
     set statusline+=%#warningmsg#
     set statusline+=%{SyntasticStatuslineFlag()}
     set statusline+=%*
@@ -847,10 +849,10 @@ Plugin 'VundleVim/Vundle.vim'
     "默认使用g++
     let g:syntastic_cpp_compiler_options = ' -std=c++11'
     "忽略检查的文件
-    " let g:syntastic_mode_map = {
-    "             \ "mode": "passive",
-    "             \ "active_filetypes": ["c", "cpp", "py"],
-    "             \ "passive_filetypes": ["cu"]}
+    let g:syntastic_mode_map = {
+             \ "mode": "passive",
+             \ "active_filetypes": ["c", "cpp", "py"],
+             \ "passive_filetypes": ["java"]}
     "如果使用clang++则需要以下
     "let g:syntastic_cpp_compiler = 'clang++'
     "let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
