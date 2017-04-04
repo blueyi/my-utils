@@ -382,6 +382,16 @@ Plugin 'VundleVim/Vundle.vim'
     set mouse=a         "在任何模式下启用鼠标
     set scrolloff=4     "当光标位于屏幕最上或最下面时保持其上面或下面有可见的4行
     set sidescroll=5    "保持左右至少有5列
+    " 实现//进行快速搜索通过v选中的内容
+    vnoremap // y/<c-r>"<cr>
+    " 当光标一段时间保持不动了，就禁用高亮
+    autocmd cursorhold * set nohlsearch
+    " 当输入查找命令时，再启用高亮
+    noremap n :set hlsearch<cr>n
+    noremap N :set hlsearch<cr>N
+    noremap / :set hlsearch<cr>/
+    noremap ? :set hlsearch<cr>?
+    noremap * *:set hlsearch<cr>"
 
     "--其他设置--
     "set autowrite      "离开当前编辑文件时，自动把修改内容写入文件（默认在buffer中）
@@ -390,6 +400,12 @@ Plugin 'VundleVim/Vundle.vim'
     set autoread        "当文件在外部被修改，自动更新该文件
     set backspace=indent,eol,start      " 设置退格键在插入模式下可作用于这三处
     " set clipboard=unnamed   "所有的复制操作都会覆盖"*寄存器，该处存放外部粘贴板内容
+    nnoremap <F7> :set invpaste paste?<CR>
+    imap <F7> <C-O>:set invpaste paste?<CR>
+    set pastetoggle=<F7>
+    map <leader>p "*p
+    map <leader>y "*y
+
     set hidden          "允许不保存buffer而切换buffer，此时buffer被暂存在内存中
     set mousemodel=popup    "设置GUI下鼠标右键显示菜单
     set history=100        "历史记录条数
