@@ -486,8 +486,8 @@ Plugin 'VundleVim/Vundle.vim'
     set pastetoggle=<F7>
 
     " 映射系统粘贴板
-    map <leader>p "*p
-    map <leader>y "*y
+    map <leader>p "+p
+    map <leader>y "+y
 
     " 常规模式下输入;cS 清除整个文件行尾空格，会提示确认
     nmap ;cS :%s/\s\+$//gc<CR>:noh<CR>
