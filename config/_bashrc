@@ -136,8 +136,9 @@ export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
 export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 # my bin
-MY_BIN=~/my-utils/common
-PATH=$PATH:$MY_BIN
+MY_BIN=$HOME/my-utils/common
+FFMPEG_BIN=$HOME/bin
+PATH=$PATH:$MY_BIN:$FFMPEG_BIN
 export PATH
 
 # pyenv
