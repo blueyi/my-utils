@@ -12,14 +12,17 @@ from common import *
 install shadowsocks python server
 run by root
 """
-
-runAsRoot()
+# runAsRoot()
 
 welcomePrint('Installing shadowsocks python server')
 
-port = 8320
-passwd = 'blueyiniu'
-pass_method = 'aes-128-cfb'
+pri_conf = '../privacy/conf.ini'
+
+conf = getKeyValue(pri_conf)
+
+port = conf['sss_port']
+passwd = conf['sss_passwd']
+pass_method = conf['sss_pass_method']
 
 error_log_file = errLogFileName(__file__)
 print(error_log_file)
