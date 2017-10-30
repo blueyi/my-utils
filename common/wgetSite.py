@@ -13,12 +13,10 @@ make a mirror site from url
 http://www.labnol.org/software/wget-command-examples/28750/
 """
 
-
-https = True
 proxy = False
 proxy_site = '127.0.0.1:1081'
 url_file = curPath() + '/url.txt'
-down_dir = '~/Downloads/cmake_tutorial'
+down_dir = '~/Downloads'
 exclude_directories = '/_sources'
 
 welcomePrint('Make a mirror site by wget, powered by blueyi')
@@ -34,9 +32,6 @@ wget_cmd = 'wget --mirror --page-requisites --adjust-extension ' + \
 # --wait=30: be gentle, wait between fetch requests
 # --user-agent=Mozilla: fake the user Agent
 
-if https :
-    wget_cmd = wget_cmd + ' --no-check-certificate '
-
 if proxy :
     wget_cmd = wget_cmd + ' -e use_proxy=yes -e https_proxy=' + proxy_site + ' '
 
@@ -47,8 +42,9 @@ with open(url_file, 'r') as text:
     for tline in text:
         if len(tline.strip()) != 0 and tline.strip()[0] != '#' and 'http' in tline:
             tline = tline.strip().split('#')[0]
+            if 'https' == tline[0:5] :
+                wget_cmd = wget_cmd + ' --no-check-certificate '
             welcomePrint('Downloading ' + tline)
             call_cmd(wget_cmd + tline)
-
 
 welcomePrint('All site download success!')
