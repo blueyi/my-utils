@@ -76,7 +76,7 @@ if (g:iswindows && g:isGUI)
 
     set guifont=DejaVu_Sans_Mono:h12
 
-    function MyDiff()
+    function! MyDiff()
         let opt = '-a --binary '
         if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
         if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
