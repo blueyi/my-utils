@@ -132,6 +132,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # cuda
+export CUDA_HOME=/usr/local/cuda-8.0
 export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
 export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
@@ -147,3 +148,17 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
+# http_proxy
+alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
+
+# pip
+export PATH="/home/blueyi/.local/bin:$PATH"
+
+# auto run n times
+function run() {
+    number=$1
+    shift
+    for n in $(seq $number); do
+      $@
+    done
+}
