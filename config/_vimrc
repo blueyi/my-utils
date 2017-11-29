@@ -76,7 +76,7 @@ if (g:iswindows && g:isGUI)
 
     set guifont=DejaVu_Sans_Mono:h12
 
-    function MyDiff()
+    function! MyDiff()
         let opt = '-a --binary '
         if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
         if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
@@ -588,6 +588,9 @@ autocmd filetype cuda imap <F9> <ESC> :call Run_cuda() <CR>
 autocmd filetype cs nnoremap <F9> :call Run_cs() <CR>
 autocmd filetype cs imap <F9> <ESC> :call Run_cs() <CR>
 
+autocmd filetype sh nnoremap <F9> :call Run_sh() <CR>
+autocmd filetype sh imap <F9> <ESC> :call Run_sh() <CR>
+
 "-- For java development setting --
 func! Run_java()
     exe ":ccl"
@@ -631,6 +634,14 @@ func! Run_py()
     exe ":update"
     exe ":!python %"
 endfunc
+
+"-- For shell development setting --
+func! Run_sh()
+    exe ":ccl"
+    exe ":update"
+    exe ":!bash %"
+endfunc
+
 
 "enable python PEP8
 au BufNewFile,BufRead *.py
