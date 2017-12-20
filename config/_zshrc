@@ -1,3 +1,46 @@
+
+# jdk
+JAVA_HOME=/usr/lib/jvm/java-8-oracle
+JRE_HOME=$JAVA_HOME/jre
+CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib
+PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
+
+export JAVA_HOME
+export JRE_HOME
+export CLASSPATH
+export PATH
+
+#nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# cuda
+export CUDA_HOME=/usr/local/cuda-8.0
+export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
+# my bin
+MY_BIN=$HOME/my-utils/common
+FFMPEG_BIN=$HOME/bin
+PATH=$PATH:$MY_BIN:$FFMPEG_BIN
+export PATH
+
+# http_proxy
+alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
+
+# pip
+export PATH="/home/blueyi/.local/bin:$PATH"
+
+# auto run n times
+function run() {
+    number=$1
+    shift
+    for n in $(seq $number); do
+      $@
+    done
+}
+
+
 # Path to your oh-my-zsh installation.
 export ZSH=/home/blueyi/.oh-my-zsh
 
@@ -83,5 +126,10 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export NVM_DIR="/home/blueyi/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+
