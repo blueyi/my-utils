@@ -135,137 +135,164 @@ endif
 " 安装方法为在终端输入如下命令
 " git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
-set nocompatible                                      "禁用 Vi 兼容模式
-filetype off                                          "禁用文件类型侦测
+" set nocompatible                                      "禁用 Vi 兼容模式
+" filetype off                                          "禁用文件类型侦测
+" 
+" if g:islinux
+"     set rtp+=~/.vim/bundle/Vundle.vim
+"     call vundle#begin()
+" else
+"     "vimfiles文件夹与vim处于同一文件夹
+"     set rtp+=$VIM/vimfiles/bundle/Vundle.vim/
+"     let path='$VIM/vimfiles/bundle'
+"     "vimfiles文件夹在用户文件夹
+"     "set rtp+=~/vimfiles/bundle/Vundle.vim/
+"     "let path='~/vimfiles/bundle'
+"     call vundle#begin(path)
+" endif
+
+" -----------------------------------------------------------------------------
+"  < vim-plug 插件管理工具配置 >
+" -----------------------------------------------------------------------------
 
 if g:islinux
-    set rtp+=~/.vim/bundle/Vundle.vim
-    call vundle#begin()
+    if empty(glob('~/.vim/autoload/plug.vim'))
+        silent !curl --insecure -fLo ~/.vim/autoload/plug.vim --create-dirs
+          \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
+    call plug#begin('~/.vim/plugged')
 else
-    "vimfiles文件夹与vim处于同一文件夹
-    set rtp+=$VIM/vimfiles/bundle/Vundle.vim/
-    let path='$VIM/vimfiles/bundle'
-    "vimfiles文件夹在用户文件夹
-    "set rtp+=~/vimfiles/bundle/Vundle.vim/
-    "let path='~/vimfiles/bundle'
-    call vundle#begin(path)
+    md ~\vimfiles\autoload
+    $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    (New-Object Net.WebClient).DownloadFile(
+    $uri,
+    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+        "~\vimfiles\autoload\plug.vim"
+        )
+    )
+    call plug#begin('$VIM/vimfiles/plugged')
 endif
 
 " let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
+" Plugin 'VundleVim/Vundle.vim'
+" 
+
+" vim help for vim-plug
+Plug 'junegunn/vim-plug'
 
 "***************** Vim Plugin ************************
 
+" For Markdown read and write
+Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
+Plug 'junegunn/limelight.vim', { 'for': 'markdown' }
+
 " Automated tag file generation and syntax highlighting of tags
-Plugin 'xolox/vim-easytags.git'
-Plugin 'xolox/vim-misc.git'
+Plug 'xolox/vim-easytags'
+Plug 'xolox/vim-misc'
 
 " Auto complete
+function! BuildYCM(info)
+    " info is a dictionary with 3 fields
+    "   " - name:   name of the plugin
+    "     " - status: 'installed', 'updated', or 'unchanged'
+    "       " - force:  set on PlugInstall! or PlugUpdate!
+    if a:info.status == 'installed' || a:info.force
+        !./install.py --clang-completer
+    endif
+endfunction
+
 if g:islinux
-    Plugin 'Valloric/YouCompleteMe.git'
+    Plug 'Valloric/YouCompleteMe' , { 'do': function('BuildYCM') }
     "       Plugin 'rdnetto/YCM-Generator.git'
 elseif g:iswindows
     if isdirectory('$VIM/vimfiles/bundle/YouCompleteMe')
-        Plugin 'blueyi/YouCompleteMe.git'
+        Plug 'blueyi/YouCompleteMe'
     else
-        Plugin 'Shougo/neocomplete.vim.git'
+        Plug 'Shougo/neocomplete.vim'
     endif
 endif
-"    if has("win64")
-"        Bundle 'snakeleon/YouCompleteMe-x64'
-"    elseif has("win32")
-"        Bundle 'snakeleon/YouCompleteMe-x86'
-"    else
-"        Bundle 'Valloric/YouCompleteMe'
-"    endif
 
 "Speed up Vim by updating folds only when called-for.
-Plugin 'Konfekt/FastFold.git'
+" Plug 'Konfekt/FastFold'
 
 " lean & mean status/tabline for vim that's light as air
-Plugin 'bling/vim-airline.git'
+Plug 'bling/vim-airline'
 
 " insert mode auto-completion for quotes, parens, brackets, etc.
-""    Plugin 'Raimondi/delimitMate.git'
-Plugin 'jiangmiao/auto-pairs.git'
+""    Plug 'Raimondi/delimitMate.git'
+Plug 'jiangmiao/auto-pairs'
 
 " Syntax checking hacks for vim
-Plugin 'scrooloose/syntastic'
+Plug 'scrooloose/syntastic'
 
 " The ultimate snippet solution for Vim
-" Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
+" Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
 " Support web develop
-" Plugin 'mattn/emmet-vim.git'
+" Plug 'mattn/emmet-vim.git'
 
 " Fuzzy file, buffer, mru, tag, etc finder
-Plugin 'kien/ctrlp.vim'
+Plug 'kien/ctrlp.vim'
 
 " a Git wrapper so awesome
 " 导致windows下vim不能正常获取shell执行的返回结果
 "    if g:islinux
-Plugin 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive'
 "    endif
 
 " displays tags in a window, ordered by scope
-Plugin 'majutsushi/tagbar'
+Plug 'majutsushi/tagbar'
 
 " Markdown support
-Plugin 'godlygeek/tabular'
-Plugin 'plasticboy/vim-markdown'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
 
 "intensely orgasmic commenting
-Plugin 'scrooloose/nerdcommenter'
-
-" visualize your Vim undo tree
-Plugin 'sjl/gundo.vim'
-
-"quoting/parenthesizing made simple use cs/ds
-Plugin 'tpope/vim-surround'
-
-"automatically adjusts 'shiftwidth' and 'expandtab' heuristically based on the current file
-Plugin 'tpope/vim-sleuth'
-
-"Open URI with your favorite browser from your most favorite editor
-"Plugin 'tyru/open-browser.vim'
-
-"Alternate Files quickly (.c --> .h etc)
-Plugin 'blueyi/a.vim'
-
-"A vim plugin to display the indention levels with thin vertical lines
-Plugin 'Yggdroot/indentLine'
+Plug 'scrooloose/nerdcommenter'
 
 "A tree explorer plugin for vim.
-Plugin 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+
+" visualize your Vim undo tree
+Plug 'sjl/gundo.vim'
+
+"quoting/parenthesizing made simple use cs/ds
+Plug 'tpope/vim-surround'
+
+"automatically adjusts 'shiftwidth' and 'expandtab' heuristically based on the current file
+Plug 'tpope/vim-sleuth'
+
+"Open URI with your favorite browser from your most favorite editor
+"Plug 'tyru/open-browser.vim'
+
+"Alternate Files quickly (.c --> .h etc)
+Plug 'blueyi/a.vim'
+
+"A vim plugin to display the indention levels with thin vertical lines
+Plug 'Yggdroot/indentLine'
 
 "Vim python-mode. PyLint, Rope, Pydoc, breakpoints from box.
-Plugin 'klen/python-mode.git'
+Plug 'klen/python-mode'
 
 "Simple templates plugin for Vim
-Plugin 'blueyi/vim-template'
+Plug 'blueyi/vim-template'
 
 " other misc for vim running eg: ycm_extra_conf.py
-Plugin 'blueyi/vim-dep'
+Plug 'blueyi/vim-dep'
 
 "********************************************
 " Color schemes
-Plugin 'blueyi/myvimcolors'
-Plugin 'tomasr/molokai'
-Plugin 'flazz/vim-colorschemes'
+Plug 'blueyi/myvimcolors'
+Plug 'tomasr/molokai'
+Plug 'flazz/vim-colorschemes'
 "********************************************
 
 
 " All of your Plugins must be added before the following line
-call vundle#end()            " required
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
+" For vim-plug
+call plug#end()
 
 "***************** Vim Configure ************************
 
@@ -746,6 +773,20 @@ endfunc
 
 
 "--------Plugin setting start------------
+
+"***************
+"--goyo.vim configure--
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+""<Leader>l触发limelight功能
+nmap <Leader>l :Goyo<CR>
+xmap <Leader>l :Goyo<CR>
+
+"--limelight.vim configure--
+"进入goyo模式后自动触发limelight,退出后则关闭
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+autocmd! User goyo.vim echom 'Goyo is now loaded!'
 
 "***************
 "--neocomplete configure--
