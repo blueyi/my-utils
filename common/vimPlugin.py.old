@@ -31,11 +31,11 @@ if isInstallYCM:
 with open(vimrc, 'r') as text:
     for tline in text:
         tline = tline.lstrip()
-        if len(tline.strip()) != 0 and tline[: tline.find(' ')] == 'Plug' and 'YouCompleteMe' not in tline:
-            plugin = tline[tline.find("'") + 1 : tline.find("'", tline.find("'") + 1)]
+        if len(tline.strip()) != 0 and tline[:6] == 'Plugin' and 'YouCompleteMe' not in tline:
+            plugin = tline[tline.find("'") + 1 : tline.rfind("'")]
             plugin_list.append(plugin)
 
-print(plugin_list)
+# print(plugin_list)
 
 # clone url to dir
 def gitClone(turl, tdir):
@@ -53,9 +53,9 @@ def gitClone(turl, tdir):
 if not os.path.exists(userPath() + '/.vimbak'):
     run_cmd('mkdir -p ~/.vimbak', error_log)
 
-# vim plugged文件夹
-if not os.path.exists(userPath() + '/.vim/plugged'):
-    run_cmd('mkdir -p ~/.vim/plugged', error_log)
+# vim bundle文件夹
+if not os.path.exists(userPath() + '/.vim/bundle'):
+    run_cmd('mkdir -p ~/.vim/bundle', error_log)
 
 welcomePrint(str(plugin_list))
 
@@ -64,7 +64,7 @@ failed_plugin = []
 # install vim plugin
 for plugin in plugin_list:
     plu_url = 'https://github.com/' + plugin
-    plu_dir = userPath() + '/.vim/plugged/'
+    plu_dir = userPath() + '/.vim/bundle/'
     if plugin[len(plugin) - 4 : ] == '.git':
         plu_dir = plu_dir + plugin[plugin.rfind('/') + 1 : len(plugin) - 4]
     else:
@@ -78,16 +78,10 @@ for plugin in plugin_list:
     elif git_code == 1:
         old_plugin.append(plugin)
 
-# For vim-plug
-vimPlug_cmd = 'curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-run_cmd(vimPlug_cmd, error_log)
-
 # ---Youcompleteme install---
 def installYCM():
     welcomePrint('Configing Youcompleteme')
-    ycm = userPath() + '/' + '.vim/plugged/YouCompleteMe'
+    ycm = userPath() + '/' + '.vim/bundle/YouCompleteMe'
     os.chdir(ycm)
     run_cmd('git submodule update --init --recursive', error_log)
     ycm_code = run_cmd('./install.py --clang-completer', error_log)

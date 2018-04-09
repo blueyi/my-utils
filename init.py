@@ -21,6 +21,6 @@ if os.geteuid == 0:
 call_cmd('sudo python common/installPack.py')
 call_cmd('python common/createSoftLink.py')
 call_cmd('python common/misc.py')
-call_cmd('python common/vimPlugin.py -ycm')
+# call_cmd('python common/vimPlugin.py -ycm')
 
 
