@@ -1,3 +1,8 @@
+# source ~/.bashrc
+
+# From bashrc
+# For golang
+export PATH=$PATH:/usr/local/go/bin
 
 # jdk
 JAVA_HOME=/usr/lib/jvm/java-8-oracle
@@ -9,11 +14,6 @@ export JAVA_HOME
 export JRE_HOME
 export CLASSPATH
 export PATH
-
-# Intellij Idea
-PATH=$PATH:/home/blueyi/soft/idea-IC/bin
-export PATH
-
 
 #nvm
 export NVM_DIR="$HOME/.nvm"
@@ -30,11 +30,17 @@ FFMPEG_BIN=$HOME/bin
 PATH=$PATH:$MY_BIN:$FFMPEG_BIN
 export PATH
 
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
 # http_proxy
 alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
 
 # pip
-export PATH="/home/blueyi/.local/bin:$PATH"
+export PATH=$HOME/.local/bin:$PATH
 
 # auto run n times
 function run() {
@@ -44,7 +50,6 @@ function run() {
       $@
     done
 }
-
 
 # Path to your oh-my-zsh installation.
 export ZSH=/home/blueyi/.oh-my-zsh
@@ -104,7 +109,7 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+# export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -131,11 +136,3 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/g
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
-
