@@ -1,4 +1,11 @@
 
+# alias
+alias wn='watch -n 1 nvidia-smi'
+alias st='source ~/tensorflow/bin/activate'
+
+# for python complete in interactive shell
+export PYTHONSTARTUP=$HOME/.pythonstartup
+
 # jdk
 JAVA_HOME=/usr/lib/jvm/java-8-oracle
 JRE_HOME=$JAVA_HOME/jre
