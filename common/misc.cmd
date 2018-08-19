@@ -29,7 +29,7 @@ sudo fc-cache -f -v
 # git clone git@github.com:blueyi/hexoblog.git ~/blog
 
 # Oh My Zsh install
-# sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # pyenv install
 curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
