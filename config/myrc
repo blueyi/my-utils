@@ -54,3 +54,6 @@ function run() {
       $@
     done
 }
+
+# For bazel
+source /home/blueyi/.bazel/bin/bazel-complete.bash
