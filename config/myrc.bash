@@ -24,9 +24,12 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # cuda
-export CUDA_HOME=/usr/local/cuda-9.0
-export PATH=/usr/local/cuda-9.0/bin${PATH:+:${PATH}}
-export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+export CUDA_PATH=/usr/local/cuda
+export PATH=$CUDA_PATH/bin:${PATH}}
+export LD_LIBRARY_PATH=$CUDA_PATH/lib64:${LD_LIBRARY_PATH}}
+# cupti
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_PATH/extras/CUPTI/lib64
+
 
 # my bin
 MY_BIN=$HOME/my-utils/common
@@ -56,4 +59,10 @@ function run() {
 }
 
 # For bazel
-source /home/blueyi/.bazel/bin/bazel-complete.bash
+# source /home/blueyi/.bazel/bin/bazel-complete.bash
+
+# for tvm
+export TVM_HOME=$HOME/github/tvm
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TVM_HOME/build
+export PYTHONPATH=$PYTHONPATH:$TVM_HOME/python:$TVM_HOME/topi/python:$TVM_HOME/nnvm/python
+
