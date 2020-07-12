@@ -1,9 +1,19 @@
+
+# reset rc
+export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
+source $MYRC_PATH/resetrc.bash
+
 # For golang
 export PATH=$PATH:/usr/local/go/bin
 
 # alias
-# alias wn='watch -n 1 nvidia-smi'
-# alias st='source ~/tensorflow/bin/activate'
+alias wn='watch -n 1 nvidia-smi'
+alias exdm='cd $HOME/soft/xdm-linux-portable-x64;./xdman'
+alias clion='$HOME/soft/clion-2020.1.2/bin/clion.sh'
+alias ess='$HOME/soft/clash/clash.sh'
+
+# http_proxy
+alias hp="http_proxy=http://127.0.0.1:7891 https_proxy=http://127.0.0.1:7891"
 
 # for python complete in interactive shell
 export PYTHONSTARTUP=$HOME/.pythonstartup
@@ -43,9 +53,6 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
-# http_proxy
-alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
-
 # pip
 export PATH=$HOME/.local/bin:$PATH
 
@@ -59,10 +66,16 @@ function run() {
 }
 
 # For bazel
-# source /home/blueyi/.bazel/bin/bazel-complete.bash
+# source $HOME/.bazel/bin/bazel-complete.bash
 
 # for tvm
 export TVM_HOME=$HOME/github/tvm
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TVM_HOME/build
 export PYTHONPATH=$PYTHONPATH:$TVM_HOME/python:$TVM_HOME/topi/python:$TVM_HOME/nnvm/python
 
+# for llvm
+export LLVM_PATH=$HOME/bin/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04
+export PATH=$LLVM_PATH/bin:$PATH
+
+# for cmake
+export PATH=$HOME/bin/cmake-3.16.8-Linux-x86_64/bin:$PATH
