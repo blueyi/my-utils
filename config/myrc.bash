@@ -19,15 +19,10 @@ alias hp="http_proxy=http://127.0.0.1:7891 https_proxy=http://127.0.0.1:7891"
 export PYTHONSTARTUP=$HOME/.pythonstartup
 
 # jdk
-JAVA_HOME=/usr/lib/jvm/java-8-oracle
-JRE_HOME=$JAVA_HOME/jre
-CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib
-PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
-
-export JAVA_HOME
-export JRE_HOME
-export CLASSPATH
-export PATH
+# export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+# export JRE_HOME=$JAVA_HOME/jre
+# export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib
+# export PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
 
 #nvm
 export NVM_DIR="$HOME/.nvm"
@@ -35,8 +30,8 @@ export NVM_DIR="$HOME/.nvm"
 
 # cuda
 export CUDA_PATH=/usr/local/cuda
-export PATH=$CUDA_PATH/bin:${PATH}}
-export LD_LIBRARY_PATH=$CUDA_PATH/lib64:${LD_LIBRARY_PATH}}
+export PATH=$CUDA_PATH/bin:${PATH}
+export LD_LIBRARY_PATH=$CUDA_PATH/lib64:${LD_LIBRARY_PATH}
 # cupti
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_PATH/extras/CUPTI/lib64
 
