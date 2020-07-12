@@ -42,4 +42,4 @@ error_log.close()
 if delBlankFile(error_log_file):
     welcomePrint('Create link success!')
 else:
-    welcomePrint('Some soft link be created failed!')
+    welcomePrint('Some soft link maybe be created failed!')
