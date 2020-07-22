@@ -117,3 +117,4 @@ if ! shopt -oq posix; then
 fi
 
 source $HOME/github/my-utils/config/myrc.bash
+
