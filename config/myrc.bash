@@ -24,9 +24,10 @@ export PYTHONSTARTUP=$HOME/.pythonstartup
 # export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib
 # export PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin
 
-#nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# node for hexo
+# export PATH=$PATH:$HOME/node_modules/.bin
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # cuda
 export CUDA_PATH=/usr/local/cuda
@@ -74,3 +75,6 @@ export PATH=$LLVM_PATH/bin:$PATH
 
 # for cmake
 export PATH=$HOME/bin/cmake-3.16.8-Linux-x86_64/bin:$PATH
+
+# for snap
+export PATH=$PATH:/snap/bin
