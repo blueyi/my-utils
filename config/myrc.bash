@@ -1,7 +1,8 @@
-
 # reset rc
 export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
 source $MYRC_PATH/resetrc.bash
+source $MYRC_PATH/proxy.bash
+source $MYRC_PATH/te.bash
 
 # For golang
 export PATH=$PATH:/usr/local/go/bin
@@ -9,11 +10,11 @@ export PATH=$PATH:/usr/local/go/bin
 # alias
 alias wn='watch -n 1 nvidia-smi'
 alias exdm='cd $HOME/soft/xdm-linux-portable-x64;./xdman'
-alias clion='$HOME/soft/clion-2020.1.2/bin/clion.sh'
 alias ess='$HOME/soft/clash/clash.sh'
+alias clion='sh $HOME/bin/clion-2020.1.2/bin/clion.sh'
 
 # http_proxy
-alias hp="http_proxy=http://127.0.0.1:7891 https_proxy=http://127.0.0.1:7891"
+alias hp="http_proxy=http://127.0.0.1:7890 https_proxy=http://127.0.0.1:7890"
 
 # for python complete in interactive shell
 export PYTHONSTARTUP=$HOME/.pythonstartup
@@ -63,11 +64,6 @@ function run() {
 
 # For bazel
 # source $HOME/.bazel/bin/bazel-complete.bash
-
-# for tvm
-export TVM_HOME=$HOME/github/tvm
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TVM_HOME/build
-export PYTHONPATH=$PYTHONPATH:$TVM_HOME/python:$TVM_HOME/topi/python:$TVM_HOME/nnvm/python
 
 # for llvm
 export LLVM_PATH=$HOME/bin/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04

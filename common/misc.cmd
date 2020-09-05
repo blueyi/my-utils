@@ -2,8 +2,8 @@
 #以#开头表示注释，自动忽略#后面的内容
 
 # git configure
-# git config --global user.name "blueyi"
-# git config --global user.email "blueyiniu@qq.com"
+git config --global user.name "blueyi"
+git config --global user.email "blueyiniu@qq.com"
 
 # fonts
 git clone https://github.com/blueyi/myfonts.git ~/.fonts
@@ -29,8 +29,8 @@ sudo fc-cache -f -v
 # git clone git@github.com:blueyi/hexoblog.git ~/blog
 
 # Oh My Zsh install
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # pyenv install
-curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+# curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
 
