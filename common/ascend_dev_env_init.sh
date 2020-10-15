@@ -17,7 +17,7 @@ mkdir ~/.pip
 echo "[global]
 index-url = https://mirrors.huaweicloud.com/repository/pypi/simple
 trusted-host = mirrors.huaweicloud.com
-timeout = 120" > pip.conf
+timeout = 120" > ~/.pip/pip.conf
 
 # Install package for python build
 sudo apt update
@@ -39,7 +39,7 @@ cd Python-3.7.5
 make -j4 && sudo make install
 cd ..
 
-cp ${PY_PATH}/lib/libpython3.7m.so.1.0 /usr/lib/
+sudo cp ${PY_PATH}/lib/libpython3.7m.so.1.0 /usr/lib/
 
 # sudo rm -rf /usr/bin/python3 /usr/local/bin/python3
 # sudo ln -s ${PY_PATH}/bin/python3 /usr/bin/python3
