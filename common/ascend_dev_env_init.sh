@@ -31,7 +31,7 @@ fonts-wqy-zenhei fonts-wqy-microhei fonts-arphic-ukai fonts-arphic-uming gnome-k
 zlib1g-dev libbz2-dev libsqlite3-dev libssl-dev libxslt1-dev libffi-dev xterm
 
 # Build python and install python3.7.5
-wget --no-check-certificate https://cdn.npm.taobao.org/dist/python/3.7.5/Python-3.7.5.tgz
+wget --no-check-certificate https://cdn.npm.taobao.org/dist/python/3.7.5/Python-3.7.5.tgz -O Python-3.7.5.tgz
 tar -zxvf Python-3.7.5.tgz
 PY_PATH=/usr/local/python3.7.5
 cd Python-3.7.5
@@ -51,7 +51,7 @@ sudo /usr/local/python3.7.5/bin/pip3.7 install numpy decorator sympy cffi covera
 matplotlib psutil attrs grpcio protobuf requests scipy PyQt5==5.14.0 xlrd absl-py Pillow
 
 # Install ascend Run package
-wget --no-check-certificate https://public-download.obs.cn-east-2.myhuaweicloud.com/MindStudio_2.4.3_linux-x86_64.zip
+wget --no-check-certificate https://public-download.obs.cn-east-2.myhuaweicloud.com/MindStudio_2.4.3_linux-x86_64.zip -O MindStudio_2.4.3_linux-x86_64.zip
 unzip MindStudio_2.4.3_linux-x86_64.zip
 chmod +x Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run
 ./Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run --install
