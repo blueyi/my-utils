@@ -31,8 +31,8 @@ fonts-wqy-zenhei fonts-wqy-microhei fonts-arphic-ukai fonts-arphic-uming gnome-k
 zlib1g-dev libbz2-dev libsqlite3-dev libssl-dev libxslt1-dev libffi-dev
 
 # Build python and install python3.7.5
-wget --no-check-certificate http://npm.taobao.org/mirrors/python/3.7.5/Python-3.7.5.tar.xz
-tar -xvf Python-3.7.5.tar.xz
+wget --no-check-certificate https://cdn.npm.taobao.org/dist/python/3.7.5/Python-3.7.5.tgz
+tar -zxvf Python-3.7.5.tgz
 PY_PATH=/usr/local/python3.7.5
 cd Python-3.7.5
 ./configure --prefix=${PY_PATH} --enable-shared
