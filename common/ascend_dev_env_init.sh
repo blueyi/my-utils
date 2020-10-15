@@ -28,7 +28,7 @@ xz-utils tk-dev libffi-dev liblzma-dev python-openssl git vim
 # Install dependency of linux package for MindStudio
 sudo apt install -y g++ firefox xdg-utils openjdk-8-jdk fonts-droid-fallback \
 fonts-wqy-zenhei fonts-wqy-microhei fonts-arphic-ukai fonts-arphic-uming gnome-keyring \
-zlib1g-dev libbz2-dev libsqlite3-dev libssl-dev libxslt1-dev libffi-dev
+zlib1g-dev libbz2-dev libsqlite3-dev libssl-dev libxslt1-dev libffi-dev xterm
 
 # Build python and install python3.7.5
 wget --no-check-certificate https://cdn.npm.taobao.org/dist/python/3.7.5/Python-3.7.5.tgz
