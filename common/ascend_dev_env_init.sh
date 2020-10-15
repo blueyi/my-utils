@@ -41,14 +41,10 @@ cd ..
 
 sudo cp ${PY_PATH}/lib/libpython3.7m.so.1.0 /usr/lib/
 
-# sudo rm -rf /usr/bin/python3 /usr/local/bin/python3
-# sudo ln -s ${PY_PATH}/bin/python3 /usr/bin/python3
-# sudo rm -rf /usr/bin/python3.7 /usr/local/bin/python3.7
-# sudo ln -s ${PY_PATH}/bin/python3 /usr/bin/python3.7
-# sudo rm -rf /usr/bin/pip3 /usr/local/bin/pip3
-# sudo ln -s ${PY_PATH}/bin/pip3 /usr/bin/pip3
-# sudo rm -rf /usr/bin/pip3.7 /usr/local/bin/pip3.7
-# sudo ln -s ${PY_PATH}/bin/pip3 /usr/bin/pip3.7
+sudo ln -s /usr/local/python3.7.5/bin/python3 /usr/bin/python3.7.5
+sudo ln -s /usr/local/python3.7.5/bin/python3 /usr/bin/python3.7
+sudo ln -s /usr/local/python3.7.5/bin/pip3 /usr/bin/pip3.7.5
+sudo ln -s /usr/local/python3.7.5/bin/pip3 /usr/bin/pip3.7
 
 # Install dependency of python package for MindStudio
 sudo /usr/local/python3.7.5/bin/pip3.7 install numpy decorator sympy cffi coverage pylint gnureadline \
@@ -57,7 +53,8 @@ matplotlib psutil attrs grpcio protobuf requests scipy PyQt5==5.14.0 xlrd absl-p
 # Install ascend Run package
 wget --no-check-certificate https://public-download.obs.cn-east-2.myhuaweicloud.com/MindStudio_2.4.3_linux-x86_64.zip
 unzip MindStudio_2.4.3_linux-x86_64.zip
-sh Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run --install
+chmod +x Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run
+./Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run --install
 tar -zxvf MindStudio_2.4.3_linux-x86_64.tar.gz -C ~/
 
 echo "######################"
