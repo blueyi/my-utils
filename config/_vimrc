@@ -203,8 +203,9 @@ function! BuildYCM(info)
 endfunction
 
 if g:islinux
-    Plug 'Valloric/YouCompleteMe' , { 'do': function('BuildYCM') }
-    "       Plugin 'rdnetto/YCM-Generator.git'
+    Plug 'ycm-core/YouCompleteMe' , { 'do': function('BuildYCM') }
+"    Plugin 'rdnetto/YCM-Generator.git'
+"    Plug 'Shougo/neocomplete.vim'
 elseif g:iswindows
     if isdirectory('$VIM/vimfiles/bundle/YouCompleteMe')
         Plug 'blueyi/YouCompleteMe'
