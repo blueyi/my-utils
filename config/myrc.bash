@@ -2,7 +2,7 @@
 export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
 source $MYRC_PATH/resetrc.bash
 source $MYRC_PATH/proxy.bash
-source $MYRC_PATH/te.bash
+source $MYRC_PATH/ascend_dev.bash
 
 # For golang
 export PATH=$PATH:/usr/local/go/bin
@@ -45,10 +45,13 @@ PATH=$PATH:$MY_BIN:$FFMPEG_BIN
 export PATH
 
 # pyenv
+export PYTHON_BUILD_MIRROR_URL="http://npm.taobao.org/mirrors/python/"
+export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
+export PYTHON_CONFIGURE_OPTS="--enable-shared"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+# eval "$(pyenv virtualenv-init -)"
 
 # pip
 export PATH=$HOME/.local/bin:$PATH

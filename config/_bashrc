@@ -116,6 +116,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-source $HOME/github/my-utils/config/myrc.bash
+source $HOME/repos/my-utils/config/myrc.bash
 alias ess='sudo service ssh start'
 
