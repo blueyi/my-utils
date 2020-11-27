@@ -1,3 +1,6 @@
+# For gogh terminal theme
+export TERMINAL=gnome-terminal
+
 # reset rc
 export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
 source $MYRC_PATH/resetrc.bash
