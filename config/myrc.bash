@@ -2,7 +2,8 @@
 export TERMINAL=gnome-terminal
 
 # reset rc
-export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
+# export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
+export MYRC_PATH=$HOME/repos/my-utils/config
 source $MYRC_PATH/resetrc.bash
 source $MYRC_PATH/proxy.bash
 source $MYRC_PATH/ascend_dev.bash
