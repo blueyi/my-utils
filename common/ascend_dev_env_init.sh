@@ -18,6 +18,8 @@ install_dep_for_root() {
   sudo sed -i "s@http://.*security.ubuntu.com@http://mirrors.huaweicloud.com@g" /etc/apt/sources.list
 
   # Install package for python build
+  sudo kill -9 $(ps aux | grep -i upgrade | awk '{print $2}')
+  sudo kill -9 $(ps aux | grep -i upgrade | awk '{print $2}')
   sudo apt update
   sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
   libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
