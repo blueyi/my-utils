@@ -67,8 +67,10 @@ else
 fi
 
 # Install ascend Run package
-wget --no-check-certificate https://public-download.obs.cn-east-2.myhuaweicloud.com/MindStudio_2.4.3_linux-x86_64.zip -O MindStudio_2.4.3_linux-x86_64.zip
-unzip MindStudio_2.4.3_linux-x86_64.zip
+wget --no-check-certificate https://public-download.obs.cn-east-2.myhuaweicloud.com:443/MindStudio_2.0.0-beta3_ubuntu18.04-x86_64.tar.gz -O MindStudio_2.0.0-beta3_ubuntu18.04-x86_64.tar.gz
+
+tar -zxvf MindStudio_2.0.0-beta3_ubuntu18.04-x86_64.tar.gz -C ~/
+
 chmod +x Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run
 ./Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run --install
 tar -zxvf MindStudio_2.4.3_linux-x86_64.tar.gz -C ~/
