@@ -16,6 +16,9 @@ alias wn='watch -n 1 nvidia-smi'
 alias exdm='cd $HOME/soft/xdm-linux-portable-x64;./xdman'
 alias ess='$HOME/soft/clash/clash.sh'
 alias clion='sh $HOME/bin/clion-2020.1.2/bin/clion.sh'
+alias winetricks='env LANG=zh_CN.UTF-8 winetricks'
+alias wine='env LANG=zh_CN.UTF-8 wine'
+alias wechat='env LANG=zh_CN.UTF-8 wine "/home/wangyulong/.wine/drive_c/Program Files (x86)/Tencent/WeChat/WeChat.exe"'
 
 # http_proxy
 alias hp="http_proxy=http://127.0.0.1:7890 https_proxy=http://127.0.0.1:7890"
@@ -44,8 +47,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_PATH/extras/CUPTI/lib64
 
 # my bin
 MY_BIN=$HOME/my-utils/common
-FFMPEG_BIN=$HOME/bin
-PATH=$PATH:$MY_BIN:$FFMPEG_BIN
+HOME_BIN=$HOME/bin
+PATH=$PATH:$MY_BIN:$HOME_BIN
 export PATH
 
 # pyenv
