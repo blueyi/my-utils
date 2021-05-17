@@ -18,6 +18,8 @@ install_dep_for_root() {
   sudo sed -i "s@http://.*security.ubuntu.com@http://mirrors.huaweicloud.com@g" /etc/apt/sources.list
 
   # Install package for python build
+  sudo kill -9 $(ps aux | grep -i upgrade | awk '{print $2}')
+  sudo kill -9 $(ps aux | grep -i upgrade | awk '{print $2}')
   sudo apt update
   sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
   libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
@@ -65,8 +67,10 @@ else
 fi
 
 # Install ascend Run package
-wget --no-check-certificate https://public-download.obs.cn-east-2.myhuaweicloud.com/MindStudio_2.4.3_linux-x86_64.zip -O MindStudio_2.4.3_linux-x86_64.zip
-unzip MindStudio_2.4.3_linux-x86_64.zip
+wget --no-check-certificate https://public-download.obs.cn-east-2.myhuaweicloud.com:443/MindStudio_2.0.0-beta3_ubuntu18.04-x86_64.tar.gz -O MindStudio_2.0.0-beta3_ubuntu18.04-x86_64.tar.gz
+
+tar -zxvf MindStudio_2.0.0-beta3_ubuntu18.04-x86_64.tar.gz -C ~/
+
 chmod +x Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run
 ./Ascend-Toolkit-20.10.0.B023-x86_64-linux_gcc7.3.0_toDC.run --install
 tar -zxvf MindStudio_2.4.3_linux-x86_64.tar.gz -C ~/
