@@ -2,7 +2,8 @@
 export TERMINAL=gnome-terminal
 
 # reset rc
-export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
+# export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
+export MYRC_PATH=$HOME/repos/my-utils/config
 source $MYRC_PATH/resetrc.bash
 source $MYRC_PATH/proxy.bash
 source $MYRC_PATH/ascend_dev.bash
@@ -13,8 +14,8 @@ export PATH=$PATH:/usr/local/go/bin
 # alias
 alias wn='watch -n 1 nvidia-smi'
 alias exdm='cd $HOME/soft/xdm-linux-portable-x64;./xdman'
-alias ess='$HOME/soft/clash/clash.sh'
-alias clion='sh $HOME/bin/clion-2020.1.2/bin/clion.sh'
+alias ess='sudo service ssh start'
+alias clion='sh $HOME/bin/clion/bin/clion.sh'
 
 # http_proxy
 alias hp="http_proxy=http://127.0.0.1:7890 https_proxy=http://127.0.0.1:7890"
