@@ -116,6 +116,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
-source $HOME/repos/my-utils/config/myrc.bash
+source $HOME/repos/my-utils/config/tvm_block.bash
 alias ess='sudo service ssh start'
 
+eval "$(jump shell bash)"
