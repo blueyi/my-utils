@@ -17,12 +17,12 @@ welcomePrint('Create soft link from file')
 link_file = curPath() + '/link.ini'
 
 error_log_file = errLogFileName(__file__)
-error_log = open(error_log_file, 'w')
+error_log = open(error_log_file, 'w', encoding="utf-8")
 
 # batch link some config file
 def config_link(file_path):
     link_dict = {}
-    with open(file_path, 'r') as text:
+    with open(file_path, 'r', encoding="utf-8") as text:
         for tline in text:
             if len(tline.strip()) != 0 and tline[0] != '#' and ('home' in tline or '~/' in tline):
                 tline = tline.replace('~', userPath())

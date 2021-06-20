@@ -49,7 +49,7 @@ def errLogFileName(file):
 
 # run an shell command in subprocess
 def run_cmd_reout(tcall_cmd, errOpened=None, goOnRun = True, isOutPut = True, isReturnCode = False):
-    p = subprocess.Popen(tcall_cmd, shell=True, stdout=subprocess.PIPE, executable='/bin/bash')
+    p = subprocess.Popen(tcall_cmd, shell=True, stdout=subprocess.PIPE, executable='/bin/bash', encoding="utf-8")
     toutput = p.communicate()[0]
     if p.returncode != 0 and ('grep' not in tcall_cmd):
         if (errOpened is not None):
@@ -66,7 +66,7 @@ def run_cmd_reout(tcall_cmd, errOpened=None, goOnRun = True, isOutPut = True, is
 # run shell command and return command return code
 # if error, write comman to error log
 def run_cmd(tcall_cmd, errOpened=None, goOnRun = True):
-    return_code = subprocess.call(tcall_cmd, shell=True)
+    return_code = subprocess.call(tcall_cmd, shell=True, encoding="utf-8")
     if return_code != 0 and ('grep' not in tcall_cmd):
         if (errOpened is not None):
             printToFile(tcall_cmd, errOpened)
@@ -78,7 +78,7 @@ def run_cmd(tcall_cmd, errOpened=None, goOnRun = True):
 
 # just run shell command，No error log
 def call_cmd(tcall_cmd, goOnRun = True):
-    return_code = subprocess.call(tcall_cmd, shell=True)
+    return_code = subprocess.call(tcall_cmd, shell=True, encoding="utf-8")
     if return_code != 0 and ('grep' not in tcall_cmd):
         print(tcall_cmd)
         if not goOnRun :
