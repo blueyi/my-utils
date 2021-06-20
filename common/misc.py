@@ -15,16 +15,16 @@ from common import *
 misc_cmd_file = curPath() + '/' + 'misc.cmd'
 
 error_log_file = errLogFileName(__file__)
-error_log = open(error_log_file, 'w')
+error_log = open(error_log_file, 'w', encoding="utf-8")
 
 welcomePrint('misc.cmd')
-with open(misc_cmd_file, 'r') as text:
+with open(misc_cmd_file, 'r', encoding="utf-8") as text:
     for tline in text:
         if len(tline.strip()) != 0 and tline.strip()[0] != '#':
             if '~/' in tline:
                 tline = tline.replace('~', userPath())
             tcmd = tline.strip().split('#')[0]
-            print(tcmd)
+            print(tcmd.encode('utf-8'))
             run_cmd(tcmd, error_log)
 
 error_log.close()

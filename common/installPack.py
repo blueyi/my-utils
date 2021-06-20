@@ -18,7 +18,7 @@ welcomePrint('Installing software from file')
 
 
 error_log_file = errLogFileName(__file__)
-error_log = open(error_log_file, 'w')
+error_log = open(error_log_file, 'w', encoding="utf-8")
 
 install_cmd = None
 dis_cmd = None
@@ -61,7 +61,7 @@ def depend_install(soft):
 soft_list = []
 old_installed_list = []
 failed_list = []
-with open(soft_list_file, 'r') as text:
+with open(soft_list_file, 'r', encoding="utf-8") as text:
     for tline in text:
         if tline[0] != '#' and len(tline.strip()) != 0:
             soft_list.append(tline.strip().split('#')[0])

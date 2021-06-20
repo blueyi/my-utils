@@ -1,6 +1,4 @@
-#其他一些需要执行的通用配置命令
-#以#开头表示注释，自动忽略#后面的内容
-
+# comment with #
 # git configure
 git config --global user.name "blueyi"
 git config --global user.email "blueyiniu@qq.com"

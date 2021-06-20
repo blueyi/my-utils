@@ -12,6 +12,9 @@ unset LD_LIBRARY_PATH
 unset LIBRARY_PATH
 unset PYTHONPATH
 
+# For Chinese language
+# export LANG=zh_CN.UTF-8
+
 # For gogh terminal theme
 export TERMINAL=gnome-terminal
 
@@ -65,6 +68,7 @@ export PYTHON_CONFIGURE_OPTS="--enable-shared"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
 
 # auto run n times
 function myrun() {
