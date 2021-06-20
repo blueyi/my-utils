@@ -23,7 +23,8 @@ export MYRC_PATH=$HOME/repos/my-utils/config
 source $MYRC_PATH/proxy.bash
 
 # http_proxy
-alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
+# alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
+alias hp="http_proxy=http://192.168.3.6:1081 https_proxy=http://192.168.3.6:1081"
 
 # for python complete in interactive shell
 export PYTHONSTARTUP=$HOME/.pythonstartup
