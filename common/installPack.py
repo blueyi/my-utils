@@ -16,10 +16,6 @@ runAsRoot()
 
 welcomePrint('Installing software from file')
 
-apt_list = ['ubuntu', 'debian', 'linuxmint']
-rpm_list = ['fedora', 'centos']
-sys_distribution = platform.linux_distribution()[0].lower()
-# print(sys_distribution)
 
 error_log_file = errLogFileName(__file__)
 error_log = open(error_log_file, 'w')
@@ -27,12 +23,12 @@ error_log = open(error_log_file, 'w')
 install_cmd = None
 dis_cmd = None
 soft_list_file = None
-if is_list_in_str(apt_list, sys_distribution):
+if 'ubuntu' in get_platform():
     install_cmd = 'apt-get install '
     dis_cmd = 'apt'
     soft_list_file = 'deb_app_list.ini'
     run_cmd('apt-get update -y', error_log)
-elif is_list_in_str(rpm_list, sys_distribution):
+elif 'fedora' in get_platform():
     install_cmd = 'yum install '
     dis_cmd = 'yum'
     soft_list_file = 'rpm_app_list.ini'

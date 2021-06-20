@@ -48,11 +48,12 @@ def errLogFileName(file):
     return curPath() + '/' + file_name.replace('.', '_') + '_' + curTimeStr() + '.log'
 
 # run an shell command in subprocess
-def run_cmd_reout(tcall_cmd, errOpened, goOnRun = True, isOutPut = True, isReturnCode = False):
+def run_cmd_reout(tcall_cmd, errOpened=None, goOnRun = True, isOutPut = True, isReturnCode = False):
     p = subprocess.Popen(tcall_cmd, shell=True, stdout=subprocess.PIPE, executable='/bin/bash')
     toutput = p.communicate()[0]
     if p.returncode != 0 and ('grep' not in tcall_cmd):
-        printToFile(tcall_cmd, errOpened)
+        if (errOpened is not None):
+            printToFile(tcall_cmd, errOpened)
         if not goOnRun :
             sys.exit(1)
     if isOutPut :
@@ -64,10 +65,11 @@ def run_cmd_reout(tcall_cmd, errOpened, goOnRun = True, isOutPut = True, isRetur
 
 # run shell command and return command return code
 # if error, write comman to error log
-def run_cmd(tcall_cmd, errOpened, goOnRun = True):
+def run_cmd(tcall_cmd, errOpened=None, goOnRun = True):
     return_code = subprocess.call(tcall_cmd, shell=True)
     if return_code != 0 and ('grep' not in tcall_cmd):
-        printToFile(tcall_cmd, errOpened)
+        if (errOpened is not None):
+            printToFile(tcall_cmd, errOpened)
         if not goOnRun :
             sys.exit(-1)
     if return_code != 0:
@@ -131,3 +133,15 @@ def getKeyValue(file_name, sep='='):
                     arg_dict[tlink[0].strip()] = tlink[1].strip()
     return arg_dict
 
+def get_platform():
+    apt_list = ['ubuntu', 'debian', 'linuxmint']
+    rpm_list = ['fedora', 'centos', 'readhat']
+    cmd = 'cat /etc/*release'
+    get_info = str(run_cmd_reout(cmd)).lower()
+    if (is_list_in_str(apt_list, get_info)):
+        return 'ubuntu'
+    if (is_list_in_str(rpm_list, get_info)):
+        return 'fedora'
+
+if __name__ == '__main__':
+    print(get_platform())

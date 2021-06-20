@@ -20,7 +20,7 @@ export MYRC_PATH=$HOME/repos/my-utils/config
 source $MYRC_PATH/proxy.bash
 
 # http_proxy
-alias hp="http_proxy=http://127.0.0.1:7890 https_proxy=http://127.0.0.1:7890"
+alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
 
 # for python complete in interactive shell
 export PYTHONSTARTUP=$HOME/.pythonstartup
@@ -64,8 +64,7 @@ export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-# eval "$(pyenv virtualenv-init -)"
+eval "$(pyenv init --path)"
 
 # auto run n times
 function myrun() {
