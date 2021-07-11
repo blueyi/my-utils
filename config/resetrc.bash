@@ -53,7 +53,7 @@ HOME_BIN=$HOME/bin
 export LOCAL_BIN_PATH=$HOME/.local/bin
 
 # for llvm
-export LLVM_PATH=$HOME/bin/llvm-9/bin
+export LLVM_PATH=$HOME/bin/llvm-11/bin
 
 # for cmake
 export CMAKE_PATH=$HOME/bin/cmake/bin
