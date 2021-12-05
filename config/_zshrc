@@ -1,4 +1,4 @@
-source $HOME/repos/my-utils/config/tvm_block.bash
+source $HOME/repos/my-utils/config/myrc.bash
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh

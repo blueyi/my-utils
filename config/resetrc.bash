@@ -24,7 +24,8 @@ source $MYRC_PATH/proxy.bash
 
 # http_proxy
 # alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
-alias hp="http_proxy=http://192.168.3.6:1081 https_proxy=http://192.168.3.6:1081"
+# alias hp="http_proxy=http://192.168.3.6:1081 https_proxy=http://192.168.3.6:1081"
+alias hp=proxy
 
 # for python complete in interactive shell
 export PYTHONSTARTUP=$HOME/.pythonstartup
@@ -53,7 +54,9 @@ HOME_BIN=$HOME/bin
 export LOCAL_BIN_PATH=$HOME/.local/bin
 
 # for llvm
-export LLVM_PATH=$HOME/bin/llvm-11/bin
+# cmake -S llvm -B build -G "Ninja" -DLLVM_ENABLE_PROJECTS="clang" -DCMAKE_INSTALL_PREFIX=/home/wangyulong/bin/llvm_12 -DCMAKE_BUILD_TYPE=Debug
+# cmake --build build
+export LLVM_PATH=$HOME/bin/llvm-12/bin
 
 # for cmake
 export CMAKE_PATH=$HOME/bin/cmake/bin
@@ -73,12 +76,39 @@ eval "$(pyenv init -)"
 
 # auto run n times
 function myrun() {
-    number=$1
-    shift
-    for n in $(seq $number); do
-      $@
-    done
+  number=$1
+  shift
+  for n in $(seq $number); do
+    $@
+  done
 }
+
+# run cmd run_times with thread_num multi-threads
+function run_multi_thread() {
+  thread_num=10
+  run_times=100
+  run_cmd=$@
+
+  mkfifo tm1
+  exec 5<>tm1
+  rm -f tm1
+  for ((i=1;i<=${thread_num};i++)) do
+    echo >&5
+  done
+
+  for ((j=1;j<=${run_times};j++)) do
+    read -u5
+    {
+      ${run_cmd}
+      sleep 1
+      echo >&5
+    }&
+  done
+  wait
+  exec 5>&-
+  exec 5<&-
+}
+
 
 # For bazel
 # source $HOME/.bazel/bin/bazel-complete.bash
@@ -92,3 +122,4 @@ alias ecc='$HOME/soft/clash/clash.sh'
 alias winetricks='env LANG=zh_CN.UTF-8 winetricks'
 alias wine='env LANG=zh_CN.UTF-8 wine'
 alias wechat='env LANG=zh_CN.UTF-8 wine "/home/wangyulong/.wine/drive_c/Program Files (x86)/Tencent/WeChat/WeChat.exe"'
+alias ev2='/home/wangyulong/repos/my-utils/bin/v2ray/Qv2ray-v2.7.0-linux-x64.AppImage'
