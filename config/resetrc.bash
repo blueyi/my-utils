@@ -24,8 +24,7 @@ source $MYRC_PATH/proxy.bash
 
 # http_proxy
 # alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
-# alias hp="http_proxy=http://192.168.3.6:1081 https_proxy=http://192.168.3.6:1081"
-alias hp=proxy
+alias hp="http_proxy=http://192.168.3.98:1081 https_proxy=http://192.168.3.98:1081"
 
 # for python complete in interactive shell
 export PYTHONSTARTUP=$HOME/.pythonstartup
@@ -38,8 +37,12 @@ export PYTHONSTARTUP=$HOME/.pythonstartup
 
 # node for hexo
 # export PATH=$PATH:$HOME/node_modules/.bin
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+# export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # cuda
 export CUDA_PATH=/usr/local/cuda
@@ -60,7 +63,8 @@ export LLVM_PATH=$HOME/bin/llvm-12/bin
 
 # for cmake
 export CMAKE_PATH=$HOME/bin/cmake/bin
-export PATH=$PATH:$CMAKE_PATH:$LLVM_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH
+
+export PATH=$PATH:$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$CUDA_LIB_PATH:
 export LIBRARY_PATH=$LD_LIBRARY_PATH
