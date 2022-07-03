@@ -24,7 +24,7 @@ source $MYRC_PATH/proxy.bash
 
 # http_proxy
 # alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
-alias hp="http_proxy=http://192.168.3.98:1081 https_proxy=http://192.168.3.98:1081"
+alias hp="http_proxy=http://192.168.3.30:1083 https_proxy=http://192.168.3.30:1083"
 
 # for python complete in interactive shell
 export PYTHONSTARTUP=$HOME/.pythonstartup
@@ -64,7 +64,7 @@ export LLVM_PATH=$HOME/bin/llvm-12/bin
 # for cmake
 export CMAKE_PATH=$HOME/bin/cmake/bin
 
-export PATH=$PATH:$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH
+export PATH=$PATH:$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH:$LLVM_PATH
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$CUDA_LIB_PATH:
 export LIBRARY_PATH=$LD_LIBRARY_PATH
@@ -79,7 +79,7 @@ eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 
 # auto run n times
-function myrun() {
+function run_n_times() {
   number=$1
   shift
   for n in $(seq $number); do

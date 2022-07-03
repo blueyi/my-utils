@@ -27,8 +27,7 @@ sudo fc-cache -f -v
 # git clone git@github.com:blueyi/hexoblog.git ~/blog
 
 # Oh My Zsh install
-# sh -c "$(curl -kfsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-sh -c "$(wget –-no-check-certificate https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # pyenv install
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
