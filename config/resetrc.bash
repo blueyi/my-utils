@@ -1,10 +1,8 @@
+# export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
+export MYRC_PATH=$HOME/repos/my-utils/config
+
 # For proxy
-unset ALL_PROXY
-unset all_proxy
-unset http_proxy
-unset HTTP_PROXY
-unset https_proxy
-unset HTTPS_PROXY
+source $MYRC_PATH/proxy.bash
 
 # For PATH
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
@@ -18,16 +16,10 @@ unset PYTHONPATH
 # For gogh terminal theme
 export TERMINAL=gnome-terminal
 
-# export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
-export MYRC_PATH=$HOME/repos/my-utils/config
-source $MYRC_PATH/proxy.bash
 
-# http_proxy
-# alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
-alias hp="http_proxy=http://192.168.3.30:1083 https_proxy=http://192.168.3.30:1083"
 
 # for python complete in interactive shell
-export PYTHONSTARTUP=$HOME/.pythonstartup
+# export PYTHONSTARTUP=$HOME/.pythonstartup
 
 # jdk
 # export JAVA_HOME=/usr/lib/jvm/java-8-oracle
