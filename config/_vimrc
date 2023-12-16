@@ -478,14 +478,14 @@ endif
 "
 "设置配色方案
 " set t_Co=256
-if g:isGUI
-    " colorscheme Tomorrow-Night-Eighties               "Gvim配色方案
-    colorscheme molokai
-    " colorscheme solarized
-else
-    " colorscheme Tomorrow-Night-Eighties               "终端配色方案
-    colorscheme molokai
-endif
+" if g:isGUI
+"     " colorscheme Tomorrow-Night-Eighties               "Gvim配色方案
+"     colorscheme molokai
+"     " colorscheme solarized
+" else
+"     " colorscheme Tomorrow-Night-Eighties               "终端配色方案
+"     colorscheme molokai
+" endif
 
 " 显示/隐藏菜单栏、工具栏、滚动条，可用 Ctrl + F11 切换
 if g:isGUI
