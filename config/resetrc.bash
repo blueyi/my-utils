@@ -62,13 +62,13 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$CUDA_LIB_PATH:
 export LIBRARY_PATH=$LD_LIBRARY_PATH
 
 # pyenv
-export PYTHON_BUILD_MIRROR_URL="http://npm.taobao.org/mirrors/python/"
-export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
-export PYTHON_CONFIGURE_OPTS="--enable-shared"
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init --path)"
-eval "$(pyenv init -)"
+# export PYTHON_BUILD_MIRROR_URL="http://npm.taobao.org/mirrors/python/"
+# export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
+# export PYTHON_CONFIGURE_OPTS="--enable-shared"
+# export PYENV_ROOT="$HOME/.pyenv"
+# export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init --path)"
+# eval "$(pyenv init -)"
 
 # auto run n times
 function run_n_times() {
