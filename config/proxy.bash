@@ -14,6 +14,7 @@ proxy () {
         export https_proxy="$PROXY_IP"
         export HTTPS_PROXY="$PROXY_IP"
         export no_proxy=127.0.0.1,localhost,local,.local,172.28.0.0/16,.aliyun.com,.tencent.com,.huawei.com
+        export NO_PROXY=127.0.0.1,localhost,local,.local,172.28.0.0/16,.aliyun.com,.tencent.com,.huawei.com
 
 #        echo -e "Acquire::http::Proxy \"http://192.168.123.176:10809\";" | sudo tee -a /etc/apt/apt.conf > /dev/null
 #        echo -e "Acquire::https::Proxy \"http://192.168.123.176:10809\";" | sudo tee -a /etc/apt/apt.conf > /dev/null
@@ -27,6 +28,7 @@ noproxy () {
         unset HTTP_PROXY
         unset https_proxy
         unset HTTPS_PROXY
+        unset NO_PROXY 
 
         unset all_proxy
         unset http_proxy
