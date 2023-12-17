@@ -3,6 +3,7 @@
 
 # PROXY_IP=192.168.3.151:1081
 # PROXY_IP=http://127.0.0.1:1080
+# PROXY_IP=127.0.0.1:1080
 PROXY_IP=http://i.yulong.wang:1080
 alias hp="http_proxy=$PROXY_IP https_proxy=$PROXY_IP"
 proxy () {
@@ -33,4 +34,3 @@ noproxy () {
 #        sudo sed -i -e '/Acquire::https::Proxy/d' /etc/apt/apt.conf
         curl myip.ipip.net
         }
-# <<< proxy setting <<<
