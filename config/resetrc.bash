@@ -70,6 +70,16 @@ export LIBRARY_PATH=$LD_LIBRARY_PATH
 # eval "$(pyenv init --path)"
 # eval "$(pyenv init -)"
 
+
+# eval "$(jump shell bash)"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/zsh_completion" ] && \. "$NVM_DIR/zsh_completion"  # This loads nvm bash_completion
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init - --no-rehash)"
+
 # auto run n times
 function run_n_times() {
   number=$1
@@ -78,6 +88,7 @@ function run_n_times() {
     $@
   done
 }
+
 
 # run cmd run_times with thread_num multi-threads
 function run_multi_thread() {
