@@ -49,8 +49,8 @@ env:
   UNICORN_WORKERS: 4
 
 env:
-  http_proxy: http://i.yulong.wang:1080
-  https_proxy: http://i.yulong.wang:1080
+  http_proxy: http://xxx:1080
+  https_proxy: http://xxx:1080
 
 
   ## TODO: The domain name this Discourse instance will respond to
@@ -71,7 +71,7 @@ env:
   DISCOURSE_SMTP_ADDRESS: smtp-relay.brevo.com
   DISCOURSE_SMTP_PORT: 587
   DISCOURSE_SMTP_USER_NAME: blueyiniu@gmail.com
-  DISCOURSE_SMTP_PASSWORD: "yhBAzUsZJ6c2r8IR"
+  #  DISCOURSE_SMTP_PASSWORD: "yhBAzUsZJ6c2r8IR"
   #DISCOURSE_SMTP_ENABLE_START_TLS: true           # (optional, default true)
   DISCOURSE_SMTP_DOMAIN: dream.yulong.wang
   DISCOURSE_NOTIFICATION_EMAIL: noreply@dream.yulong.wang
