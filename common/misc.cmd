@@ -4,8 +4,8 @@ git config --global user.name "blueyi"
 git config --global user.email "blueyiniu@qq.com"
 
 # fonts
-git clone https://github.com/blueyi/myfonts.git ~/.fonts
-sudo fc-cache -f -v
+# git clone https://github.com/blueyi/myfonts.git ~/.fonts
+# sudo fc-cache -f -v
 
 # some useful ppa
 # sudo add-apt-repository -y ppa:wiznote-team/ppa   # wiznote client for ubuntu
@@ -14,9 +14,6 @@ sudo fc-cache -f -v
 # sudo add-apt-repository -y ppa:hzwhuang/ss-qt5  # shadowsocks-qt5 client
 
 # Another soft
-# http://meetfranz.com/  # Franz support multil messaging app, eg: wechat
-
-# chmod +x app/ss/shadowsocks-local-linux64
 
 # hexo install
 # curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | sh
@@ -27,10 +24,9 @@ sudo fc-cache -f -v
 # git clone git@github.com:blueyi/hexoblog.git ~/blog
 
 # Oh My Zsh install
- sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # pyenv install
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 cd ~/.pyenv && src/configure && make -C src
-
 

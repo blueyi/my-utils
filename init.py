@@ -18,9 +18,9 @@ if os.geteuid == 0:
     print('Do Not Run As Root!!!')
     sys.exit(1)
 
-call_cmd('sudo python common/installPack.py')
-call_cmd('python common/createSoftLink.py')
-call_cmd('python common/misc.py')
+call_cmd('sudo python3 common/installPack.py')
+call_cmd('python3 common/createSoftLink.py')
+call_cmd('python3 common/misc.py')
 # call_cmd('python common/vimPlugin.py -ycm')
 
 
