@@ -32,9 +32,47 @@ export TERMINAL=gnome-terminal
 # export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
+# for pyenv
+export PYTHON_BUILD_MIRROR_URL="http://npm.taobao.org/mirrors/python/"
+export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
+export PYTHON_CONFIGURE_OPTS="--enable-shared"
+
+if [ -n "$(echo $ZSH_VERSION)" ]; then
+   echo "== zsh $ZSH_VERSION =="
+
+# NVM ENV
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# pyenv for zsh
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+
+elif [ -n "$(echo $BASH_VERSION)" ]; then
+  echo "== bash $BASH_VERSION =="
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init - --no-rehash)"
+
+else
+  echo "== other shell: cat /proc/$$/comm =="
+fi
+
+
+# RUST
+. "$HOME/.cargo/env"
 
 # cuda
 export CUDA_PATH=/usr/local/cuda
@@ -61,18 +99,9 @@ export PATH=$PATH:$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH:$
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$CUDA_LIB_PATH:
 export LIBRARY_PATH=$LD_LIBRARY_PATH
 
-# pyenv
-# export PYTHON_BUILD_MIRROR_URL="http://npm.taobao.org/mirrors/python/"
-# export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
-# export PYTHON_CONFIGURE_OPTS="--enable-shared"
-# export PYENV_ROOT="$HOME/.pyenv"
-# export PATH="$PYENV_ROOT/bin:$PATH"
-# eval "$(pyenv init --path)"
-# eval "$(pyenv init -)"
-
-
 # eval "$(jump shell bash)"
 
+# NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

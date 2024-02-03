@@ -202,8 +202,17 @@ function! BuildYCM(info)
     endif
 endfunction
 
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+let g:deoplete#enable_at_startup = 1
+
 if g:islinux
-    Plug 'ycm-core/YouCompleteMe' , { 'do': function('BuildYCM') }
+"    Plug 'ycm-core/YouCompleteMe' , { 'do': function('BuildYCM') }
 "    Plugin 'rdnetto/YCM-Generator.git'
 "    Plug 'Shougo/neocomplete.vim'
 elseif g:iswindows
