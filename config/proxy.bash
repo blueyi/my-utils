@@ -1,7 +1,7 @@
 # >>> proxy setting >>>
 # alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
 
-PROXY_IP=192.168.3.169:1081
+PROXY_IP=192.168.3.25:1081
 # PROXY_IP=http://127.0.0.1:1080
 # PROXY_IP=127.0.0.1:1081
 # PROXY_IP=http://i.yulong.wang:1080
