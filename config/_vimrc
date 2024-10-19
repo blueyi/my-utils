@@ -223,7 +223,10 @@ elseif g:iswindows
     endif
 endif
 
-"Speed up Vim by updating folds only when called-for.
+" rust
+Plug 'rust-lang/rust.vim'
+
+""Speed up Vim by updating folds only when called-for.
 " Plug 'Konfekt/FastFold'
 
 " lean & mean status/tabline for vim that's light as air

@@ -121,3 +121,4 @@ alias ess='sudo service ssh start'
 
 # eval "$(jump shell bash)"
 
+. "$HOME/.cargo/env"
