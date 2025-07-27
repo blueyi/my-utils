@@ -1,6 +1,9 @@
 # export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
 export MYRC_PATH=$HOME/repos/my-utils/config
 
+# ollama
+# export OLLAMA_MODELS="$HOME/ollama/models"
+
 # For proxy
 source $MYRC_PATH/proxy.bash
 
@@ -33,7 +36,7 @@ export TERMINAL=gnome-terminal
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # for pyenv
-export PYTHON_BUILD_MIRROR_URL="http://npm.taobao.org/mirrors/python/"
+# export PYTHON_BUILD_MIRROR_URL="http://npm.taobao.org/mirrors/python/"
 export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 
@@ -89,12 +92,17 @@ export LOCAL_BIN_PATH=$HOME/.local/bin
 # for llvm
 # cmake -S llvm -B build -G "Ninja" -DLLVM_ENABLE_PROJECTS="clang" -DCMAKE_INSTALL_PREFIX=/home/wangyulong/bin/llvm_12 -DCMAKE_BUILD_TYPE=Debug
 # cmake --build build
-export LLVM_PATH=$HOME/bin/llvm-12/bin
+if [ "${LLVM_PATH+_}" ]; then
+ export LLVM_BIN_PATH=${LLVM_PATH}/build/bin
+else
+ export LLVM_BIN_PATH=$HOME/bin/llvm-19.1.1/bin
+fi
+
 
 # for cmake
 export CMAKE_PATH=$HOME/bin/cmake/bin
 
-export PATH=$PATH:$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH:$LLVM_PATH
+export PATH=$PATH:$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH:$LLVM_BIN_PATH
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$CUDA_LIB_PATH:
 export LIBRARY_PATH=$LD_LIBRARY_PATH
