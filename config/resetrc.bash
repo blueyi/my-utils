@@ -92,7 +92,7 @@ export LOCAL_BIN_PATH=$HOME/.local/bin
 # for llvm
 # cmake -S llvm -B build -G "Ninja" -DLLVM_ENABLE_PROJECTS="clang" -DCMAKE_INSTALL_PREFIX=/home/wangyulong/bin/llvm_12 -DCMAKE_BUILD_TYPE=Debug
 # cmake --build build
-if [ "${LLVM_PATH+_}" ]; then
+if [ "${LLVM_PATH+_}" ] && [ -f "${LLVM_PATH}/build/bin/clang" ]; then
  export LLVM_BIN_PATH=${LLVM_PATH}/build/bin
 else
  export LLVM_BIN_PATH=$HOME/bin/llvm-19.1.1/bin
@@ -102,7 +102,7 @@ fi
 # for cmake
 export CMAKE_PATH=$HOME/bin/cmake/bin
 
-export PATH=$PATH:$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH:$LLVM_BIN_PATH
+export PATH=$CMAKE_PATH:$LOCAL_BIN_PATH:$MY_BIN:$HOME_BIN:$CUDA_BIN_PATH:$LLVM_BIN_PATH:$PATH
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$CUDA_LIB_PATH:
 export LIBRARY_PATH=$LD_LIBRARY_PATH
@@ -153,6 +153,8 @@ function run_multi_thread() {
   exec 5<&-
 }
 
+# Zellij
+export ZELLIJ_SOCKET_DIR=/tmp/zellij
 
 # For bazel
 # source $HOME/.bazel/bin/bazel-complete.bash
