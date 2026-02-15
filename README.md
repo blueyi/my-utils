@@ -62,6 +62,18 @@ source ~/repos/my-utils/profiles/python/env.bash   # Python
 source ~/repos/my-utils/profiles/ai_infra/env.bash  # AI Infra
 ```
 
+## Cursor Config Backup
+
+Sync Cursor settings to `cursor_bak/` and use symlinks so edits stay in the repo. **Not enabled by default**; use `--tools cursor`:
+
+```bash
+./bootstrap.sh --tools cursor --yes     # Link Cursor config to cursor_bak
+./bootstrap.sh --tools cursor          # Interactive
+# Standalone:
+./common/cursor_config_link.sh          # Link
+./common/cursor_config_link.sh --restore   # Restore original paths
+```
+
 ## License
 
 MIT

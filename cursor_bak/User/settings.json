@@ -1,0 +1,69 @@
+{
+    "rust-analyzer.inlayHints.closureCaptureHints.enable": true,
+    "editor.semanticTokenColorCustomizations": {
+        "rules": {
+            "*.mutable": {
+                "fontStyle": "", // set to empty string to disable underline, which is the default
+            }
+        }
+    },
+    "Key Promoter.suggestKeybindingCreation": false,
+    "Key Promoter.ignoredCommands": [
+        "type",
+        "inlineChat.hideHint",
+        "closeReferenceSearch",
+        "closeMarkersNavigation",
+        "closeParameterHints",
+        "actions.find",
+        "editor.action.clipboardCopyAction",
+        "workbench.action.files.save"
+    ],
+    "C_Cpp.default.cppStandard": "c++20",
+    "C_Cpp.default.cStandard": "c17",
+    "vim.handleKeys": {
+        "<C-a>": false,
+        "<C-c>": false,
+        "<C-x>": false,
+        "<C-f>": false,
+        "<C-h>": false,
+        "<C-s>": false,
+        "<C-z>": false,
+        "<C-y>": false,
+        "<C-i>": false,
+        "<C-I>": false,
+        "<C-K, M>": false,
+        "<C-K>": false,
+    },
+    "marscode.codeCompletionPro": {
+        "enableCodeCompletionPro": true
+    },
+    "editor.unicodeHighlight.nonBasicASCII": false,
+    "gitlens.ai.model": "vscode",
+    "gitlens.ai.vscode.model": "copilot:gpt-4o",
+    "trae.codeCompletionPro": {},
+    "debug.onTaskErrors": "showErrors",
+    "security.workspace.trust.untrustedFiles": "open",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "editor.guides.indentation": false,
+    "[cpp]": {
+        "editor.wordBasedSuggestions": "off",
+        "editor.semanticHighlighting.enabled": true,
+        "editor.stickyScroll.defaultModel": "foldingProviderModel",
+        "editor.suggest.insertMode": "replace"
+    },
+    "[cmake-cache]": {},
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "vim.digraphs": {
+
+    },
+    "vim.commandLineModeKeyBindings": [
+
+    ],
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": true,
+        "markdown": false,
+        "scminput": false
+    },
+    "files.autoSave": "afterDelay"
+}

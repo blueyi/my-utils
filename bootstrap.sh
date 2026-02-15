@@ -3,9 +3,9 @@
 # Supports Linux + macOS.
 #
 # Usage:
-#   ./bootstrap.sh              # Interactive
-#   ./bootstrap.sh --yes       # Unattended, all tools
-#   ./bootstrap.sh --tools packages links vimrc --yes
+#   ./bootstrap.sh              # Interactive (packages, links, misc, vimrc)
+#   ./bootstrap.sh --yes       # Unattended, default tools
+#   ./bootstrap.sh --tools packages links cursor --yes   # cursor not in default
 
 set -e
 MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     *)
       echo "Unknown option: $1"
-      echo "Usage: $0 [--yes] [--tools packages links misc vimrc]"
+      echo "Usage: $0 [--yes] [--tools packages links misc vimrc cursor]"
       exit 1
       ;;
   esac
@@ -58,6 +58,9 @@ run_tool() {
       ;;
     vimrc)
       "$COMMON/install_vim_plugins.sh"
+      ;;
+    cursor)
+      "$COMMON/cursor_config_link.sh"
       ;;
     *)
       echo "Unknown tool: $name"

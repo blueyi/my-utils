@@ -2,3 +2,8 @@
 *.pyc
 common/*.pyc
 common/.ropeproject
+
+# Cursor session / user data (keep settings.json, mcp.json, rules/)
+cursor_bak/User/History/
+cursor_bak/User/globalStorage/
+cursor_bak/User/workspaceStorage/
