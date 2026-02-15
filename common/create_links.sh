@@ -35,13 +35,13 @@ while IFS= read -r line || [ -n "$line" ]; do
     continue
   fi
 
-  # Avoid circular link: if target resolves inside repo (e.g. ~/.config -> repo/config),
-  # creating ~/.config/zellij would overwrite repo/config/zellij with a self-reference.
+  # Avoid circular link: if target parent resolves inside repo, skip.
+  # (e.g. ~/.config -> repo/config, or ~/.pip -> repo/config/pip)
   tgt_parent="$(dirname "$tgt_full")"
   if [ -e "$tgt_parent" ]; then
-    tgt_parent_canon="$(cd "$tgt_parent" 2>/dev/null && pwd -P)" || true
-    if [[ -n "$tgt_parent_canon" && "$tgt_parent_canon" == "$ROOT"* ]]; then
-      echo "  Skip $tgt (circular link: target would be inside repo)"
+    canon="$(cd "$tgt_parent" 2>/dev/null && pwd -P)" || true
+    if [[ -n "$canon" && "$canon" == "$ROOT"* ]]; then
+      echo "  Skip $tgt (circular link: target parent resolves inside repo)"
       continue
     fi
   fi
