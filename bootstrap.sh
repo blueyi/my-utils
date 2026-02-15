@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # My-Utils Bootstrap - One-click dev environment setup
-# Zero Python dependency. Supports Linux + macOS.
+# Supports Linux + macOS.
 #
 # Usage:
 #   ./bootstrap.sh              # Interactive

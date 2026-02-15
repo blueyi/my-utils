@@ -1,50 +1,50 @@
 # My-Utils
 
-一键初始化个人 Linux / macOS 开发环境，支持 zsh、bash，配置 vimrc、zshrc、bashrc 等。
+One-click dev environment setup for Linux / macOS. Supports zsh, bash, vimrc, zshrc, bashrc, etc.
 
-## 特性
+## Features
 
-- 支持 Linux（Ubuntu / Debian / Fedora）和 macOS
-- 配置以软链接管理，修改保存在仓库内，便于备份和版本控制
-- 支持一键或按需安装，`--yes` 静默执行
-- 场景化配置：C++、Python、AI Infra（LLVM / MLIR、TVM）
+- Linux (Ubuntu / Debian / Fedora) and macOS
+- Configs managed via symlinks; edits stay in repo for backup and version control
+- One-shot or selective install; `--yes` for non-interactive mode
+- Profile presets: C++, Python, AI Infra (LLVM / MLIR, TVM)
 
-## 快速开始
+## Quick Start
 
 ```bash
 git clone https://github.com/your-user/my-utils.git ~/repos/my-utils
 cd ~/repos/my-utils
 
-# 一键安装
+# One-shot install
 ./bootstrap.sh --yes
 
-# 或交互式选择
+# Or interactive
 ./bootstrap.sh
 
 exec $SHELL
 ```
 
-## 安装选项
+## Install Options
 
 ```bash
-# 仅安装系统包
+# System packages only
 ./bootstrap.sh --tools packages --yes
 
-# 仅创建软链接（vimrc、bashrc、zshrc 等）
+# Symlinks only (vimrc, bashrc, zshrc, etc.)
 ./bootstrap.sh --tools links --yes
 
-# 仅安装 oh-my-zsh、pyenv
+# oh-my-zsh, pyenv only
 ./bootstrap.sh --tools misc --yes
 
-# 仅安装 vim 插件
+# Vim plugins only
 ./bootstrap.sh --tools vimrc --yes
 ```
 
-## 配置结构
+## Config Layout
 
-`~/.vimrc`、`~/.bashrc`、`~/.zshrc` 等通过软链接指向仓库内 `config/` 下的文件，修改 `config/` 中的文件即修改实际使用的配置，可直接 git 提交。
+`~/.vimrc`, `~/.bashrc`, `~/.zshrc` symlink to files under `config/`. Edit files in `config/` to change live config; commit as usual.
 
-```sh
+```
 config/
 ├── _vimrc      → ~/.vimrc
 ├── _bashrc     → ~/.bashrc
@@ -54,7 +54,7 @@ config/
 └── ...
 ```
 
-## 场景 Profiles
+## Profiles
 
 ```bash
 source ~/repos/my-utils/profiles/cpp/env.bash      # C++ / LLVM
