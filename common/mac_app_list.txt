@@ -1,0 +1,26 @@
+# macOS Homebrew package list
+# One package per line, # for comment
+
+# core
+vim
+curl
+wget
+git
+zsh
+
+# c/c++
+llvm
+cmake
+ninja
+gdb
+
+# python (pyenv will manage python, this is for system tools)
+python@3.11
+
+# utils
+ctags
+openssl
+readline
+xz
+zlib
+sqlite
