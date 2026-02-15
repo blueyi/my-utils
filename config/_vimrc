@@ -1,6 +1,6 @@
 " File: _vimrc
 " Description: Vim/Neovim config for Linux + macOS. vim-plug, coc.nvim, ALE, fzf, etc.
-" Run :PlugInstall to install plugins. Coc LSP extensions auto-install on first run.
+" Run :PlugInstall to install plugins. Coc requires Vim 9.0.0438+ or Neovim 0.8.0+ and Node.js.
 " =============================================================================
 "        << Linux + macOS | Vim + Neovim >>
 " =============================================================================
@@ -36,12 +36,17 @@ if empty(glob('~/.vim/autoload/plug.vim'))
       \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+" coc.nvim requires Vim 9.0.0438+ or Neovim 0.8.0+
+let g:coc_available = (v:version >= 900 && has('patch-9.0.0438')) || (has('nvim') && has('nvim-0.8'))
+
 call plug#begin('~/.vim/plugged')
 
 Plug 'junegunn/vim-plug'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
 Plug 'junegunn/limelight.vim', { 'for': 'markdown' }
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+if g:coc_available
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+endif
 Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -539,35 +544,36 @@ let g:airline_powerline_fonts = 0
 let g:airline#extensions#ale#enabled = 1
 
 "***************
-"--coc.nvim configure--
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gr <Plug>(coc-references)
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-nmap <M-g> <Plug>(coc-definition)
+"--coc.nvim configure (requires Vim 9.0.0438+ or Neovim 0.8.0+, and Node.js)--
+if g:coc_available
+  nmap <silent> gd <Plug>(coc-definition)
+  nmap <silent> gy <Plug>(coc-type-definition)
+  nmap <silent> gr <Plug>(coc-references)
+  nmap <silent> [g <Plug>(coc-diagnostic-prev)
+  nmap <silent> ]g <Plug>(coc-diagnostic-next)
+  nmap <M-g> <Plug>(coc-definition)
 
-" Auto install coc LSP extensions on first run
-augroup CocInstallOnce
-  autocmd!
-  autocmd VimEnter * call s:MaybeCocInstall()
-augroup END
-function! s:MaybeCocInstall()
-  if filereadable(expand('~/.vimbak/coc-extensions-done'))
-    return
-  endif
-  call timer_start(2000, function('s:DoCocInstall'))
-endfunction
-function! s:DoCocInstall(_)
-  if filereadable(expand('~/.vimbak/coc-extensions-done'))
-    return
-  endif
-  if !exists(':CocInstall')
-    return
-  endif
-  call writefile([], expand('~/.vimbak/coc-extensions-done'))
-  silent! execute 'CocInstall coc-json coc-clangd coc-pyright coc-rust-analyzer'
-endfunction
+  augroup CocInstallOnce
+    autocmd!
+    autocmd VimEnter * call s:MaybeCocInstall()
+  augroup END
+  function! s:MaybeCocInstall()
+    if filereadable(expand('~/.vimbak/coc-extensions-done'))
+      return
+    endif
+    call timer_start(2000, function('s:DoCocInstall'))
+  endfunction
+  function! s:DoCocInstall(_)
+    if filereadable(expand('~/.vimbak/coc-extensions-done'))
+      return
+    endif
+    if !exists(':CocInstall')
+      return
+    endif
+    call writefile([], expand('~/.vimbak/coc-extensions-done'))
+    silent! execute 'CocInstall coc-json coc-clangd coc-pyright coc-rust-analyzer'
+  endfunction
+endif
 
 "***************
 "--ALE configure--

@@ -3,6 +3,7 @@
 
 # core
 vim
+node
 curl
 wget
 git
