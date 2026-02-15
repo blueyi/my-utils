@@ -1,48 +1,14 @@
 " File: _vimrc
-" Author: blueyiniu@qq.com
-" Description: blueyi's Personal vim configure file for Windows and Linux.
-" Since: 2009-10-xx
+" Description: Vim/Neovim config for Linux + macOS. vim-plug, coc.nvim, ALE, fzf, etc.
+" Run :PlugInstall to install plugins. Coc LSP extensions auto-install on first run.
 " =============================================================================
-"        需要手动进行的操作
-" =============================================================================
-" 推荐使用这个编译版本https://tuxproject.de/projects/vim/，这个版本对lua等支持都有，或者官方版本，官网版本暂时发现不支持lua，很多插件需要vim
-" 对lua的支持，例如neocomplete
-" 该配置文件在：https://github.com/blueyi/my-utils/blob/master/config/_vimrc
-"
-" 1.建立自动备份文件夹"~/.vimbak"，不管是win还是linux都创建在个人用户下。vim自动
-" 生成的后缀为"~"和"un~"的备份文件和undo文件、swap文件、tags文件等将统一存放在该文件夹
-"
-" 2.手动创建vim插件管理器vundle的文件夹并clone vundle插件到该文件夹:
-" linux下执行以下两条命令：
-"   1."mkdir -p ~/.vim/bundle/Vundle.vim"
-"   2."git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim"
-"   将.vimrc放在用户根目录下即可
-"
-" win下使用cmd执行以下两条命令(默认cmd路径在当前用户文件夹)：
-"   1."md vimfiles\bundle\Vundle.vim"
-"   2."git clone https://github.com/VundleVim/Vundle.vim.git vimfiles\bundle\Vundle.vim"
-"   将_vimrc放在用户根目录下，或者放在vim安装文件夹同目录，并搜索修改下面vundle配置中的rtp
-"   和path将相应内容注释掉
-"
-"   如果想让插件和vim在同一文件夹，只需要将vimfiles文件夹与vim文件处于同一个文件夹下
-"   并将_vimrc放在该文件夹下（本vimrc中的vundle默认采用这种方式）
-"
-" 3.打开vim，手动执行":PluginInstall"，即可自动安装vundle管理的插件
-"
-" Youcompleteme: install.py --clang-completer --msvc 12
-" 一些需要注意的默认设置：
-" 1.C++程序编译时都默认加-g参数，方便gdb调试
-" 2.不管源代码是否被修改，F10都会重新编译源文件，以防止头文件修改后而源代码没有修改导致不编译的情况
-"
-"参考https://github.com/mhinz/vim-galore
-"
-" =============================================================================
-"        << Linux / macOS only (Windows removed) >>
+"        << Linux + macOS | Vim + Neovim >>
 " =============================================================================
 let g:is_macos = has('macunix')
 let g:is_linux = !g:is_macos
 let g:islinux = g:is_linux
 let g:iswindows = 0
+let g:is_neovim = has('nvim')
 let g:isGUI = has("gui_running")
 
 " Linux Gvim/Vim default
@@ -63,35 +29,8 @@ endif
 
 
 " =============================================================================
-"                          << 以下为用户自定义配置 >>
+"  Plugins (vim-plug)
 " =============================================================================
-
-" -----------------------------------------------------------------------------
-"  < Vundle 插件管理工具配置 >
-" -----------------------------------------------------------------------------
-" 用于更方便的管理vim插件，具体用法参考 :h vundle 帮助
-" 安装方法为在终端输入如下命令
-" git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-
-" set nocompatible                                      "禁用 Vi 兼容模式
-" filetype off                                          "禁用文件类型侦测
-" 
-" if g:islinux
-"     set rtp+=~/.vim/bundle/Vundle.vim
-"     call vundle#begin()
-" else
-"     "vimfiles文件夹与vim处于同一文件夹
-"     set rtp+=$VIM/vimfiles/bundle/Vundle.vim/
-"     let path='$VIM/vimfiles/bundle'
-"     "vimfiles文件夹在用户文件夹
-"     "set rtp+=~/vimfiles/bundle/Vundle.vim/
-"     "let path='~/vimfiles/bundle'
-"     call vundle#begin(path)
-" endif
-
-" -----------------------------------------------------------------------------
-"  < vim-plug (Linux + macOS) >
-" -----------------------------------------------------------------------------
 if empty(glob('~/.vim/autoload/plug.vim'))
     silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
       \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -99,137 +38,33 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 call plug#begin('~/.vim/plugged')
 
-" let Vundle manage Vundle, required
-" Plugin 'VundleVim/Vundle.vim'
-" 
-
-" vim help for vim-plug
 Plug 'junegunn/vim-plug'
-
-"***************** Vim Plugin ************************
-
-" For Markdown read and write
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
 Plug 'junegunn/limelight.vim', { 'for': 'markdown' }
-
-" Automated tag file generation and syntax highlighting of tags
-Plug 'xolox/vim-easytags'
-Plug 'xolox/vim-misc'
-
-" Auto complete
-function! BuildYCM(info)
-    " info is a dictionary with 3 fields
-    "   " - name:   name of the plugin
-    "     " - status: 'installed', 'updated', or 'unchanged'
-    "       " - force:  set on PlugInstall! or PlugUpdate!
-    if a:info.status == 'installed' || a:info.force
-        !./install.py --clang-completer
-    endif
-endfunction
-
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-let g:deoplete#enable_at_startup = 1
-
-if g:islinux
-"    Plug 'ycm-core/YouCompleteMe' , { 'do': function('BuildYCM') }
-"    Plugin 'rdnetto/YCM-Generator.git'
-"    Plug 'Shougo/neocomplete.vim'
-elseif g:iswindows
-    if isdirectory('$VIM/vimfiles/bundle/YouCompleteMe')
-        Plug 'blueyi/YouCompleteMe'
-    else
-        Plug 'Shougo/neocomplete.vim'
-    endif
-endif
-
-" rust
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'dense-analysis/ale'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'ludovicchabant/vim-gutentags'
 Plug 'rust-lang/rust.vim'
-
-""Speed up Vim by updating folds only when called-for.
-" Plug 'Konfekt/FastFold'
-
-" lean & mean status/tabline for vim that's light as air
 Plug 'bling/vim-airline'
-
-" insert mode auto-completion for quotes, parens, brackets, etc.
-""    Plug 'Raimondi/delimitMate.git'
 Plug 'jiangmiao/auto-pairs'
-
-" Syntax checking hacks for vim
-Plug 'scrooloose/syntastic'
-
-" The ultimate snippet solution for Vim
-" Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-
-" Support web develop
-" Plug 'mattn/emmet-vim.git'
-
-" Fuzzy file, buffer, mru, tag, etc finder
-Plug 'kien/ctrlp.vim'
-
-" a Git wrapper so awesome
-" 导致windows下vim不能正常获取shell执行的返回结果
-"    if g:islinux
 Plug 'tpope/vim-fugitive'
-"    endif
-
-" displays tags in a window, ordered by scope
 Plug 'majutsushi/tagbar'
-
-" Markdown support
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
-
-"intensely orgasmic commenting
 Plug 'scrooloose/nerdcommenter'
-
-"A tree explorer plugin for vim.
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-
-" visualize your Vim undo tree
-Plug 'sjl/gundo.vim'
-
-"quoting/parenthesizing made simple use cs/ds
+Plug 'mbbill/undotree'
 Plug 'tpope/vim-surround'
-
-"automatically adjusts 'shiftwidth' and 'expandtab' heuristically based on the current file
 Plug 'tpope/vim-sleuth'
-
-"Open URI with your favorite browser from your most favorite editor
-"Plug 'tyru/open-browser.vim'
-
-"Alternate Files quickly (.c --> .h etc)
 Plug 'blueyi/a.vim'
-
-"A vim plugin to display the indention levels with thin vertical lines
 Plug 'Yggdroot/indentLine'
-
-"Vim python-mode. PyLint, Rope, Pydoc, breakpoints from box.
-Plug 'klen/python-mode'
-
-"Simple templates plugin for Vim
 Plug 'blueyi/vim-template'
-
-" other misc for vim running eg: ycm_extra_conf.py
-Plug 'blueyi/vim-dep'
-
-"********************************************
-" Color schemes
-Plug 'blueyi/myvimcolors'
 Plug 'tomasr/molokai'
 Plug 'flazz/vim-colorschemes'
-"********************************************
 
-
-" All of your Plugins must be added before the following line
-" For vim-plug
 call plug#end()
 
 "***************** Vim Configure ************************
@@ -245,18 +80,7 @@ set fileencodings=cs-bom,utf-8,cp936,gb2312,gb18030,big5,euc-jp,euc-kr,latin1,ut
 set fileformat=unix                                   "设置新文件的<EOL>格式
 set fileformats=unix,dos,mac                          "给出文件的<EOL>格式类型
 
-if (g:iswindows && g:isGUI)
-    "解决菜单乱码
-    source $VIMRUNTIME/delmenu.vim
-    source $VIMRUNTIME/menu.vim
-
-    "解决consle输出乱码
-    "language messages zh_CN.utf-8
-    let $LANG='en' "set messages language
-    set langmenu=en "set menu's language of gvim
-endif
-
-"--基本设置--
+"--basic--
 filetype plugin on        "针对不同的文件类型加载对应的插件
 filetype plugin indent on               "启用缩进
 
@@ -298,9 +122,14 @@ if has("syntax")
     syntax on
 endif
 
-" 包含C++头文件
-if isdirectory('/usr/include/c++/4.8')
-    set path+=/usr/include/c++/4.8
+" C++ include path (Linux: /usr/include/c++/*, macOS: Xcode/Homebrew)
+if g:is_linux
+    for d in split(glob('/usr/include/c++/*'), "\n")
+        if isdirectory(d) | let &path .= ',' . d | endif
+    endfor
+else
+    if isdirectory('/usr/local/include') | set path+=/usr/local/include | endif
+    if isdirectory('/opt/homebrew/include') | set path+=/opt/homebrew/include | endif
 endif
 
 " Uncomment the following to have Vim jump to the last position when reopening a file
@@ -528,8 +357,12 @@ nmap <F2> :NERDTreeToggle<CR>
 "F3调用Tagbar插件
 nmap <F3> :TagbarToggle<CR>
 
-"F4调用Gundo插件
-nnoremap <F4> :GundoToggle<CR>
+" F4: undotree
+nnoremap <F4> :UndotreeToggle<CR>
+" F5: ALE lint
+nnoremap <F5> :ALELint<CR>
+" Ctrl+P: fzf files (was ctrlp)
+nnoremap <C-p> :Files<CR>
 
 "-- Compile single program --
 autocmd filetype c nnoremap <F9> :call Run_c() <CR>
@@ -560,36 +393,23 @@ autocmd filetype sh imap <F9> <ESC> :call Run_sh() <CR>
 func! Run_java()
     exe ":ccl"
     exe ":update"
-    if g:iswindows
-        exe ':!javac %'
-    else
-        exe ':!javac %'
-    endif
+    exe ':!javac %'
     if v:shell_error == 0
-        if g:iswindows
-            exe ":!java -cp . %<"
-        else
-            exe ":!java -cp . %<"
-        endif
+        exe ":!java -cp . %<"
     endif
 endfunc
 
 "-- For CUDA development setting --
-" compile, link and execute .cu file with Samples header file
 func! Run_cuda()
     exe ":ccl"
     exe ":update"
-    if g:iswindows
-        exe ':!nvcc --ptxas-options=-v % -I "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\inc" -o %<.exe'
-    else
-        exe ':!nvcc --ptxas-options=-v % -I "/usr/local/cuda-8.0/samples/common/inc" -o %<.o'
+    let cuda_inc = expand('~') . '/cuda/samples/common/inc'
+    if !isdirectory(cuda_inc)
+        let cuda_inc = '/usr/local/cuda/samples/common/inc'
     endif
+    exe ':!nvcc --ptxas-options=-v % -I "' . cuda_inc . '" -o %<.o'
     if v:shell_error == 0
-        if g:iswindows
-            exe ":!%<.exe"
-        else
-            exe ":!./%<.o"
-        endif
+        exe ":!./%<.o"
     endif
 endfunc
 
@@ -597,7 +417,7 @@ endfunc
 func! Run_py()
     exe ":ccl"
     exe ":update"
-    exe ":!python %"
+    exe ":!python3 %"
 endfunc
 
 "-- For shell development setting --
@@ -639,33 +459,17 @@ endfunc
 func! Run_c()
     exe ":ccl"
     exe ":update"
-    if g:iswindows
-        exe ':!gcc -fexec-charset=gbk -Wall -g -O0 % -o %<.exe'
-    else
-        exe ':!gcc -Wall -g -O0 % -o %<.o'
-    endif
+    exe ':!gcc -Wall -g -O0 % -o %<.o'
     if v:shell_error == 0
-        if g:iswindows
-            exe ":!%<.exe"
-        else
-            exe ":!./%<.o"
-        endif
+        exe ":!./%<.o"
     endif
 endfunc
 func! Run_cpp()
     exe ":ccl"
     exe ":update"
-    if g:iswindows
-        exe ':!g++ -fexec-charset=gbk -Wall -std=gnu++11 -g -O0 % -o %<.exe'
-    else
-        exe ':!g++ -Wall -std=gnu++11 -g -O0 % -o %<.o'
-    endif
+    exe ':!g++ -Wall -std=gnu++11 -g -O0 % -o %<.o'
     if v:shell_error == 0
-        if g:iswindows
-            exe ":!%<.exe"
-        else
-            exe ":!./%<.o"
-        endif
+        exe ":!./%<.o"
     endif
 endfunc
 
@@ -727,185 +531,65 @@ autocmd! User GoyoLeave Limelight!
 autocmd! User goyo.vim echom 'Goyo is now loaded!'
 
 "***************
-"--neocomplete configure--
-"Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplete.
-let g:neocomplete#enable_at_startup = 1
-" Use smartcase.
-let g:neocomplete#enable_smart_case = 1
-" Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 3
-let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-" Define dictionary.
-let g:neocomplete#sources#dictionary#dictionaries = {
-            \ 'default' : '',
-            \ 'vimshell' : $HOME.'/.vimshell_hist',
-            \ 'scheme' : $HOME.'/.gosh_completions'
-            \ }
-
-" Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-" Plugin key-mappings.
-inoremap <expr><C-g>     neocomplete#undo_completion()
-inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-""    inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-""    function! s:my_cr_function()
-""        return neocomplete#close_popup() . "\<CR>"
-""        " For no inserting <CR> key.
-""        "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
-""    endfunction
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" <C-h>, <BS>: close popup and delete backword char.
-inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-"    inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><C-y>  neocomplete#close_popup()
-inoremap <expr><C-e>  neocomplete#cancel_popup()
-" Close popup by <Space>.
-"inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
-
-" For cursor moving in insert mode(Not recommended)
-"inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
-"inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
-"inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
-"inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
-" Or set this.
-"let g:neocomplete#enable_cursor_hold_i = 1
-" Or set this.
-"let g:neocomplete#enable_insert_char_pre = 1
-
-" AutoComplPop like behavior.
-"let g:neocomplete#enable_auto_select = 1
-
-" Shell like behavior(not recommended).
-"set completeopt+=longest
-"let g:neocomplete#enable_auto_select = 1
-"let g:neocomplete#disable_auto_complete = 1
-"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
-
-" Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-" Enable heavy omni completion.
-if !exists('g:neocomplete#sources#omni#input_patterns')
-    let g:neocomplete#sources#omni#input_patterns = {}
-endif
-"let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-"let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-"let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-
-" For perlomni.vim setting.
-" https://github.com/c9s/perlomni.vim
-let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-
-
-"***************
-"--Youcompleteme configure--
-"Recompile and diagnostics withe F5
-"    nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>
-" let g:ycm_use_ultisnips_completer = 1
-
-if g:islinux
-    let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/vim-dep/ycm_extra_conf.py'
-    let g:ycm_path_to_python_interpreter = '/usr/bin/python'
-else
-    let g:ycm_global_ycm_extra_conf = $VIM.'/vimfiles/bundle/vim-dep/ycm_extra_conf.py'
-    let g:ycm_path_to_python_interpreter = 'C:\Python27\python.exe'
-endif
-" 设置转到定义处的快捷键为ALT + G，这个功能非常赞
-nmap <M-g> :YcmCompleter GoToDefinitionElseDeclaration <C-R>=expand("<cword>")<CR><CR>
-" 补全功能在注释中同样有效
-let g:ycm_complete_in_comments  = 1
-let g:ycm_confirm_extra_conf    = 0
-
-let g:ycm_extra_conf_vim_data   = ['&filetype']
-let g:ycm_filetype_blacklist = { 'help': 1 }
-
-" 关闭youcompleteme的语法检查，而是使用syntastic进行语法检查
-let g:ycm_show_diagnostics_ui = 0
-
-" 开启标签补全
-let g:ycm_collect_identifiers_from_tags_files = 1
-" 从第一个键入字符就开始罗列匹配项
-let g:ycm_min_num_of_chars_for_completion=1
-"离开插入模式后自动关闭预览窗口
-"autocmd InsertLeave * if pumvisible() == 0|pclose|endif
-" 禁止缓存匹配项，每次都重新生成匹配项
-let g:ycm_cache_omnifunc=0
-" 语法关键字补全
-let g:ycm_seed_identifiers_with_syntax=1
-" 修改对C函数的补全快捷键，默认是CTRL + space，修改为ALT + ;
-let g:ycm_key_invoke_completion = '<M-;>'
-"回车即选中当前项
-inoremap <expr> <CR>       pumvisible() ? "\<C-y>" : "\<CR>"
-
-"***************
 "--vim-airline configure--
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline_powerline_fonts = 0
+let g:airline#extensions#ale#enabled = 1
 
 "***************
-"--Syntastic configure--
-"强制使用F5进行语法检查
-nnoremap <F5> :SyntasticCheck<CR>
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+"--coc.nvim configure--
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nmap <M-g> <Plug>(coc-definition)
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_loc_list_height = 5
-let g:syntastic_auto_loc_list = 0
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 1
-"   let g:syntastic_javascript_checkers = ['eslint']
-"   let g:syntastic_python_python_exec = 'C:\Python35\python.exe'
-
-"    let g:syntastic_error_symbol = '❌'
-"    let g:syntastic_style_error_symbol = '⁉️'
-"    let g:syntastic_warning_symbol = '⚠️'
-"    let g:syntastic_style_warning_symbol = '💩'
-
-highlight link SyntasticErrorSign SignColumn
-highlight link SyntasticWarningSign SignColumn
-highlight link SyntasticStyleErrorSign SignColumn
-highlight link SyntasticStyleWarningSign SignColumn
-"默认使用g++
-let g:syntastic_cpp_compiler_options = ' -std=c++11'
-"忽略检查的文件
-let g:syntastic_mode_map = {
-            \ "mode": "active",
-            \ "active_filetypes": ["c", "cpp", "py"],
-            \ "passive_filetypes": ["java"]}
-"如果使用clang++则需要以下
-"let g:syntastic_cpp_compiler = 'clang++'
-"let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
-" support html5
-"let g:syntastic_html_tidy_exec = 'tidy5'
+" Auto install coc LSP extensions on first run
+augroup CocInstallOnce
+  autocmd!
+  autocmd VimEnter * call s:MaybeCocInstall()
+augroup END
+function! s:MaybeCocInstall()
+  if filereadable(expand('~/.vimbak/coc-extensions-done'))
+    return
+  endif
+  call timer_start(2000, function('s:DoCocInstall'))
+endfunction
+function! s:DoCocInstall(_)
+  if filereadable(expand('~/.vimbak/coc-extensions-done'))
+    return
+  endif
+  if !exists(':CocInstall')
+    return
+  endif
+  call writefile([], expand('~/.vimbak/coc-extensions-done'))
+  silent! execute 'CocInstall coc-json coc-clangd coc-pyright coc-rust-analyzer'
+endfunction
 
 "***************
-"--UltiSnips configure--
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
+"--ALE configure--
+let g:ale_linters = {'c': ['clangd'], 'cpp': ['clangd'], 'python': ['pyright'], 'rust': ['analyzer']}
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_enter = 1
+let g:ale_sign_column_always = 1
+
+"***************
+"--fzf configure--
+let g:fzf_layout = { 'down': '~40%' }
+
+"***************
+"--undotree configure--
+let g:undotree_WindowLayout = 2
+let g:undotree_SplitWidth = 40
+let g:undotree_SetFocusWhenToggle = 1
+
+"***************
+"--gutentags configure--
+let g:gutentags_cache_dir = expand('~/.vimbak/gtags')
+" use default find; set g:gutentags_file_list_command for faster scanners (e.g. fd)
 
 "***************
 "--matchit configure--
@@ -922,11 +606,6 @@ let b:match_ignorecase = 1
 "autocmd FileType html,css EmmetInstall
 
 "***************
-"--ctrlp configure--
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-
-"***************
 "--tagbar configure--
 let g:tagbar_autofocus = 1
 
@@ -935,12 +614,6 @@ let g:tagbar_autofocus = 1
 let g:vim_markdown_folding_disabled=1
 let g:vim_markdown_conceal = 0
 
-
-"***************
-"--gundo configure--
-let g:gundo_width = 60
-let g:gundo_preview_height = 40
-let g:gundo_right = 1
 
 "***************
 "    "--open-browser configure--
@@ -1038,12 +711,6 @@ let NERDSpaceDelims = 1                     "在左注释符之后，右注释�
 " -----------------------------------------------------------------------------
 let g:AutoPairs = {'《':'》', '“':'”', '（':'）', '(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 
-
-" --easytags configure--
-let g:easytags_file = '~/.vimbak/tags'
-
-"--python-mode configure--
-let g:pymode_rope_complete_on_dot = 0  " disable python-mode complete
 
 "--------Plugin setting end------------
 
