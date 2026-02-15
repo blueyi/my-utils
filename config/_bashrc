@@ -117,13 +117,14 @@ if ! shopt -oq posix; then
 fi
 
 [ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
-: "${MYRC_PATH:=$HOME/repos/my-utils/config}"
+: "${MY_UTILS_ROOT:=$HOME/repos/my-utils}"
+: "${MYRC_PATH:=$MY_UTILS_ROOT/config}"
 source "$MYRC_PATH/tvm_block.bash"
 alias ess='sudo service ssh start'
 
 # eval "$(jump shell bash)"
 
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - bash)"

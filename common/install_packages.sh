@@ -10,6 +10,25 @@ source "$COMMON_DIR/platform.sh"
 OS=$(detect_os)
 PM=$(detect_package_manager)
 
+# Ensure Homebrew is installed on macOS
+ensure_brew() {
+  if command -v brew &>/dev/null; then
+    return 0
+  fi
+  # Add common brew paths (Apple Silicon: /opt/homebrew, Intel: /usr/local)
+  for p in /opt/homebrew/bin /usr/local/bin; do
+    [ -x "$p/brew" ] && export PATH="$p:$PATH" && return 0
+  done
+  echo "Installing Homebrew..."
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  # Add brew to PATH for this session (Apple Silicon default)
+  if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+}
+
 if [ "$OS" = "unknown" ] || [ "$PM" = "unknown" ]; then
   echo "Unsupported platform: $OS / $PM"
   exit 1
@@ -57,6 +76,7 @@ case "$PM" in
     list_file="$COMMON_DIR/rpm_app_list.ini"
     ;;
   brew)
+    ensure_brew
     list_file="$COMMON_DIR/mac_app_list.txt"
     ;;
   *)
