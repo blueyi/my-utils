@@ -47,6 +47,7 @@ exec $SHELL
 ```
 config/
 ├── _vimrc      → ~/.vimrc
+├── init.vim    → ~/.config/nvim/init.vim  (Neovim, sources ~/.vimrc)
 ├── _bashrc     → ~/.bashrc
 ├── _zshrc      → ~/.zshrc
 ├── myrc.bash

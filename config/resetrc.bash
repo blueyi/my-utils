@@ -69,7 +69,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init - --no-rehash)"
+command -v rbenv >/dev/null && eval "$(rbenv init - --no-rehash)"
 
 else
   echo "== other shell: cat /proc/$$/comm =="
@@ -77,7 +77,7 @@ fi
 
 
 # RUST
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # cuda
 export CUDA_PATH=/usr/local/cuda
@@ -118,7 +118,7 @@ export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 [ -s "$NVM_DIR/zsh_completion" ] && \. "$NVM_DIR/zsh_completion"  # This loads nvm bash_completion
 export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init - --no-rehash)"
+command -v rbenv >/dev/null && eval "$(rbenv init - --no-rehash)"
 
 # auto run n times
 function run_n_times() {
