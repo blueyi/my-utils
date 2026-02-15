@@ -1,4 +1,6 @@
-export MY_CONF_PATH=$HOME/repos/my-utils/config
+[ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
+: "${MY_UTILS_ROOT:=$HOME/repos/my-utils}"
+export MY_CONF_PATH="${MY_UTILS_ROOT}/config"
 # export TVM_HOME=$HOME/repos/tvm
 # source $MY_CONF_PATH/tvm.bash
 

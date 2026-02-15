@@ -4,4 +4,5 @@ export LLVM_PATH=$HOME/repos/llvm-project
 # export PATH=$LLVM_PATH_BIN:$PATH
 alias cllvm='cd ${LLVM_PATH}'
 
-source $HOME/repos/my-utils/config/resetrc.bash
+: "${MYRC_PATH:=$HOME/repos/my-utils/config}"
+source "$MYRC_PATH/resetrc.bash"

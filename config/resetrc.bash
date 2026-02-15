@@ -1,5 +1,7 @@
-# export MYRC_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd);
-export MYRC_PATH=$HOME/repos/my-utils/config
+# MYRC_PATH / MY_UTILS_ROOT set by ~/.my-utils.env (from create_links.sh)
+[ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
+: "${MY_UTILS_ROOT:=$HOME/repos/my-utils}"
+: "${MYRC_PATH:=${MY_UTILS_ROOT}/config}"
 
 # ollama
 # export OLLAMA_MODELS="$HOME/ollama/models"
@@ -16,8 +18,8 @@ unset PYTHONPATH
 # For Chinese language
 # export LANG=zh_CN.UTF-8
 
-# For gogh terminal theme
-export TERMINAL=gnome-terminal
+# For gogh terminal theme (Linux; macOS uses different default)
+[[ "$(uname -s)" = Linux* ]] && export TERMINAL=gnome-terminal
 
 
 
@@ -83,7 +85,8 @@ export CUDA_BIN_PATH=$CUDA_PATH/bin
 export CUDA_LIB_PATH=$CUDA_PATH/lib64:$CUDA_PATH/extras/CUPTI/lib64
 
 # my bin
-MY_BIN=$HOME/my-utils/common
+: "${MY_UTILS_ROOT:=$HOME/repos/my-utils}"
+MY_BIN=${MY_UTILS_ROOT}/common
 HOME_BIN=$HOME/bin
 
 # for pip
@@ -161,11 +164,11 @@ export ZELLIJ_SOCKET_DIR=/tmp/zellij
 
 # alias
 alias wn='watch -n 1 nvidia-smi'
-alias exdm='cd $HOME/soft/xdm-linux-portable-x64;./xdman'
+alias exdm="cd $HOME/soft/xdm-linux-portable-x64 && ./xdman"
 alias ess='sudo service ssh start'
 alias clion='sh $HOME/bin/clion/bin/clion.sh'
-alias ecc='$HOME/soft/clash/clash.sh'
+alias ecc="${HOME}/soft/clash/clash.sh"
 alias winetricks='env LANG=zh_CN.UTF-8 winetricks'
 alias wine='env LANG=zh_CN.UTF-8 wine'
 alias wechat='env LANG=zh_CN.UTF-8 wine "/home/wangyulong/.wine/drive_c/Program Files (x86)/Tencent/WeChat/WeChat.exe"'
-alias ev2='/home/wangyulong/repos/my-utils/bin/v2ray/Qv2ray-v2.7.0-linux-x64.AppImage'
+alias ev2="${MY_UTILS_ROOT}/bin/v2ray/Qv2ray-v2.7.0-linux-x64.AppImage"
