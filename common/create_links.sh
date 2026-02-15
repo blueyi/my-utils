@@ -4,7 +4,7 @@
 
 set -e
 COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$COMMON_DIR/.." && pwd)"
+ROOT="$(cd "$COMMON_DIR/.." && pwd -P)"
 LINK_FILE="$COMMON_DIR/link.ini"
 
 # Write MY_UTILS_ROOT for rc files to use (they source this for portable paths)
@@ -33,6 +33,17 @@ while IFS= read -r line || [ -n "$line" ]; do
   if [ ! -e "$src_full" ]; then
     echo "  Skip $src (not found)"
     continue
+  fi
+
+  # Avoid circular link: if target resolves inside repo (e.g. ~/.config -> repo/config),
+  # creating ~/.config/zellij would overwrite repo/config/zellij with a self-reference.
+  tgt_parent="$(dirname "$tgt_full")"
+  if [ -e "$tgt_parent" ]; then
+    tgt_parent_canon="$(cd "$tgt_parent" 2>/dev/null && pwd -P)" || true
+    if [[ -n "$tgt_parent_canon" && "$tgt_parent_canon" == "$ROOT"* ]]; then
+      echo "  Skip $tgt (circular link: target would be inside repo)"
+      continue
+    fi
   fi
 
   if [ -e "$tgt_full" ] && [ ! -L "$tgt_full" ]; then
