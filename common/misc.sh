@@ -3,7 +3,12 @@
 # Sourced by run_misc.sh
 
 set -e
-COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Use MY_UTILS_ROOT when set (e.g. from run_misc.sh under bootstrap); else resolve from script location
+if [ -n "${MY_UTILS_ROOT:-}" ]; then
+  COMMON_DIR="$MY_UTILS_ROOT/common"
+else
+  COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 source "$COMMON_DIR/platform.sh"
 
 # Git config (idempotent)

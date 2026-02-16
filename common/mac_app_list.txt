@@ -16,7 +16,7 @@ ninja
 gdb
 
 # python (pyenv will manage python, this is for system tools)
-python@3.11
+python
 
 # utils
 ctags

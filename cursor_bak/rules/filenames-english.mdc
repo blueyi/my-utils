@@ -1,0 +1,12 @@
+---
+description: All filenames must use English by default
+alwaysApply: true
+---
+
+# Filenames - English Only (Global)
+
+- **Default rule**: All filenames must use **English** (letters, numbers, hyphens, underscores).
+- **Scope**: New files, renamed files, plans, docs, assets across all projects.
+- **Format**: Use lowercase-with-hyphens or snake_case. Avoid spaces and non-ASCII.
+- **Content**: File content may use any language. This rule applies only to **filenames**.
+- **Examples**: `oneask-web-automation-tool.plan.md` not `oneask_网页自动化聚合工具.plan.md`

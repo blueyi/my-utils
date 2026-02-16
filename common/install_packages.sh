@@ -3,8 +3,12 @@
 # Zero Python dependency
 
 set -e
-COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$COMMON_DIR/.." && pwd)"
+# Use MY_UTILS_ROOT from bootstrap when set; else resolve from script location
+if [ -n "${MY_UTILS_ROOT:-}" ]; then
+  COMMON_DIR="$MY_UTILS_ROOT/common"
+else
+  COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 
 source "$COMMON_DIR/platform.sh"
 OS=$(detect_os)
@@ -44,7 +48,7 @@ install_one() {
         echo "  $pkg (already installed)"
       else
         echo "  Installing $pkg..."
-        sudo apt-get install -y "$pkg"
+        sudo apt-get install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
       fi
       ;;
     yum)
@@ -52,7 +56,7 @@ install_one() {
         echo "  $pkg (already installed)"
       else
         echo "  Installing $pkg..."
-        sudo yum install -y "$pkg"
+        sudo yum install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
       fi
       ;;
     brew)
@@ -60,7 +64,7 @@ install_one() {
         echo "  $pkg (already installed)"
       else
         echo "  Installing $pkg..."
-        brew install "$pkg"
+        brew install "$pkg" || echo "  WARN: $pkg install failed, continuing..."
       fi
       ;;
   esac
@@ -77,6 +81,10 @@ case "$PM" in
     ;;
   brew)
     ensure_brew
+    # Ensure C/C++ compilers for CMake (macOS: Xcode Command Line Tools provide clang)
+    if ! command -v clang &>/dev/null; then
+      echo "  Hint: Install Xcode Command Line Tools for C/C++: xcode-select --install"
+    fi
     list_file="$COMMON_DIR/mac_app_list.txt"
     ;;
   *)
@@ -93,6 +101,7 @@ fi
 while IFS= read -r line || [ -n "$line" ]; do
   line="${line%%#*}"
   line="${line// /}"
+  line="${line//$'\r'/}"
   [ -z "$line" ] && continue
   # Expand e.g. linux-headers-`uname -r` on Linux
   pkg=$(eval echo "$line")

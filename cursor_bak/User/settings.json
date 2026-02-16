@@ -3,7 +3,7 @@
     "editor.semanticTokenColorCustomizations": {
         "rules": {
             "*.mutable": {
-                "fontStyle": "", // set to empty string to disable underline, which is the default
+                "fontStyle": ""
             }
         }
     },
@@ -32,7 +32,7 @@
         "<C-i>": false,
         "<C-I>": false,
         "<C-K, M>": false,
-        "<C-K>": false,
+        "<C-K>": false
     },
     "marscode.codeCompletionPro": {
         "enableCodeCompletionPro": true
@@ -53,17 +53,17 @@
     },
     "[cmake-cache]": {},
     "github.copilot.nextEditSuggestions.enabled": true,
-    "vim.digraphs": {
-
-    },
-    "vim.commandLineModeKeyBindings": [
-
-    ],
+    "vim.digraphs": {},
+    "vim.commandLineModeKeyBindings": [],
     "github.copilot.enable": {
         "*": true,
         "plaintext": true,
         "markdown": false,
         "scminput": false
     },
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    "cursor.cpp.disabledLanguages": [
+        "markdown",
+        "scminput"
+    ]
 }

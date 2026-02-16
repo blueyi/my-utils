@@ -1,7 +1,7 @@
 # resetrc.bash - Shell init base for Linux + macOS
-# MYRC_PATH / MY_UTILS_ROOT set by ~/.my-utils.env (from create_links.sh)
+# MY_UTILS_ROOT from ~/.my-utils.env (bootstrap) or derived from this script path (config/resetrc.bash -> ..)
 [ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
-: "${MY_UTILS_ROOT:=$HOME/repos/my-utils}"
+[ -z "${MY_UTILS_ROOT:-}" ] && export MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 : "${MYRC_PATH:=${MY_UTILS_ROOT}/config}"
 
 # Platform
@@ -19,6 +19,9 @@ if _is_macos; then
   [ -z "$_brew_prefix" ] && [ -d /usr/local/Homebrew ] && _brew_prefix="/usr/local"
   if [ -n "$_brew_prefix" ]; then
     export PATH="${_brew_prefix}/bin:${_brew_prefix}/sbin:$PATH"
+    [ -d "${_brew_prefix}/opt/curl/bin" ] && export PATH="${_brew_prefix}/opt/curl/bin:$PATH"
+    [ -d "${_brew_prefix}/opt/curl/lib" ] && export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${_brew_prefix}/opt/curl/lib"
+    [ -d "${_brew_prefix}/opt/curl/include" ] && export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${_brew_prefix}/opt/curl/include"
   fi
   export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH"
 else
@@ -31,6 +34,29 @@ else
   unset LIBRARY_PATH
 fi
 unset PYTHONPATH
+
+# C++ / CMake build environment (Ninja, C/C++ compiler; paths differ on macOS vs Linux)
+if _is_macos; then
+  # Ninja/cmake from Homebrew; clang from Xcode Command Line Tools
+  [ -d /opt/homebrew/bin ] && export PATH="/opt/homebrew/bin:$PATH"
+  [ -d /usr/local/bin ] && case ":$PATH:" in *":/usr/local/bin:"*) ;; *) export PATH="/usr/local/bin:$PATH";; esac
+  [ -x /usr/bin/clang ] && export CC=/usr/bin/clang
+  [ -x /usr/bin/clang++ ] && export CXX=/usr/bin/clang++
+  # Optional: use Homebrew LLVM instead of Xcode clang (uncomment if needed)
+  # [ -d /opt/homebrew/opt/llvm/bin ] && export PATH="/opt/homebrew/opt/llvm/bin:$PATH" && export CC=clang CXX=clang++
+  # [ -d /usr/local/opt/llvm/bin ] && export PATH="/usr/local/opt/llvm/bin:$PATH" && export CC=clang CXX=clang++
+else
+  # Linux: gcc/g++, ninja(ninja-build) and cmake usually in /usr/bin or /usr/local/bin
+  [ -x /usr/bin/gcc ] && export CC=/usr/bin/gcc
+  [ -x /usr/bin/g++ ] && export CXX=/usr/bin/g++
+  [ -d /usr/local/bin ] && case ":$PATH:" in *":/usr/local/bin:"*) ;; *) export PATH="/usr/local/bin:$PATH";; esac
+fi
+# CMake finds Ninja via PATH; optionally set CMAKE_MAKE_PROGRAM for scripts that use it
+if [ -z "${CMAKE_MAKE_PROGRAM:-}" ]; then
+  _ninja=$(command -v ninja 2>/dev/null || command -v ninja-build 2>/dev/null)
+  [ -n "$_ninja" ] && export CMAKE_MAKE_PROGRAM="$_ninja"
+fi
+unset _ninja 2>/dev/null || true
 
 # For Chinese language
 # export LANG=zh_CN.UTF-8
@@ -55,8 +81,10 @@ command -v pyenv >/dev/null && eval "$(pyenv init -)" || true
 export PATH="$HOME/.rbenv/bin:$PATH"
 command -v rbenv >/dev/null && eval "$(rbenv init - 2>/dev/null)" || true
 
-# Rust
+# Rust (rustup: ~/.cargo/env from rustup-init, or Homebrew /opt/homebrew/opt/rustup/bin)
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+[ -d /opt/homebrew/opt/rustup/bin ] && export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+[ -d /usr/local/opt/rustup/bin ] && export PATH="/usr/local/opt/rustup/bin:$PATH"
 
 # CUDA (Linux, optional)
 if _is_linux && [ -d /usr/local/cuda ]; then
@@ -68,7 +96,6 @@ if _is_linux && [ -d /usr/local/cuda ]; then
 fi
 
 # My bins
-: "${MY_UTILS_ROOT:=$HOME/repos/my-utils}"
 MY_BIN=${MY_UTILS_ROOT}/common
 HOME_BIN=$HOME/bin
 export LOCAL_BIN_PATH=$HOME/.local/bin

@@ -3,14 +3,15 @@
 # Supports Linux + macOS.
 #
 # Usage:
-#   ./bootstrap.sh              # Interactive (packages, links, misc, vimrc)
-#   ./bootstrap.sh --yes       # Unattended, default tools
-#   ./bootstrap.sh --tools packages links cursor --yes   # cursor not in default
+#   ./bootstrap.sh              # Interactive: ask which of (packages, links, misc, vimrc, cursor) to run
+#   ./bootstrap.sh --yes        # Unattended: run all (packages, links, misc, vimrc, cursor) with no prompts
+#   ./bootstrap.sh --tools packages links --yes   # Unattended, only selected tools
 
 set -e
-MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMMON="$MY_UTILS_ROOT/common"
+# Canonical project root; all child scripts (create_links, install_packages, etc.) use this when set
+MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 export MY_UTILS_ROOT
+COMMON="$MY_UTILS_ROOT/common"
 
 YES_MODE=false
 SELECTED_TOOLS=()
@@ -32,14 +33,17 @@ while [[ $# -gt 0 ]]; do
     *)
       echo "Unknown option: $1"
       echo "Usage: $0 [--yes] [--tools packages links misc vimrc cursor]"
+      echo "  --yes: run all selected tools without prompting"
+      echo "  --tools: run only these (default: all)"
+      echo "  packages=install pkgs, links=symlinks, misc=oh-my-zsh/pyenv, vimrc=vim plugins, cursor=config backup"
       exit 1
       ;;
   esac
 done
 
-ALL_TOOLS=(packages links misc vimrc)
+ALL_TOOLS=(packages links misc vimrc cursor)
 
-# If no tools specified, use all
+# If no tools specified, use all (--yes without --tools => one-shot init: packages, links, misc, vimrc, cursor)
 if [ ${#SELECTED_TOOLS[@]} -eq 0 ]; then
   SELECTED_TOOLS=("${ALL_TOOLS[@]}")
 fi

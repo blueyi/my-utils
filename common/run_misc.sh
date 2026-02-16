@@ -3,7 +3,12 @@
 # Zero Python dependency
 
 set -e
-COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Use MY_UTILS_ROOT from bootstrap when set; else resolve from script location
+if [ -n "${MY_UTILS_ROOT:-}" ]; then
+  COMMON_DIR="$MY_UTILS_ROOT/common"
+else
+  COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 
 if [ ! -f "$COMMON_DIR/misc.sh" ]; then
   echo "misc.sh not found"

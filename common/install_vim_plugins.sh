@@ -3,8 +3,13 @@
 # Zero Python dependency
 
 set -e
-COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$COMMON_DIR/.." && pwd)"
+# Use MY_UTILS_ROOT from bootstrap when set; else resolve from script location
+if [ -n "${MY_UTILS_ROOT:-}" ]; then
+  ROOT="$(cd "$MY_UTILS_ROOT" && pwd)"
+else
+  COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  ROOT="$(cd "$COMMON_DIR/.." && pwd)"
+fi
 VIMRC="$ROOT/config/_vimrc"
 PLUG_DIR="$HOME/.vim/autoload"
 PLUGGED_DIR="$HOME/.vim/plugged"
@@ -22,8 +27,8 @@ else
   echo "vim-plug already installed"
 fi
 
-# Install plugins via vim (vim reads vimrc which has Plug declarations)
+# Install plugins via vim (batch mode: -E -s avoids "Press ENTER" prompt; pipe newline as fallback)
 echo "Installing vim plugins (this may take a while)..."
-vim -u "$VIMRC" +PlugInstall +qall 2>/dev/null || {
-  echo "If vim failed, run manually: vim +PlugInstall +qall"
+( echo '' | vim -u "$VIMRC" -E -s -c "PlugInstall" -c "qall" 2>/dev/null ) || {
+  echo "If vim failed, run manually: vim -u $VIMRC +PlugInstall +qall"
 }

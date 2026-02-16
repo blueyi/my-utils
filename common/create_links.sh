@@ -3,15 +3,27 @@
 # Config files stay in repo; ~/.vimrc etc point to them for easy git backup
 
 set -e
-COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$COMMON_DIR/.." && pwd -P)"
+# Use MY_UTILS_ROOT from bootstrap when set; else resolve from script location
+if [ -n "${MY_UTILS_ROOT:-}" ]; then
+  ROOT="$(cd "$MY_UTILS_ROOT" && pwd -P)"
+  COMMON_DIR="$MY_UTILS_ROOT/common"
+else
+  COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  ROOT="$(cd "$COMMON_DIR/.." && pwd -P)"
+fi
 LINK_FILE="$COMMON_DIR/link.ini"
 
-# Write MY_UTILS_ROOT for rc files to use (they source this for portable paths)
+# Write MY_UTILS_ROOT for rc files: use $HOME-relative path when repo is under HOME (portable across machines)
 ENV_FILE="$HOME/.my-utils.env"
-echo "export MY_UTILS_ROOT=\"$ROOT\"" > "$ENV_FILE"
+if [[ "$ROOT" == "$HOME"/* ]]; then
+  _rel="${ROOT#"$HOME"/}"
+  echo "export MY_UTILS_ROOT=\"\$HOME/$_rel\"" > "$ENV_FILE"
+else
+  echo "export MY_UTILS_ROOT=\"$ROOT\"" > "$ENV_FILE"
+fi
 echo "export MYRC_PATH=\"\$MY_UTILS_ROOT/config\"" >> "$ENV_FILE"
 echo "Created $ENV_FILE"
+unset _rel
 
 echo "=== Creating soft links ==="
 
@@ -42,6 +54,23 @@ while IFS= read -r line || [ -n "$line" ]; do
     canon="$(cd "$tgt_parent" 2>/dev/null && pwd -P)" || true
     if [[ -n "$canon" && "$canon" == "$ROOT"* ]]; then
       echo "  Skip $tgt (circular link: target parent resolves inside repo)"
+      continue
+    fi
+  fi
+
+  # If target is already a symlink, check it points to the expected source (idempotent)
+  if [ -L "$tgt_full" ]; then
+    current_target=$(readlink "$tgt_full")
+    [[ -z "$current_target" ]] && current_target=""
+    if [[ "$current_target" != /* ]]; then
+      current_abs="$(dirname "$tgt_full")/$current_target"
+    else
+      current_abs="$current_target"
+    fi
+    expected_canon=$(cd "$(dirname "$src_full")" 2>/dev/null && echo "$(pwd -P)/$(basename "$src_full")") || true
+    current_canon=$(cd "$(dirname "$current_abs")" 2>/dev/null && echo "$(pwd -P)/$(basename "$current_abs")") || true
+    if [[ -n "$expected_canon" && -n "$current_canon" && "$current_canon" == "$expected_canon" ]]; then
+      echo "  $tgt_full (already points to expected)"
       continue
     fi
   fi

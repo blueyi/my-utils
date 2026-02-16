@@ -1,6 +1,16 @@
 [ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
-: "${MYRC_PATH:=$HOME/repos/my-utils/config}"
-source "$MYRC_PATH/myrc.bash"
+if [ -z "${MY_UTILS_ROOT:-}" ] && [ -L "$HOME/.zshrc" ]; then
+  _t="$(readlink "$HOME/.zshrc" 2>/dev/null)"
+  if [ -n "$_t" ]; then
+    if [[ "$_t" == /* ]]; then _d="$(dirname "$_t")"; else _d="$(cd "$(dirname "$HOME/.zshrc")" 2>/dev/null && cd "$(dirname "$_t")" 2>/dev/null && pwd)"; fi
+    [[ "${_d:-}" == *"config"* ]] && export MY_UTILS_ROOT="$(cd "$_d/.." 2>/dev/null && pwd)"
+  fi
+  unset _t _d 2>/dev/null || true
+fi
+if [ -n "${MY_UTILS_ROOT:-}" ]; then
+  : "${MYRC_PATH:=${MY_UTILS_ROOT}/config}"
+  source "$MYRC_PATH/myrc.bash"
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
@@ -102,3 +112,6 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Rust cargo environment
+[ -f ~/.cargo/env ] && . ~/.cargo/env

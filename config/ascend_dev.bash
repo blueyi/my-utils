@@ -1,4 +1,6 @@
-source $HOME/repos/my-utils/config/resetrc.bash
+[ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
+[ -z "${MY_UTILS_ROOT:-}" ] && export MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$MY_UTILS_ROOT/config/resetrc.bash"
 
 export ASCEND_PATH=$HOME/Ascend
 # export ASCEND_CUSTOM_PATH=${ASCEND_PATH}/ascend-toolkit/20.10.0.B023
