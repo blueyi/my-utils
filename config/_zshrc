@@ -115,3 +115,9 @@ source $ZSH/oh-my-zsh.sh
 
 # Rust cargo environment
 [ -f ~/.cargo/env ] && . ~/.cargo/env
+
+# OpenClaw CLI Tab completion (must run after compinit, e.g. after oh-my-zsh)
+[[ -f ~/.openclaw/completions/openclaw.zsh ]] && source ~/.openclaw/completions/openclaw.zsh
+
+# OpenClaw Completion
+source "/Users/yulong/.openclaw/completions/openclaw.zsh"

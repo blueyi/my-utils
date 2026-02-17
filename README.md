@@ -96,7 +96,15 @@ cmake ..
 
 ## Cursor Config Backup
 
-Sync Cursor settings to `cursor_bak/` and use symlinks so edits stay in the repo. **Included in default tool list** (both `./bootstrap.sh --yes` and interactive `./bootstrap.sh` will include cursor unless you use `--tools` to limit):
+Sync Cursor settings to `cursor_bak/` and use symlinks so edits stay in the repo. Backed up (macOS: `~/Library/Application Support/Cursor`, Linux: `~/.config/Cursor`):
+
+- **User/** – settings.json, keybindings.json, mcp.json, snippets, etc.
+- **Preferences** – app-level preferences file
+- **ide_state.json** – when present
+- **~/.cursor/rules** → `cursor_bak/rules`
+- **~/.cursor/projects** → `cursor_bak/projects` (per-workspace state; `terminals/` and `agent-transcripts/` are gitignored)
+
+**Included in default tool list** (both `./bootstrap.sh --yes` and interactive `./bootstrap.sh` will include cursor unless you use `--tools` to limit):
 
 ```bash
 ./bootstrap.sh --yes                    # runs cursor step with others

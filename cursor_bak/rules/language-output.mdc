@@ -1,6 +1,8 @@
 ---
+description: 
 alwaysApply: true
 ---
+
 # Response Language Rule
 
 - **When the user writes in Chinese (simplified or traditional)**: respond with **both Chinese and English**. Use Chinese as the primary content, followed by the English equivalent (e.g., in parentheses, or as a short bilingual summary).

@@ -7,3 +7,6 @@ common/.ropeproject
 cursor_bak/User/History/
 cursor_bak/User/globalStorage/
 cursor_bak/User/workspaceStorage/
+# Cursor projects: ephemeral per-workspace data (keep mcps/ for MCP config)
+cursor_bak/projects/*/terminals/
+cursor_bak/projects/*/agent-transcripts/
