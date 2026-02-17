@@ -46,6 +46,7 @@
     "workbench.secondarySideBar.defaultVisibility": "hidden",
     "editor.guides.indentation": false,
     "[cpp]": {
+    
         "editor.wordBasedSuggestions": "off",
         "editor.semanticHighlighting.enabled": true,
         "editor.stickyScroll.defaultModel": "foldingProviderModel",
@@ -65,5 +66,9 @@
     "cursor.cpp.disabledLanguages": [
         "markdown",
         "scminput"
-    ]
+    ],
+    "editor.fontSize": 13,
+    "terminal.integrated.fontSize": 13,
+    "window.zoomLevel": 1,
+    "mlir.onSettingsChanged": "restart"
 }

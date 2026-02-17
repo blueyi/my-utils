@@ -15,13 +15,20 @@ cmake
 ninja
 gdb
 
-# python (pyenv will manage python, this is for system tools)
+# python (pyenv manages python versions; install pyenv via brew on macOS)
+pyenv
 python
+
+# pyenv build deps (openssl readline sqlite xz zlib tcl-tk libb2 zstd pkg-config)
+openssl
+readline
+sqlite
+xz
+zlib
+tcl-tk
+libb2
+zstd
+pkg-config
 
 # utils
 ctags
-openssl
-readline
-xz
-zlib
-sqlite
