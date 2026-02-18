@@ -103,12 +103,8 @@ command -v rbenv >/dev/null && eval "$(rbenv init - 2>/dev/null)" || true
 [ -d /opt/homebrew/opt/rustup/bin ] && case ":$PATH:" in *":/opt/homebrew/opt/rustup/bin:"*) ;; *) export PATH="/opt/homebrew/opt/rustup/bin:$PATH";; esac
 [ -d /usr/local/opt/rustup/bin ] && case ":$PATH:" in *":/usr/local/opt/rustup/bin:"*) ;; *) export PATH="/usr/local/opt/rustup/bin:$PATH";; esac
 
-# OpenClaw CLI Tab completion (must run after compinit, e.g. after oh-my-zsh)
-[[ -f ~/.openclaw/completions/openclaw.zsh ]] && source ~/.openclaw/completions/openclaw.zsh
-
-# OpenClaw Completion
-source "$HOME/.openclaw/completions/openclaw.zsh"
-
+# OpenClaw CLI tab completion (must run after compinit, e.g. after oh-my-zsh in _zshrc)
+[[ -f "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
 
 # CUDA (Linux, optional) - set explicitly so repeated source does not accumulate
 if _is_linux && [ -d /usr/local/cuda ]; then

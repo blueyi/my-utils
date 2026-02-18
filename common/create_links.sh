@@ -13,8 +13,8 @@ else
 fi
 LINK_FILE="$COMMON_DIR/link.ini"
 
-# Write MY_UTILS_ROOT for rc files: use $HOME-relative path when repo is under HOME (portable across machines)
-ENV_FILE="$HOME/.my-utils.env"
+# Write config/my-utils.env (source by rc via symlink ~/.my-utils.env -> config/my-utils.env)
+ENV_FILE="$ROOT/config/my-utils.env"
 if [[ "$ROOT" == "$HOME"/* ]]; then
   _rel="${ROOT#"$HOME"/}"
   echo "export MY_UTILS_ROOT=\"\$HOME/$_rel\"" > "$ENV_FILE"
@@ -22,7 +22,7 @@ else
   echo "export MY_UTILS_ROOT=\"$ROOT\"" > "$ENV_FILE"
 fi
 echo "export MYRC_PATH=\"\$MY_UTILS_ROOT/config\"" >> "$ENV_FILE"
-echo "Created $ENV_FILE"
+echo "Created $ENV_FILE (link ~/.my-utils.env in link.ini)"
 unset _rel
 
 echo "=== Creating soft links ==="

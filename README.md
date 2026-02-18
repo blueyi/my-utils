@@ -7,7 +7,7 @@ One-click dev environment setup for Linux / macOS. Supports zsh, bash, vimrc, zs
 - Linux (Ubuntu / Debian / Fedora) and macOS
 - Configs managed via symlinks; edits stay in repo for backup and version control
 - One-shot or selective install; `--yes` for non-interactive mode
-- Profile presets: C++, Python, AI Infra (LLVM / MLIR, TVM)
+- Profile presets: C++, Python, AI Infra (LLVM / MLIR); optional Triton (GPU kernel) via `config/triton.bash`
 
 ## Quick Start
 
@@ -42,25 +42,27 @@ exec $SHELL
 
 ## Config Layout
 
-`~/.vimrc`, `~/.bashrc`, `~/.zshrc` symlink to files under `config/`. Edit files in `config/` to change live config; commit as usual.
+`~/.vimrc`, `~/.bashrc`, `~/.zshrc` symlink to files under `config/`. Edit files in `config/` to change live config; commit as usual. **C++ / CMake** env (PATH, CC, CXX, Ninja) is loaded by default via `myrc.bash`. For directory tree and role of each script, see [STRUCTURE.md](STRUCTURE.md).
 
 ```
 config/
-├── _vimrc      → ~/.vimrc
-├── init.vim    → ~/.config/nvim/init.vim  (Neovim, sources ~/.vimrc)
-├── _bashrc     → ~/.bashrc
-├── _zshrc      → ~/.zshrc
-├── myrc.bash
-├── resetrc.bash
+├── _vimrc, _bashrc, _zshrc   → ~/.vimrc, ~/.bashrc, ~/.zshrc
+├── myrc.bash, path.bash, resetrc.bash, llvm.bash
+├── cmake_env.bash            # C++ (default loaded)
+├── triton.bash               # Triton GPU kernel dev (source when needed)
 └── ...
 ```
 
-## Profiles
+## Profiles and optional env
 
 ```bash
+# Preset profiles (manual source)
 source ~/repos/my-utils/profiles/cpp/env.bash      # C++ / LLVM
 source ~/repos/my-utils/profiles/python/env.bash   # Python
 source ~/repos/my-utils/profiles/ai_infra/env.bash  # AI Infra
+
+# Triton (GPU kernel) dev
+source "$MYRC_PATH/triton.bash"
 ```
 
 ## Troubleshooting

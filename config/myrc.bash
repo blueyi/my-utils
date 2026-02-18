@@ -5,5 +5,6 @@ export MY_CONF_PATH="${MY_UTILS_ROOT}/config"
 # export TVM_HOME=$HOME/repos/tvm
 # source $MY_CONF_PATH/tvm.bash
 
-source $MY_CONF_PATH/llvm.bash
-# source $MY_CONF_PATH/dl.bash
+source "$MY_CONF_PATH/llvm.bash"
+# C++ / CMake: default load for C++ dev (PATH, CC, CXX, CMAKE_MAKE_PROGRAM)
+[ -f "$MY_CONF_PATH/cmake_env.bash" ] && . "$MY_CONF_PATH/cmake_env.bash"

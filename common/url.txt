@@ -1,4 +1,0 @@
-# https://developer.android.com/studio
-# https://www.johnlamp.net/    # cmake tutorial
-# https://cmake.org/cmake/help/v3.7/index.html  # cmake official doc
-https://docs.docker.com

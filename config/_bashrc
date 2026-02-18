@@ -116,25 +116,4 @@ if ! shopt -oq posix; then
   fi
 fi
 
-[ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
-if [ -z "${MY_UTILS_ROOT:-}" ] && [ -L "$HOME/.bashrc" ]; then
-  _t="$(readlink "$HOME/.bashrc" 2>/dev/null)"
-  if [ -n "$_t" ]; then
-    if [[ "$_t" == /* ]]; then _d="$(dirname "$_t")"; else _d="$(cd "$(dirname "$HOME/.bashrc")" 2>/dev/null && cd "$(dirname "$_t")" 2>/dev/null && pwd)"; fi
-    [[ "${_d:-}" == *"config"* ]] && export MY_UTILS_ROOT="$(cd "$_d/.." 2>/dev/null && pwd)"
-  fi
-  unset _t _d 2>/dev/null || true
-fi
-if [ -n "${MY_UTILS_ROOT:-}" ]; then
-  : "${MYRC_PATH:=${MY_UTILS_ROOT}/config}"
-  [ -f "$MYRC_PATH/path.bash" ] && . "$MYRC_PATH/path.bash"
-  source "$MYRC_PATH/tvm_block.bash"
-fi
-alias ess='sudo service ssh start'
-
-# eval "$(jump shell bash)"
-
-[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - bash)"
+[ -f "$HOME/.my-utils.env" ] && . "$HOME/.my-utils.env" && [ -n "${MYRC_PATH:-}" ] && . "$MYRC_PATH/myrc.bash"

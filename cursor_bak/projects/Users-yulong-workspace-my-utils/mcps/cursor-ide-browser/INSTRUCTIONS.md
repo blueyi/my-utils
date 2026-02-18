@@ -13,6 +13,11 @@ IMPORTANT - Before interacting with any page:
 IMPORTANT - Waiting strategy:
 When waiting for page changes (navigation, content loading, animations, etc.), prefer short incremental waits (1-3 seconds) with browser_snapshot checks in between rather than a single long wait. For example, instead of waiting 10 seconds, do: wait 2s -> snapshot -> check if ready -> if not, wait 2s more -> snapshot again. This allows you to proceed as soon as the page is ready rather than always waiting the maximum time.
 
+PERFORMANCE PROFILING:
+- browser_profile_start/stop: CPU profiling with call stacks and timing data. Use to identify slow JavaScript functions.
+- Profile data is written to ~/.cursor/browser-logs/. Files: cpu-profile-{timestamp}.json (raw profile in Chrome DevTools format) and cpu-profile-{timestamp}-summary.md (human-readable summary).
+- IMPORTANT: When investigating performance issues, read the raw cpu-profile-*.json file to verify summary data. Key fields: profile.samples.length (total samples), profile.nodes[].hitCount (per-node hits), profile.nodes[].callFrame.functionName (function names). Cross-reference with the summary to confirm findings before making optimization recommendations.
+
 Notes:
 - Native dialogs (alert/confirm/prompt) never block automation. By default, confirm() returns true and prompt() returns the default value. To test different responses, call browser_handle_dialog BEFORE the triggering action: use accept: false for "Cancel", or promptText: "value" for custom prompt input.
 - Iframe content is not accessible - only elements outside iframes can be interacted with.
