@@ -100,3 +100,9 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 [ -f "$HOME/.my-utils.env" ] && . "$HOME/.my-utils.env" && [ -n "${MYRC_PATH:-}" ] && . "$MYRC_PATH/myrc.bash"
+
+# OpenClaw Completion
+source "/Users/yulong/.openclaw/completions/openclaw.zsh"
+
+# Claude API configuration
+source ~/claude_conf.bash
