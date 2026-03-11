@@ -88,6 +88,17 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" 2>/dev/null || true
 [ -s "$NVM_DIR/zsh_completion" ] && . "$NVM_DIR/zsh_completion" 2>/dev/null || true
 
+
+# npm global bin (for openclaw CLI and other global Node tools)
+if [ -d "$HOME/.npm-global/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.npm-global/bin:"*) ;;
+    *) export PATH="$HOME/.npm-global/bin:$PATH" ;;
+  esac
+fi
+
+
+
 # pyenv (prepend only if not already in PATH - idempotent for repeated source)
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d "$PYENV_ROOT/bin" ]] && case ":$PATH:" in *":$PYENV_ROOT/bin:"*) ;; *) export PATH="$PYENV_ROOT/bin:$PATH";; esac
@@ -103,8 +114,12 @@ command -v rbenv >/dev/null && eval "$(rbenv init - 2>/dev/null)" || true
 [ -d /opt/homebrew/opt/rustup/bin ] && case ":$PATH:" in *":/opt/homebrew/opt/rustup/bin:"*) ;; *) export PATH="/opt/homebrew/opt/rustup/bin:$PATH";; esac
 [ -d /usr/local/opt/rustup/bin ] && case ":$PATH:" in *":/usr/local/opt/rustup/bin:"*) ;; *) export PATH="/usr/local/opt/rustup/bin:$PATH";; esac
 
-# OpenClaw CLI tab completion (must run after compinit, e.g. after oh-my-zsh in _zshrc)
-[[ -f "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
+# OpenClaw CLI tab completion (zsh; must run after compinit/oh-my-zsh)
+if [ -n "${ZSH_VERSION:-}" ]; then
+  _oc_comp="$HOME/.npm-global/lib/node_modules/openclaw/completions/openclaw.zsh"
+  [ -f "$_oc_comp" ] && source "$_oc_comp"
+  unset _oc_comp
+fi
 
 # CUDA (Linux, optional) - set explicitly so repeated source does not accumulate
 if _is_linux && [ -d /usr/local/cuda ]; then
