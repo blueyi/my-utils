@@ -8,6 +8,7 @@
 BACKUP_DIRS=(
     "$HOME/.openclaw"
     "$HOME/workspace/my-utils:main"
+    "$HOME/workspace/repos/hexoblog:master"
     # "$HOME/some-other-repo:master"
     # "/path/to/another/dir"
 )
