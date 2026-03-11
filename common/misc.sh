@@ -89,6 +89,18 @@ else
   fi
 fi
 
+# pyenv-virtualenv plugin (for `pyenv virtualenv-init`)
+PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
+if [ -d "$PYENV_ROOT" ]; then
+  if [ ! -d "$PYENV_ROOT/plugins/pyenv-virtualenv" ]; then
+    echo "Installing pyenv-virtualenv plugin..."
+    git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_ROOT/plugins/pyenv-virtualenv" || \
+      echo "  WARN: git clone pyenv-virtualenv failed; run manually: git clone https://github.com/pyenv/pyenv-virtualenv.git \"$PYENV_ROOT/plugins/pyenv-virtualenv\""
+  else
+    echo "pyenv-virtualenv plugin already installed"
+  fi
+fi
+
 # --- Hexo blog dependencies (Node.js + hexo-cli), Linux + macOS ---
 ensure_hexo_env() {
   # Ensure Node.js is available
