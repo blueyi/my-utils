@@ -114,11 +114,28 @@ command -v rbenv >/dev/null && eval "$(rbenv init - 2>/dev/null)" || true
 [ -d /opt/homebrew/opt/rustup/bin ] && case ":$PATH:" in *":/opt/homebrew/opt/rustup/bin:"*) ;; *) export PATH="/opt/homebrew/opt/rustup/bin:$PATH";; esac
 [ -d /usr/local/opt/rustup/bin ] && case ":$PATH:" in *":/usr/local/opt/rustup/bin:"*) ;; *) export PATH="/usr/local/opt/rustup/bin:$PATH";; esac
 
-# OpenClaw CLI tab completion (zsh; must run after compinit/oh-my-zsh)
+# OpenClaw CLI tab completion (zsh)
+# - macOS: use ~/.openclaw/completions/openclaw.zsh (with compinit/bashcompinit)
+# - Linux: keep existing npm-global completion path
 if [ -n "${ZSH_VERSION:-}" ]; then
-  _oc_comp="$HOME/.npm-global/lib/node_modules/openclaw/completions/openclaw.zsh"
-  [ -f "$_oc_comp" ] && source "$_oc_comp"
-  unset _oc_comp
+  if _is_macos; then
+    # Ensure completion system is initialized
+    if ! type compinit >/dev/null 2>&1; then
+      autoload -Uz compinit
+      compinit
+    fi
+    if ! type bashcompinit >/dev/null 2>&1; then
+      autoload -Uz bashcompinit
+      bashcompinit
+    fi
+    # openclaw completion (macOS)
+    [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
+  elif _is_linux; then
+    # openclaw completion (Linux, npm global path)
+    _oc_comp="$HOME/.npm-global/lib/node_modules/openclaw/completons/openclaw.zsh"
+    [ -f "$_oc_comp" ] && source "$_oc_comp"
+    unset _oc_comp
+  fi
 fi
 
 # CUDA (Linux, optional) - set explicitly so repeated source does not accumulate

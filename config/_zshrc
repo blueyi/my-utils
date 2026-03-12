@@ -103,6 +103,3 @@ source $ZSH/oh-my-zsh.sh
 
 # Claude API configuration
 source ~/claude_conf.bash
-
-# OpenClaw Completion
-source "/home/ubuntu/.openclaw/completions/openclaw.zsh"
