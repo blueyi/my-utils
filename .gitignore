@@ -45,3 +45,4 @@ Thumbs.db
 *.tmp
 *.bak
 .env.local
+common/ssServerInstall.py
