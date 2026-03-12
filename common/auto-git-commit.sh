@@ -43,8 +43,15 @@ backup_one_dir() {
         return 0
     fi
 
+    # Always try to pull latest from remote before backing up
+    log "[$name] Updating from remote (git pull --rebase)..."
+    if ! git pull --rebase 2>&1 | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done; then
+        log "[$name] ERROR: git pull --rebase failed (uncommitted changes or conflicts); skip backup for this repo"
+        return 1
+    fi
+
     if git diff-index --quiet HEAD -- 2>/dev/null && [ -z "$(git status --porcelain)" ]; then
-        log "[$name] No changes"
+        log "[$name] No changes after pull"
         return 0
     fi
 
