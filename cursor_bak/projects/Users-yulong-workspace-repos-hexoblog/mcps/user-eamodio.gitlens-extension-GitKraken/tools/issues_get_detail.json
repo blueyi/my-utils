@@ -1,0 +1,44 @@
+{
+  "name": "issues_get_detail",
+  "description": "Retrieve detailed information about a specific issue by its unique ID. For Jira Epics, the response includes a childIssues array containing all issues linked to the epic.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "azure_organization": {
+        "description": "Optionally set the Azure DevOps organization name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "issue_id": {
+        "description": "The Number or ID of the issue to retrieve. Supported formats include GitHub/GitLab numeric IDs (e.g., 123 or #123), Jira keys (e.g., PROJ-123), Linear issue IDs (UUID format), etc.",
+        "type": "string"
+      },
+      "provider": {
+        "description": "Specify the issue provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "jira",
+          "azure",
+          "linear"
+        ],
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Repository name. This is required for GitHub and GitLab",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Organization name. This is required for GitHub and GitLab",
+        "type": "string"
+      }
+    },
+    "required": [
+      "provider",
+      "issue_id"
+    ]
+  }
+}

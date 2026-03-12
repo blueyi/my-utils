@@ -1,0 +1,16 @@
+{
+  "name": "git_status",
+  "description": "Show the working tree status (git status).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "The directory to run git status in",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

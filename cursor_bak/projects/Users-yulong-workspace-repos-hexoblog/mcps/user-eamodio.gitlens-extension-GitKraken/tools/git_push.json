@@ -1,0 +1,16 @@
+{
+  "name": "git_push",
+  "description": "Update remote refs along with associated objects (git push).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "The directory to run git push in",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

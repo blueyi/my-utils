@@ -1,0 +1,44 @@
+{
+  "name": "git_log_or_diff",
+  "description": "Show commit logs or changes between commits (git log --oneline or git diff).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "description": "The action to perform: 'log' for commit logs or 'diff' for changes",
+        "enum": [
+          "log",
+          "diff"
+        ],
+        "type": "string"
+      },
+      "authors": {
+        "description": "Optional array of author names or emails to filter commits by (only applies to 'log' action)",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "directory": {
+        "description": "The directory to run the command in",
+        "type": "string"
+      },
+      "revision_range": {
+        "description": "Optional revision range (e.g., 'HEAD', 'main..feature', 'abc123', 'HEAD~5..HEAD'). For 'diff' action, shows differences for the specified range. For 'log' action, shows commits in the range. Defaults to HEAD.",
+        "type": "string"
+      },
+      "since": {
+        "description": "Optional date/timestamp/relative time to show commits after (e.g., '2024-01-01', '2 weeks ago', 'yesterday', '1 hour ago', '3 days ago'). Only applies to 'log' action.",
+        "type": "string"
+      },
+      "until": {
+        "description": "Optional date/timestamp/relative time to show commits before (e.g., '2024-12-31', '1 week ago', 'today', 'yesterday', '2 hours ago'). Only applies to 'log' action.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory",
+      "action"
+    ]
+  }
+}
