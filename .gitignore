@@ -18,3 +18,30 @@ cursor_bak/projects/*/worker.log
 cursor_bak/projects/*/.workspace-trusted
 # macOS temp workspace dirs (var-folders-*), not meaningful to version
 cursor_bak/projects/var-folders-*/
+
+# Binary files and tools
+bin/
+*.o
+*.a
+*.so
+*.dylib
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+__pycache__/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+.env.local
