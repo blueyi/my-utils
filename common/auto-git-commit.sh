@@ -36,7 +36,10 @@ BACKUP_DIRS=(
 #     "$HOME/.openclaw"
 # )
 BACKUP_DIRS_LINUX=(
-    "$HOME/.openclaw"
+    "$HOME/.openclaw:ucloud"
+    "$HOME/workspace/my-utils:main"
+    "$HOME/workspace/repos/hexoblog:master"
+    "$HOME/workspace/repos/kora:main"
 )
 # BACKUP_DIRS_WINDOWS=(
 #     "$HOME/workspace/my-utils:main-windows"
