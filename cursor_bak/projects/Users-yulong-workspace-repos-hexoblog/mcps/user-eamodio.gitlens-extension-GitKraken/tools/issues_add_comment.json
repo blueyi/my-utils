@@ -1,0 +1,49 @@
+{
+  "name": "issues_add_comment",
+  "description": "Add a comment to an issue",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "azure_organization": {
+        "description": "Optionally set the Azure DevOps organization name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "comment": {
+        "description": "The text content of the comment",
+        "type": "string"
+      },
+      "issue_id": {
+        "description": "The ID of the issue to comment on",
+        "type": "string"
+      },
+      "provider": {
+        "description": "Specify the issue provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "jira",
+          "azure",
+          "linear"
+        ],
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Repository name. This is required for GitHub and GitLab",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Organization name. This is required for GitHub and GitLab",
+        "type": "string"
+      }
+    },
+    "required": [
+      "provider",
+      "issue_id",
+      "comment"
+    ]
+  }
+}

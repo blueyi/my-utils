@@ -1,0 +1,20 @@
+{
+  "name": "git_stash",
+  "description": "Stash the changes in a dirty working directory (git stash).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "The directory to run git stash in",
+        "type": "string"
+      },
+      "name": {
+        "description": "Optional name for the stash (used as the stash message)",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

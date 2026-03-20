@@ -74,5 +74,6 @@
     "window.openFoldersInNewWindow": "on",
     "window.zoomLevel": 1,
     "mlir.onSettingsChanged": "restart",
-    "python.createEnvironment.trigger": "off"
+    "python.createEnvironment.trigger": "off",
+    "git.openRepositoryInParentFolders": "always"
 }
