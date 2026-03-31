@@ -100,7 +100,8 @@ fi
 
 while IFS= read -r line || [ -n "$line" ]; do
   line="${line%%#*}"
-  line="${line// /}"
+  # Keep internal spaces intact (e.g. `uname -r`); only trim ends.
+  line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
   line="${line//$'\r'/}"
   [ -z "$line" ] && continue
   # Expand e.g. linux-headers-`uname -r` on Linux

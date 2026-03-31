@@ -40,6 +40,9 @@ BACKUP_DIRS_LINUX=(
     "$HOME/workspace/my-utils:main"
     "$HOME/workspace/repos/hexoblog:master"
     "$HOME/workspace/repos/kora:main"
+    "$HOME/repos/my-utils:main"
+    "$HOME/.openclaw:wsl"
+    "$HOME/workspace/repos/arke:main"
 )
 # BACKUP_DIRS_WINDOWS=(
 #     "$HOME/workspace/my-utils:main-windows"
@@ -145,6 +148,12 @@ for entry in "${BACKUP_DIRS[@]}"; do
         branch="$DEFAULT_BRANCH"
     fi
     [[ -z "$dir" ]] && continue
+
+    if [ ! -d "$dir" ]; then
+        name="$(basename "$dir")"
+        log "[$name] SKIP: directory not found: $dir"
+        continue
+    fi
 
     if ! backup_one_dir "$dir" "$branch"; then
         fail=1

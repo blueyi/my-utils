@@ -102,8 +102,8 @@ source $ZSH/oh-my-zsh.sh
 [ -f "$HOME/.my-utils.env" ] && . "$HOME/.my-utils.env" && [ -n "${MYRC_PATH:-}" ] && . "$MYRC_PATH/myrc.bash"
 
 # Claude API configuration
-source ~/claude_conf.bash
-source ~/github.bash
+[ -f "$HOME/claude_conf.bash" ] && source "$HOME/claude_conf.bash"
+[ -f "$HOME/github.bash" ] && source "$HOME/github.bash"
 
 # OpenClaw Completion
-source "/home/ubuntu/.openclaw/completions/openclaw.zsh"
+[ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"

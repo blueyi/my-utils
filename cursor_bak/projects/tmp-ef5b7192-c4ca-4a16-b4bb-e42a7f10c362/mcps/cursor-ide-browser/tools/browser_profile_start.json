@@ -1,0 +1,14 @@
+{
+  "name": "browser_profile_start",
+  "description": "Start CPU profiling to capture call stack timing data. Use browser_profile_stop to end profiling and get results.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      }
+    },
+    "required": []
+  }
+}

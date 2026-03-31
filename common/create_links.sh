@@ -50,7 +50,7 @@ while IFS= read -r line || [ -n "$line" ]; do
   # Avoid circular link: if target parent resolves inside repo, skip.
   # (e.g. ~/.config -> repo/config, or ~/.pip -> repo/config/pip)
   tgt_parent="$(dirname "$tgt_full")"
-  if [ -e "$tgt_parent" ]; then
+  if [ -e "$tgt_parent" ] || [ -L "$tgt_parent" ]; then
     canon="$(cd "$tgt_parent" 2>/dev/null && pwd -P)" || true
     if [[ -n "$canon" && "$canon" == "$ROOT"* ]]; then
       echo "  Skip $tgt (circular link: target parent resolves inside repo)"
@@ -81,7 +81,22 @@ while IFS= read -r line || [ -n "$line" ]; do
     mv "$tgt_full" "$bak"
   fi
 
-  mkdir -p "$(dirname "$tgt_full")"
+  # Ensure target parent directory exists. If it's a broken symlink (common when repo moved),
+  # back it up and recreate as a real directory so we can place files under it.
+  if [ -L "$tgt_parent" ] && [ ! -e "$tgt_parent" ]; then
+    bak="${tgt_parent}.bak.$(date +%Y%m%d%H%M%S)"
+    echo "  Backup: $tgt_parent -> $bak"
+    if ! mv "$tgt_parent" "$bak" 2>/dev/null; then
+      echo "  WARN: cannot move broken symlink $tgt_parent (permission denied); skip $tgt"
+      continue
+    fi
+  fi
+  if [ ! -d "$tgt_parent" ]; then
+    if ! mkdir -p "$tgt_parent" 2>/dev/null; then
+      echo "  WARN: cannot create directory $tgt_parent (permission denied); skip $tgt"
+      continue
+    fi
+  fi
   ln -sf "$src_full" "$tgt_full"
   echo "  $tgt_full -> $src_full"
 done < "$LINK_FILE"

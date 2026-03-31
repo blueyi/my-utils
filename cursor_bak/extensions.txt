@@ -1,1 +1,0 @@
-Extensions installed on SSH: ucloud:
