@@ -105,5 +105,8 @@ source $ZSH/oh-my-zsh.sh
 [ -f "$HOME/claude_conf.bash" ] && source "$HOME/claude_conf.bash"
 [ -f "$HOME/github.bash" ] && source "$HOME/github.bash"
 
+# OpenClaw CLI (wrapper lives here; completions assume `openclaw` is on PATH)
+[ -d "$HOME/.openclaw/bin" ] && export PATH="$HOME/.openclaw/bin:$PATH"
+
 # OpenClaw Completion
 [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
