@@ -1,0 +1,35 @@
+{
+  "name": "issues_assigned_to_me",
+  "description": "Fetch issues assigned to the user",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "azure_organization": {
+        "description": "Optionally set the Azure DevOps organization name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "page": {
+        "description": "Optional parameter to specify the page number, defaults to 1",
+        "type": "number"
+      },
+      "provider": {
+        "description": "Specify the issue provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "jira",
+          "azure",
+          "linear"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "provider"
+    ]
+  }
+}
