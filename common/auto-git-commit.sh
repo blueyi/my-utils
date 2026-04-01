@@ -26,6 +26,7 @@ BACKUP_DIRS=(
     "$HOME/workspace/my-utils:main"
     "$HOME/workspace/repos/hexoblog:master"
     "$HOME/workspace/repos/kora:main"
+    "$HOME/.openclaw:macos"
     # "$HOME/some-other-repo:master"
     # "/path/to/another/dir"
 )
