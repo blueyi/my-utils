@@ -43,7 +43,6 @@ BACKUP_DIRS_LINUX=(
     "$HOME/workspace/repos/kora:main"
     "$HOME/repos/my-utils:main"
     "$HOME/.openclaw:wsl"
-    "$HOME/workspace/repos/arke:main"
 )
 # BACKUP_DIRS_WINDOWS=(
 #     "$HOME/workspace/my-utils:main-windows"
