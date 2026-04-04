@@ -5,6 +5,8 @@
 #
 # Console: prints a short start/end summary to stderr (use AUTO_GIT_SILENT=1 for cron).
 # Details always go to AUTO_GIT_LOG (default ~/workspace/auto-git-backup.log).
+# Cron hourly example (crontab -e; use the real path to this script):
+#   0 * * * * AUTO_GIT_SILENT=1 /bin/bash /home/you/workspace/my-utils/common/auto-git-commit.sh
 #
 # Multi-OS: to avoid different systems overwriting each other, use per-OS lists.
 # Define BACKUP_DIRS_MACOS, BACKUP_DIRS_LINUX, and/or BACKUP_DIRS_WINDOWS; if set
