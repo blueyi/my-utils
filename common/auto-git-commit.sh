@@ -158,6 +158,7 @@ _say "auto-git-commit: log file -> $LOG_FILE"
 log "=== auto-git-commit start (OS: $BACKUP_OS) ==="
 
 fail=0
+failed_entries=()
 for entry in "${BACKUP_DIRS[@]}"; do
     # Skip empty and comment lines
     [[ -z "$entry" ]] && continue
@@ -184,6 +185,7 @@ for entry in "${BACKUP_DIRS[@]}"; do
 
     if ! backup_one_dir "$dir" "$branch"; then
         fail=1
+        failed_entries+=("$dir (branch: $branch)")
     fi
 done
 
@@ -192,5 +194,13 @@ if [ "$fail" -eq 0 ]; then
     _say "auto-git-commit: finished OK (exit 0). Per-repo detail in log."
 else
     _say "auto-git-commit: finished with errors (exit 1). See: $LOG_FILE"
+    if [ "${#failed_entries[@]}" -gt 0 ]; then
+        _say "auto-git-commit: backup failed for:"
+        for _fe in "${failed_entries[@]}"; do
+            _say "  - $_fe"
+            log "FAILED entry: $_fe"
+        done
+        unset _fe
+    fi
 fi
 exit "$fail"

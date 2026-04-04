@@ -141,12 +141,14 @@ if [ -n "${ZSH_VERSION:-}" ]; then
       autoload -Uz bashcompinit
       bashcompinit
     fi
-    [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
-  elif _is_linux; then
-    _oc_comp="$HOME/.npm-global/lib/node_modules/openclaw/completons/openclaw.zsh"
-    [ -f "$_oc_comp" ] && source "$_oc_comp"
-    unset _oc_comp
   fi
+  # OpenClaw (zsh): ~/.openclaw install first; else npm-global (completions or upstream completons path).
+  _oc_zsh=""
+  [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && _oc_zsh="$HOME/.openclaw/completions/openclaw.zsh"
+  [ -z "$_oc_zsh" ] && [ -f "$HOME/.npm-global/lib/node_modules/openclaw/completions/openclaw.zsh" ] && _oc_zsh="$HOME/.npm-global/lib/node_modules/openclaw/completions/openclaw.zsh"
+  [ -z "$_oc_zsh" ] && [ -f "$HOME/.npm-global/lib/node_modules/openclaw/completons/openclaw.zsh" ] && _oc_zsh="$HOME/.npm-global/lib/node_modules/openclaw/completons/openclaw.zsh"
+  [ -n "$_oc_zsh" ] && source "$_oc_zsh"
+  unset _oc_zsh
   if _is_linux; then
     [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && . /usr/share/doc/fzf/examples/key-bindings.zsh
     [ -f /usr/share/doc/fzf/examples/completion.zsh ] && . /usr/share/doc/fzf/examples/completion.zsh
