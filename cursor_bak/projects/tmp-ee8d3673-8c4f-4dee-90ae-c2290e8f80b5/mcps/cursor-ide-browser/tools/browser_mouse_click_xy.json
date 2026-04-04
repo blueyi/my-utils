@@ -1,0 +1,34 @@
+{
+  "name": "browser_mouse_click_xy",
+  "description": "Click left, middle, or right mouse button using coordinates from a fresh viewport screenshot captured immediately before this call for the same tab. Do not reuse older screenshot coordinates. If any other browser tool runs first, this call will fail until you capture a new viewport screenshot.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "x": {
+        "type": "number",
+        "description": "X coordinate from the fresh viewport screenshot captured immediately before this call for this tab, measured in screenshot pixels."
+      },
+      "y": {
+        "type": "number",
+        "description": "Y coordinate from the fresh viewport screenshot captured immediately before this call for this tab, measured in screenshot pixels."
+      },
+      "button": {
+        "type": "string",
+        "enum": [
+          "left",
+          "right",
+          "middle"
+        ],
+        "description": "Mouse button to click. Defaults to \"left\"."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      }
+    },
+    "required": [
+      "x",
+      "y"
+    ]
+  }
+}

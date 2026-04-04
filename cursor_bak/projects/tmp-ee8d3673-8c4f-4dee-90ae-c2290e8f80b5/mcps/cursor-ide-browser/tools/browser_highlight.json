@@ -1,6 +1,6 @@
 {
-  "name": "browser_is_enabled",
-  "description": "Check if an element is enabled (not disabled by its own state or a parent fieldset).",
+  "name": "browser_highlight",
+  "description": "Temporarily highlight an element for visual debugging.",
   "arguments": {
     "type": "object",
     "properties": {
@@ -11,6 +11,10 @@
       "ref": {
         "type": "string",
         "description": "Exact target element reference from the page snapshot"
+      },
+      "durationMs": {
+        "type": "number",
+        "description": "Highlight duration in milliseconds. Defaults to 2000."
       },
       "viewId": {
         "type": "string",

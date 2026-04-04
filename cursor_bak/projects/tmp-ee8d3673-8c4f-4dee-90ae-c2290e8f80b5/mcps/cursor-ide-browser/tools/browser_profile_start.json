@@ -1,6 +1,6 @@
 {
-  "name": "browser_unlock",
-  "description": "Unlock the browser to allow user interaction. Call this when you are done with a sequence of browser operations.",
+  "name": "browser_profile_start",
+  "description": "Start CPU profiling to capture call stack timing data. Use browser_profile_stop to end profiling and get results.",
   "arguments": {
     "type": "object",
     "properties": {

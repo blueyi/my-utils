@@ -6,7 +6,14 @@
 : "${MYRC_PATH:=${MY_UTILS_ROOT}/config}"
 export MY_CONF_PATH="${MYRC_PATH}"
 
-_is_linux() { [[ "$(uname -s)" = Linux* ]]; }
+# Linux + WSL: WSL2 reports Linux in uname; extra probes match common/platform.sh is_wsl for edge cases.
+_is_linux() {
+  [[ "$(uname -s)" = Linux* ]] && return 0
+  [ -n "${WSL_DISTRO_NAME:-}" ] && return 0
+  [ -n "${WSL_INTEROP:-}" ] && return 0
+  grep -qi microsoft /proc/version 2>/dev/null && return 0
+  return 1
+}
 _is_macos() { [[ "$(uname -s)" = Darwin* ]]; }
 
 # =============================================================================
@@ -49,6 +56,7 @@ else
   unset LD_LIBRARY_PATH
   unset LIBRARY_PATH
   _path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  [ -d /usr/lib/wsl/lib ] && _path="/usr/lib/wsl/lib:$_path"
   [ -d /usr/games ] && _path="$_path:/usr/games"
   [ -d /usr/local/games ] && _path="$_path:/usr/local/games"
   [ -d /snap/bin ] && _path="$_path:/snap/bin"
@@ -77,7 +85,8 @@ unset _ninja 2>/dev/null || true
 # SECTION: Locale hints + pyenv build defaults
 # =============================================================================
 # export LANG=zh_CN.UTF-8
-_is_linux && export TERMINAL=gnome-terminal
+# Skip on WSL (/proc/version contains Microsoft); gnome-terminal is not the host GUI there.
+_is_linux && ! grep -qi microsoft /proc/version 2>/dev/null && export TERMINAL=gnome-terminal
 
 export PYTHON_BUILD_MIRROR_URL="https://www.python.org/ftp/python/"
 export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
@@ -157,8 +166,13 @@ if _is_linux && [ -d /usr/local/cuda ]; then
   export CUDA_PATH=/usr/local/cuda
   export CUDA_BIN_PATH=$CUDA_PATH/bin
   export CUDA_LIB_PATH=$CUDA_PATH/lib64:$CUDA_PATH/extras/CUPTI/lib64
-  export LD_LIBRARY_PATH="$CUDA_LIB_PATH"
-  export LIBRARY_PATH="$CUDA_LIB_PATH"
+  if [ -d /usr/lib/wsl/lib ]; then
+    export LD_LIBRARY_PATH="/usr/lib/wsl/lib:$CUDA_LIB_PATH"
+    export LIBRARY_PATH="/usr/lib/wsl/lib:$CUDA_LIB_PATH"
+  else
+    export LD_LIBRARY_PATH="$CUDA_LIB_PATH"
+    export LIBRARY_PATH="$CUDA_LIB_PATH"
+  fi
 fi
 
 # =============================================================================

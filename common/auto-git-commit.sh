@@ -6,14 +6,22 @@
 # Multi-OS: to avoid different systems overwriting each other, use per-OS lists.
 # Define BACKUP_DIRS_MACOS, BACKUP_DIRS_LINUX, and/or BACKUP_DIRS_WINDOWS; if set
 # for current OS, that list is used; otherwise BACKUP_DIRS is used.
+# WSL2 uses uname Linux and also matches common/platform.sh WSL probes below.
 
-# --- Detect OS (macos, linux, windows) ---
+# --- Detect OS (macos, linux, windows) — WSL counts as linux ---
 _detect_os() {
     case "$(uname -s)" in
         Darwin)   echo "macos" ;;
-        Linux)    echo "linux" ;;
+        Linux*)   echo "linux" ;;
         MINGW*|MSYS*|CYGWIN*) echo "windows" ;;
-        *)        echo "unknown" ;;
+        *)
+            if [ -n "${WSL_DISTRO_NAME:-}" ] || [ -n "${WSL_INTEROP:-}" ] \
+                || grep -qi microsoft /proc/version 2>/dev/null; then
+                echo "linux"
+            else
+                echo "unknown"
+            fi
+            ;;
     esac
 }
 BACKUP_OS="$(_detect_os)"
