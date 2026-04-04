@@ -11,6 +11,4 @@ source ~/.shell_init.bash
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 # OpenClaw zsh completion: config/resetrc.bash (SECTION: zsh-only — OpenClaw + fzf)
-
-# OpenClaw Completion
-source "/home/blueyi/.openclaw/completions/openclaw.zsh"
+[[ -r "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
