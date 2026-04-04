@@ -1,6 +1,6 @@
 {
-  "name": "browser_get_attribute",
-  "description": "Read a specific attribute from an element.",
+  "name": "browser_get_bounding_box",
+  "description": "Get bounding box details for an element.",
   "arguments": {
     "type": "object",
     "properties": {
@@ -12,10 +12,6 @@
         "type": "string",
         "description": "Exact target element reference from the page snapshot"
       },
-      "name": {
-        "type": "string",
-        "description": "Attribute name to read"
-      },
       "viewId": {
         "type": "string",
         "description": "Target browser tab ID. If omitted, uses the last interacted tab."
@@ -23,8 +19,7 @@
     },
     "required": [
       "element",
-      "ref",
-      "name"
+      "ref"
     ]
   }
 }

@@ -1,12 +1,12 @@
 {
-  "name": "browser_is_checked",
-  "description": "Check if a checkbox or radio element is checked.",
+  "name": "browser_hover",
+  "description": "Hover over element on page",
   "arguments": {
     "type": "object",
     "properties": {
       "element": {
         "type": "string",
-        "description": "Human-readable element description used to obtain permission to inspect the element"
+        "description": "Human-readable element description used to obtain permission to interact with the element"
       },
       "ref": {
         "type": "string",
