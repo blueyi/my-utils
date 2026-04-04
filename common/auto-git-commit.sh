@@ -67,6 +67,15 @@ esac
 DEFAULT_BRANCH="${AUTO_GIT_BRANCH:-main}"
 LOG_FILE="${AUTO_GIT_LOG:-$HOME/workspace/auto-git-backup.log}"
 
+# Non-interactive SSH for pull/push (cron, scripts): first connect to a host like gitcode.com
+# otherwise stops at "Are you sure you want to continue connecting". Override by exporting
+# GIT_SSH_COMMAND before running this script.
+if [ -z "${GIT_SSH_COMMAND:-}" ]; then
+    export GIT_SSH_COMMAND='ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new'
+fi
+# Avoid blocking on HTTPS credential prompts when no TTY.
+export GIT_TERMINAL_PROMPT="${GIT_TERMINAL_PROMPT:-0}"
+
 # --- Helpers ---
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
@@ -117,7 +126,7 @@ Changed files:
 $changed"
 
     git add -A
-    if ! git commit -m "$commit_msg"; then
+    if ! git commit -q -m "$commit_msg"; then
         log "[$name] ERROR: git commit failed"
         return 1
     fi
