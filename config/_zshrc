@@ -12,3 +12,6 @@ source ~/.shell_init.bash
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 # OpenClaw zsh completion: config/resetrc.bash (SECTION: zsh-only — OpenClaw + fzf)
 [[ -r "$HOME/.openclaw/completions/openclaw.zsh" ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
+
+# OpenClaw Completion
+source "/home/ubuntu/.openclaw/completions/openclaw.zsh"
