@@ -4,7 +4,7 @@
 #
 # Usage:
 #   ./bootstrap.sh              # Interactive: ask which of (packages, links, misc, vimrc, cursor) to run
-#   ./bootstrap.sh --yes        # Unattended: run all (packages, links, misc, vimrc, cursor) with no prompts
+#   ./bootstrap.sh --yes        # Unattended: packages → links → misc → vimrc → cursor; links: ~/.my-utils.env, ~/.shell_init.bash (bash/zsh). Fish links optional (commented in link.ini).
 #   ./bootstrap.sh --tools packages links --yes   # Unattended, only selected tools
 
 set -e

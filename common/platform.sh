@@ -28,3 +28,11 @@ detect_package_manager() {
 
 is_linux() { [ "$(detect_os)" = "linux" ]; }
 is_macos() { [ "$(detect_os)" = "macos" ]; }
+
+# WSL1/WSL2: Ubuntu packages rarely ship linux-headers matching Microsoft kernel (uname -r).
+is_wsl() {
+  [ -n "${WSL_DISTRO_NAME:-}" ] && return 0
+  [ -n "${WSL_INTEROP:-}" ] && return 0
+  grep -qi microsoft /proc/version 2>/dev/null && return 0
+  return 1
+}

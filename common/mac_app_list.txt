@@ -8,6 +8,7 @@ curl
 wget
 git
 zsh
+# fish — optional; brew install fish if needed
 
 # c/c++
 llvm

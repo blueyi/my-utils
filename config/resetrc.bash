@@ -1,21 +1,25 @@
-# resetrc.bash - Shell init base for Linux + macOS
-# MY_UTILS_ROOT from ~/.my-utils.env (bootstrap) or derived from this script path (config/resetrc.bash -> ..)
+# resetrc.bash — shared shell env for bash/zsh (optional Fish: emit_fish_env.bash sources this file).
+# Sections below are delimiter comments only (single file). Search for "SECTION:" to jump.
+
 [ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
 [ -z "${MY_UTILS_ROOT:-}" ] && export MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 : "${MYRC_PATH:=${MY_UTILS_ROOT}/config}"
+export MY_CONF_PATH="${MYRC_PATH}"
 
-# Platform
 _is_linux() { [[ "$(uname -s)" = Linux* ]]; }
 _is_macos() { [[ "$(uname -s)" = Darwin* ]]; }
 
-# For proxy
+# =============================================================================
+# SECTION: Proxy (optional)
+# =============================================================================
 [ -f "$MYRC_PATH/proxy.bash" ] && source "$MYRC_PATH/proxy.bash"
 
-# Base PATH and lib env - initialize to baseline so repeated source does not accumulate (idempotent)
+# =============================================================================
+# SECTION: Baseline PATH / macOS Homebrew keg flags
+# =============================================================================
 if _is_macos; then
   unset LD_LIBRARY_PATH
   unset LIBRARY_PATH
-  # macOS baseline PATH (no $PATH - avoid duplicate when source multiple times)
   _path="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
   _ldflags=""
   _cppflags=""
@@ -42,7 +46,6 @@ if _is_macos; then
   export PKG_CONFIG_PATH="${_pkg_config_path%:}"
   unset _path _ldflags _cppflags _pkg_config_path
 else
-  # Linux: baseline PATH (no $PATH); clear lib paths so repeated source is idempotent
   unset LD_LIBRARY_PATH
   unset LIBRARY_PATH
   _path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -54,7 +57,9 @@ else
 fi
 unset PYTHONPATH
 
-# C++ / CMake build environment (CC/CXX; PATH already set above)
+# =============================================================================
+# SECTION: CC/CXX and Ninja (CMake)
+# =============================================================================
 if _is_macos; then
   [ -x /usr/bin/clang ] && export CC=/usr/bin/clang
   [ -x /usr/bin/clang++ ] && export CXX=/usr/bin/clang++
@@ -62,34 +67,33 @@ else
   [ -x /usr/bin/gcc ] && export CC=/usr/bin/gcc
   [ -x /usr/bin/g++ ] && export CXX=/usr/bin/g++
 fi
-# CMake finds Ninja via PATH; optionally set CMAKE_MAKE_PROGRAM for scripts that use it
 if [ -z "${CMAKE_MAKE_PROGRAM:-}" ]; then
   _ninja=$(command -v ninja 2>/dev/null || command -v ninja-build 2>/dev/null)
   [ -n "$_ninja" ] && export CMAKE_MAKE_PROGRAM="$_ninja"
 fi
 unset _ninja 2>/dev/null || true
 
-# For Chinese language
+# =============================================================================
+# SECTION: Locale hints + pyenv build defaults
+# =============================================================================
 # export LANG=zh_CN.UTF-8
-
-# For gogh terminal theme (Linux only)
 _is_linux && export TERMINAL=gnome-terminal
 
-# pyenv build options
 export PYTHON_BUILD_MIRROR_URL="https://www.python.org/ftp/python/"
-# export PYTHON_BUILD_MIRROR_URL="https://mirrors.huaweicloud.com/python/"
-# export PYTHON_BUILD_MIRROR_URL="https://mirrors.aliyun.com/python/"
 export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 
-# NVM, pyenv, rbenv - works on both platforms
+# =============================================================================
+# SECTION: NVM
+# =============================================================================
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" 2>/dev/null || true
 [ -s "$NVM_DIR/zsh_completion" ] && . "$NVM_DIR/zsh_completion" 2>/dev/null || true
 
-
-# npm global bin (for openclaw CLI and other global Node tools)
+# =============================================================================
+# SECTION: npm global bin
+# =============================================================================
 if [ -d "$HOME/.npm-global/bin" ]; then
   case ":$PATH:" in
     *":$HOME/.npm-global/bin:"*) ;;
@@ -97,29 +101,29 @@ if [ -d "$HOME/.npm-global/bin" ]; then
   esac
 fi
 
-
-
-# pyenv (prepend only if not already in PATH - idempotent for repeated source)
+# =============================================================================
+# SECTION: pyenv + virtualenv
+# =============================================================================
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d "$PYENV_ROOT/bin" ]] && case ":$PATH:" in *":$PYENV_ROOT/bin:"*) ;; *) export PATH="$PYENV_ROOT/bin:$PATH";; esac
 command -v pyenv >/dev/null && eval "$(pyenv init -)" || true
-eval "$(pyenv virtualenv-init -)"
+eval "$(pyenv virtualenv-init -)" || true
 
-# rbenv
+# =============================================================================
+# SECTION: rbenv + Rust (rustup)
+# =============================================================================
 case ":$PATH:" in *":$HOME/.rbenv/bin:"*) ;; *) export PATH="$HOME/.rbenv/bin:$PATH";; esac
 command -v rbenv >/dev/null && eval "$(rbenv init - 2>/dev/null)" || true
 
-# Rust (rustup)
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 [ -d /opt/homebrew/opt/rustup/bin ] && case ":$PATH:" in *":/opt/homebrew/opt/rustup/bin:"*) ;; *) export PATH="/opt/homebrew/opt/rustup/bin:$PATH";; esac
 [ -d /usr/local/opt/rustup/bin ] && case ":$PATH:" in *":/usr/local/opt/rustup/bin:"*) ;; *) export PATH="/usr/local/opt/rustup/bin:$PATH";; esac
 
-# OpenClaw CLI tab completion (zsh)
-# - macOS: use ~/.openclaw/completions/openclaw.zsh (with compinit/bashcompinit)
-# - Linux: keep existing npm-global completion path
+# =============================================================================
+# SECTION: zsh-only — OpenClaw + fzf
+# =============================================================================
 if [ -n "${ZSH_VERSION:-}" ]; then
   if _is_macos; then
-    # Ensure completion system is initialized
     if ! type compinit >/dev/null 2>&1; then
       autoload -Uz compinit
       compinit
@@ -128,17 +132,27 @@ if [ -n "${ZSH_VERSION:-}" ]; then
       autoload -Uz bashcompinit
       bashcompinit
     fi
-    # openclaw completion (macOS)
     [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
   elif _is_linux; then
-    # openclaw completion (Linux, npm global path)
     _oc_comp="$HOME/.npm-global/lib/node_modules/openclaw/completons/openclaw.zsh"
     [ -f "$_oc_comp" ] && source "$_oc_comp"
     unset _oc_comp
   fi
+  if _is_linux; then
+    [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && . /usr/share/doc/fzf/examples/key-bindings.zsh
+    [ -f /usr/share/doc/fzf/examples/completion.zsh ] && . /usr/share/doc/fzf/examples/completion.zsh
+  elif _is_macos; then
+    _fzf_prefix=""
+    command -v brew >/dev/null 2>&1 && _fzf_prefix="$(brew --prefix fzf 2>/dev/null)"
+    [ -n "$_fzf_prefix" ] && [ -f "$_fzf_prefix/shell/key-bindings.zsh" ] && . "$_fzf_prefix/shell/key-bindings.zsh"
+    [ -n "$_fzf_prefix" ] && [ -f "$_fzf_prefix/shell/completion.zsh" ] && . "$_fzf_prefix/shell/completion.zsh"
+    unset _fzf_prefix
+  fi
 fi
 
-# CUDA (Linux, optional) - set explicitly so repeated source does not accumulate
+# =============================================================================
+# SECTION: CUDA (Linux, optional)
+# =============================================================================
 if _is_linux && [ -d /usr/local/cuda ]; then
   export CUDA_PATH=/usr/local/cuda
   export CUDA_BIN_PATH=$CUDA_PATH/bin
@@ -147,12 +161,21 @@ if _is_linux && [ -d /usr/local/cuda ]; then
   export LIBRARY_PATH="$CUDA_LIB_PATH"
 fi
 
-# My bins
+# =============================================================================
+# SECTION: Repo common bin + user layout
+# =============================================================================
 MY_BIN=${MY_UTILS_ROOT}/common
 HOME_BIN=$HOME/bin
 export LOCAL_BIN_PATH=$HOME/.local/bin
 
-# LLVM (optional, guard)
+[ -d "$HOME/bin/cmake/bin" ] && export CMAKE_PATH=$HOME/bin/cmake/bin || CMAKE_PATH=""
+
+# =============================================================================
+# SECTION: LLVM checkout + LLVM_BIN_PATH
+# =============================================================================
+export LLVM_PATH="${LLVM_PATH:-$HOME/workspace/repos/llvm-project}"
+alias cllvm='cd ${LLVM_PATH}'
+
 if [ -n "${LLVM_PATH-}" ] && [ -f "${LLVM_PATH}/build/bin/clang" ]; then
   export LLVM_BIN_PATH=${LLVM_PATH}/build/bin
 elif [ -d "$HOME/bin/llvm-19.1.1/bin" ]; then
@@ -161,23 +184,26 @@ else
   LLVM_BIN_PATH=""
 fi
 
-# CMake (optional, guard)
-[ -d "$HOME/bin/cmake/bin" ] && export CMAKE_PATH=$HOME/bin/cmake/bin || CMAKE_PATH=""
-
-# Prepend user paths (idempotent: only add if not already in PATH)
+# =============================================================================
+# SECTION: PATH prepend (cmake, cuda, llvm, …)
+# =============================================================================
 _path_add() { [ -d "$1" ] && case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$PATH";; esac; }
-[ -n "$CMAKE_PATH" ] && _path_add "$CMAKE_PATH"
-[ -n "$LOCAL_BIN_PATH" ] && _path_add "$LOCAL_BIN_PATH"
-[ -n "$MY_BIN" ] && _path_add "$MY_BIN"
-[ -n "$HOME_BIN" ] && _path_add "$HOME_BIN"
+[ -n "${CMAKE_PATH:-}" ] && _path_add "$CMAKE_PATH"
+[ -n "${LOCAL_BIN_PATH:-}" ] && _path_add "$LOCAL_BIN_PATH"
+[ -n "${MY_BIN:-}" ] && _path_add "$MY_BIN"
+[ -n "${HOME_BIN:-}" ] && _path_add "$HOME_BIN"
 [ -n "${CUDA_BIN_PATH:-}" ] && _path_add "$CUDA_BIN_PATH"
-[ -n "$LLVM_BIN_PATH" ] && _path_add "$LLVM_BIN_PATH"
+[ -n "${LLVM_BIN_PATH:-}" ] && _path_add "$LLVM_BIN_PATH"
 unset -f _path_add 2>/dev/null; unset _brew_prefix 2>/dev/null
 
-# Zellij
+# =============================================================================
+# SECTION: Zellij
+# =============================================================================
 export ZELLIJ_SOCKET_DIR=/tmp/zellij
 
-# Functions
+# =============================================================================
+# SECTION: Functions
+# =============================================================================
 run_n_times() {
   local n=$1 i=1; shift
   while [ "$i" -le "$n" ]; do
@@ -202,7 +228,9 @@ run_multi_thread() {
   exec 5<&-
 }
 
-# Aliases - Linux-specific guarded
+# =============================================================================
+# SECTION: Linux-only aliases
+# =============================================================================
 if _is_linux; then
   alias wn='watch -n 1 nvidia-smi'
   alias ess='sudo service ssh start'

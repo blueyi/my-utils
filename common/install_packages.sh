@@ -106,6 +106,15 @@ while IFS= read -r line || [ -n "$line" ]; do
   [ -z "$line" ] && continue
   # Expand e.g. linux-headers-`uname -r` on Linux
   pkg=$(eval echo "$line")
+  # WSL: linux-headers-$(uname -r) is not published in Ubuntu repos (Microsoft kernel)
+  if [ "$PM" = apt ] && is_wsl; then
+    case "$pkg" in
+      linux-headers-*)
+        echo "  Skip $pkg (WSL: kernel headers not in distro repos; native Linux keeps this line in deb_app_list.ini)"
+        continue
+        ;;
+    esac
+  fi
   install_one "$pkg"
 done < "$list_file"
 

@@ -62,12 +62,60 @@ ensure_git && {
   git config --global core.editor "vim"
 } || true
 
-# Oh My Zsh
+# Oh My Zsh (unattended: no chsh, no new shell; KEEP_ZSHRC preserves symlinked ~/.zshrc)
+install_omz_plugins() {
+  [ -d "$HOME/.oh-my-zsh" ] || return 0
+  local custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+  [ ! -d "$custom/plugins/zsh-autosuggestions" ] && {
+    echo "Cloning zsh-autosuggestions..."
+    git clone https://github.com/zsh-users/zsh-autosuggestions "$custom/plugins/zsh-autosuggestions" || true
+  }
+  [ ! -d "$custom/plugins/zsh-syntax-highlighting" ] && {
+    echo "Cloning zsh-syntax-highlighting..."
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$custom/plugins/zsh-syntax-highlighting" || true
+  }
+  [ ! -d "$custom/themes/powerlevel10k" ] && {
+    echo "Cloning powerlevel10k..."
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$custom/themes/powerlevel10k" || true
+  }
+}
+
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   echo "Installing Oh My Zsh..."
-  KEEP_ZSHRC=yes RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
+  KEEP_ZSHRC=yes CHSH=no RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended || true
+  install_omz_plugins
 else
   echo "Oh My Zsh already installed"
+  install_omz_plugins
+fi
+
+# fzf (Ubuntu/WSL: apt; macOS: Homebrew)
+if is_macos; then
+  ensure_brew
+  if command -v brew &>/dev/null; then
+    brew list fzf &>/dev/null || brew install fzf || echo "  WARN: brew install fzf failed"
+  fi
+else
+  case "$(detect_package_manager)" in
+    apt)
+      if ! command -v fzf &>/dev/null; then
+        echo "Installing fzf (apt)..."
+        sudo apt-get update -qq && sudo apt-get install -y fzf || echo "  WARN: apt install fzf failed"
+      fi
+      ;;
+  esac
+fi
+
+# Default login shell → zsh (may fail on some WSL setups without extra permissions)
+if command -v zsh &>/dev/null; then
+  _zsh_bin="$(command -v zsh)"
+  if [ -n "${SHELL:-}" ] && [ "$(basename "$SHELL")" != "zsh" ]; then
+    echo "Setting default login shell to zsh ($_zsh_bin)..."
+    chsh -s "$_zsh_bin" 2>/dev/null || echo "  WARN: chsh failed; on WSL try: chsh from a login shell or set default in /etc/passwd / wsl.conf"
+  else
+    echo "Login shell already zsh or SHELL unset; skip chsh"
+  fi
+  unset _zsh_bin
 fi
 
 # pyenv: macOS = brew install (see mac_app_list.txt); Linux = git clone to ~/.pyenv
