@@ -3,6 +3,9 @@
 # Add entries to BACKUP_DIRS below; run manually or via cron/launchd.
 # Each directory must be a git repo; changes are committed and pushed to origin.
 #
+# Console: prints a short start/end summary to stderr (use AUTO_GIT_SILENT=1 for cron).
+# Details always go to AUTO_GIT_LOG (default ~/workspace/auto-git-backup.log).
+#
 # Multi-OS: to avoid different systems overwriting each other, use per-OS lists.
 # Define BACKUP_DIRS_MACOS, BACKUP_DIRS_LINUX, and/or BACKUP_DIRS_WINDOWS; if set
 # for current OS, that list is used; otherwise BACKUP_DIRS is used.
@@ -81,6 +84,11 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
 }
 
+_say() {
+    [ -n "${AUTO_GIT_SILENT:-}" ] && return 0
+    printf '%s\n' "$*" >&2
+}
+
 # Backup one git directory: commit and push if there are changes.
 # Usage: backup_one_dir <directory> [branch]
 backup_one_dir() {
@@ -145,6 +153,8 @@ $changed"
 
 # --- Main ---
 mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || true
+_say "auto-git-commit: started (OS=$BACKUP_OS)"
+_say "auto-git-commit: log file -> $LOG_FILE"
 log "=== auto-git-commit start (OS: $BACKUP_OS) ==="
 
 fail=0
@@ -178,4 +188,9 @@ for entry in "${BACKUP_DIRS[@]}"; do
 done
 
 log "=== auto-git-commit end ==="
+if [ "$fail" -eq 0 ]; then
+    _say "auto-git-commit: finished OK (exit 0). Per-repo detail in log."
+else
+    _say "auto-git-commit: finished with errors (exit 1). See: $LOG_FILE"
+fi
 exit "$fail"
