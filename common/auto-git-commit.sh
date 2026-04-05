@@ -38,7 +38,7 @@ BACKUP_DIRS=(
     "$HOME/.openclaw"
     "$HOME/workspace/my-utils:main"
     "$HOME/workspace/repos/hexoblog:master"
-    "$HOME/workspace/repos/kora:main"
+    # "$HOME/workspace/repos/kora:main"  # disabled: auto-backup breaks in-progress edits
     "$HOME/.openclaw:macos"
     # "$HOME/some-other-repo:master"
     # "/path/to/another/dir"
@@ -53,7 +53,7 @@ BACKUP_DIRS_LINUX=(
     "$HOME/.openclaw:ucloud"
     "$HOME/workspace/my-utils:main"
     "$HOME/workspace/repos/hexoblog:master"
-    "$HOME/workspace/repos/kora:main"
+    # "$HOME/workspace/repos/kora:main"  # disabled: auto-backup breaks in-progress edits
     "$HOME/repos/my-utils:main"
     "$HOME/.openclaw:wsl"
 )
