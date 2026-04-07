@@ -13,3 +13,7 @@ source ~/.shell_init.bash
 
 # OpenClaw Completion
 source "$HOME/.openclaw/completions/openclaw.zsh"
+
+# Load environment variables
+[ -f ~/.env.rc ] && source ~/.env.rc
+export PATH="$HOME/bin:$PATH"
