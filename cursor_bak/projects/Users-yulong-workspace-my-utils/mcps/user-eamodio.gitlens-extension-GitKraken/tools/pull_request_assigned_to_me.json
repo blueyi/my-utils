@@ -1,0 +1,42 @@
+{
+  "name": "pull_request_assigned_to_me",
+  "description": "Search pull requests where you are the assignee, author, or reviewer",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name of the pull request. Required for Azure DevOps",
+        "type": "string"
+      },
+      "is_closed": {
+        "description": "Set to true if you want to search for closed pull requests",
+        "type": "boolean"
+      },
+      "page": {
+        "description": "Optional parameter to specify the page number, defaults to 1",
+        "type": "number"
+      },
+      "provider": {
+        "description": "Specify the git provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "bitbucket",
+          "azure"
+        ],
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Set the repository name of the pull request. Required for Azure DevOps and Bitbucket",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Set the organization name of the pull request. Required for Azure DevOps and Bitbucket",
+        "type": "string"
+      }
+    },
+    "required": [
+      "provider"
+    ]
+  }
+}

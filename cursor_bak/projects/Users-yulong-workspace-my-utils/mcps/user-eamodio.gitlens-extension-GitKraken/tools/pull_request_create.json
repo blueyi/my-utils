@@ -1,0 +1,59 @@
+{
+  "name": "pull_request_create",
+  "description": "Create a new pull request",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name of the pull request. Required for Azure DevOps",
+        "type": "string"
+      },
+      "body": {
+        "description": "The body/description of the pull request",
+        "type": "string"
+      },
+      "is_draft": {
+        "description": "Create as draft pull request",
+        "type": "boolean"
+      },
+      "provider": {
+        "description": "Specify the git provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "bitbucket",
+          "azure"
+        ],
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Set the repository name of the pull request. Required for Azure DevOps and Bitbucket",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Set the organization name of the pull request. Required for Azure DevOps and Bitbucket",
+        "type": "string"
+      },
+      "source_branch": {
+        "description": "Source branch from which the pull request will be created",
+        "type": "string"
+      },
+      "target_branch": {
+        "description": "Target branch where the pull request will be merged",
+        "type": "string"
+      },
+      "title": {
+        "description": "The title of the pull request",
+        "type": "string"
+      }
+    },
+    "required": [
+      "repository_name",
+      "repository_organization",
+      "title",
+      "source_branch",
+      "target_branch",
+      "provider"
+    ]
+  }
+}
