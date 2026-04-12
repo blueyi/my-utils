@@ -44,3 +44,8 @@ Thumbs.db
 *.bak
 .env.local
 common/ssServerInstall.py
+
+# my-utils env backup artifacts (must stay out of git)
+tools/env_sync/tmp/
+*.env.rc.enc
+*.envrc.enc

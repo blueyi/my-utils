@@ -132,6 +132,43 @@ cmake ..
 
 **Linux (apt):** Install packages with `./bootstrap.sh --tools packages --yes`. If the terminal didn’t load your rc, run `source .../config/cmake_env.bash` before cmake.
 
+## Env RC encrypted backup (repo-external)
+
+`my-utils` now includes env backup helpers compatible with the `sync-config` skill's `.env.rc` encryption format, but with a safer default: **encrypted output lives outside the repo**.
+
+Scripts:
+
+- `tools/env_sync/encrypt_env.py`
+- `tools/env_sync/decrypt_env.py`
+- `tools/env_sync/merge_env.py`
+
+Default encrypted backup path:
+
+```bash
+~/.local/state/my-utils/env.rc.enc
+```
+
+Typical usage:
+
+```bash
+export SYNC_ENV_KEY="your-secure-key-here"
+
+# Encrypt ~/.env.rc to repo-external backup file
+python3 tools/env_sync/encrypt_env.py
+
+# Decrypt to stdout or a temp file
+python3 tools/env_sync/decrypt_env.py --output /tmp/env.rc.backup
+
+# Compare / merge (keep local values, add missing keys from backup)
+python3 tools/env_sync/merge_env.py --local ~/.env.rc --backup /tmp/env.rc.backup --dry-run
+```
+
+Notes:
+
+- Format is intentionally compatible with `workspace/skills/sync-config/scripts/{encrypt,decrypt,merge}_env.py`
+- The encrypted artifact is **not stored in this repo** by default
+- `SYNC_ENV_KEY` is required and should stay in your local shell env / `~/.env.rc`
+
 ## Cursor Config Backup
 
 Sync Cursor settings to `cursor_bak/` and use symlinks so edits stay in the repo. Backed up (macOS: `~/Library/Application Support/Cursor`, Linux: `~/.config/Cursor`):
