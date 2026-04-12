@@ -136,11 +136,11 @@ cmake ..
 
 `my-utils` now includes env backup helpers compatible with the `sync-config` skill's `.env.rc` encryption format, but with a safer default: **encrypted output lives outside the repo**.
 
-Scripts:
+Unified command:
 
-- `tools/env_sync/encrypt_env.py`
-- `tools/env_sync/decrypt_env.py`
-- `tools/env_sync/merge_env.py`
+- `tools/env_sync/env_sync.py`
+
+Legacy helper scripts still exist for now, but the recommended entrypoint is the single unified command above.
 
 Default encrypted backup path:
 
@@ -154,13 +154,13 @@ Typical usage:
 export SYNC_ENV_KEY="your-secure-key-here"
 
 # Encrypt ~/.env.rc to repo-external backup file
-python3 tools/env_sync/encrypt_env.py
+python3 tools/env_sync/env_sync.py encrypt
 
 # Decrypt to stdout or a temp file
-python3 tools/env_sync/decrypt_env.py --output /tmp/env.rc.backup
+python3 tools/env_sync/env_sync.py decrypt --output /tmp/env.rc.backup
 
 # Compare / merge (keep local values, add missing keys from backup)
-python3 tools/env_sync/merge_env.py --local ~/.env.rc --backup /tmp/env.rc.backup --dry-run
+python3 tools/env_sync/env_sync.py merge --local ~/.env.rc --backup /tmp/env.rc.backup --dry-run
 ```
 
 Notes:
