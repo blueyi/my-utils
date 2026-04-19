@@ -56,6 +56,7 @@ BACKUP_DIRS_LINUX=(
     # "$HOME/workspace/repos/kora:main"  # disabled: auto-backup breaks in-progress edits
     "$HOME/repos/my-utils:main"
     "$HOME/.openclaw:wsl"
+    "$HOME/.hermes:wsl"
 )
 # BACKUP_DIRS_WINDOWS=(
 #     "$HOME/workspace/my-utils:main-windows"
