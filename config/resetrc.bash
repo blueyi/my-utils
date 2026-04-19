@@ -162,6 +162,19 @@ if [ -n "${ZSH_VERSION:-}" ]; then
 fi
 
 # =============================================================================
+# SECTION: Hermes shell completion (bash/zsh)
+# =============================================================================
+if command -v hermes >/dev/null 2>&1; then
+  if [ -n "${ZSH_VERSION:-}" ]; then
+    autoload -Uz compinit 2>/dev/null || true
+    compinit 2>/dev/null || true
+    eval "$(hermes completion zsh 2>/dev/null)" || true
+  elif [ -n "${BASH_VERSION:-}" ]; then
+    eval "$(hermes completion bash 2>/dev/null)" || true
+  fi
+fi
+
+# =============================================================================
 # SECTION: CUDA (Linux, optional)
 # =============================================================================
 if _is_linux && [ -d /usr/local/cuda ]; then
