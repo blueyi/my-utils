@@ -1,0 +1,18 @@
+{
+  "name": "move_agent_to_root",
+  "description": "Move the current agent to a new root workspace directory. Use this after creating a worktree or whenever the conversation should continue from a different workspace root.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "rootPath": {
+        "description": "Absolute path to the directory that should become the agent root workspace (e.g. \"/Users/name/projects/my-app\")",
+        "type": "string"
+      }
+    },
+    "required": [
+      "rootPath"
+    ],
+    "additionalProperties": false
+  }
+}
