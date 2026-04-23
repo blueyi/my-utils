@@ -8,9 +8,17 @@
         "description": "The directory to run git stash in",
         "type": "string"
       },
+      "include_untracked": {
+        "description": "When true, include untracked files in the stash.",
+        "type": "boolean"
+      },
       "name": {
         "description": "Optional name for the stash (used as the stash message)",
         "type": "string"
+      },
+      "staged_only": {
+        "description": "When true, stash only the currently staged changes and leave unstaged work untouched.",
+        "type": "boolean"
       }
     },
     "required": [
