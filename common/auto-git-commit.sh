@@ -57,6 +57,7 @@ BACKUP_DIRS_LINUX=(
     "$HOME/repos/my-utils:main"
     "$HOME/.openclaw:wsl"
     "$HOME/.hermes:wsl"
+    "$HOME/.hermes:ucloud"
 )
 # BACKUP_DIRS_WINDOWS=(
 #     "$HOME/workspace/my-utils:main-windows"
