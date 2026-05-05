@@ -1,0 +1,16 @@
+{
+  "name": "gitlens_launchpad",
+  "description": " Gitlens Launchpad. Gets your open pull requests prioritized by what needs attention: ready to merge, has conflicts, awaiting review, etc. Helpful for checking todos, outstanding tasks, or deciding what to work on next.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

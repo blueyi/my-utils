@@ -1,0 +1,45 @@
+{
+  "name": "pull_request_get_detail",
+  "description": "Get an specific pull request",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name of the pull request. Required for Azure DevOps",
+        "type": "string"
+      },
+      "provider": {
+        "description": "Specify the git provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "bitbucket",
+          "azure"
+        ],
+        "type": "string"
+      },
+      "pull_request_files": {
+        "description": "Set to true if you want to retrieve the files changed in the pull request. Not supported by Azure DevOps.",
+        "type": "boolean"
+      },
+      "pull_request_id": {
+        "description": "ID of the pull request to retrieve",
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Set the repository name of the pull request",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Set the organization name of the pull request",
+        "type": "string"
+      }
+    },
+    "required": [
+      "pull_request_id",
+      "repository_name",
+      "repository_organization",
+      "provider"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "git_branch",
+  "description": "List or create branches (git branch).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "description": "Git branch action to be executed",
+        "enum": [
+          "create",
+          "list"
+        ],
+        "type": "string"
+      },
+      "branch_name": {
+        "description": "(Optional) Name of the branch to create or delete",
+        "type": "string"
+      },
+      "directory": {
+        "description": "The directory to run git branch in",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory",
+      "action"
+    ]
+  }
+}
