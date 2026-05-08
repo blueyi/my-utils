@@ -1,0 +1,16 @@
+{
+  "name": "git_graph",
+  "description": " Show the commit graph for a repository (git log --graph), will open a UI if client supports it.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}
