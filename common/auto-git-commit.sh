@@ -40,6 +40,8 @@ BACKUP_DIRS=(
     "$HOME/workspace/repos/hexoblog:master"
     # "$HOME/workspace/repos/kora:main"  # disabled: auto-backup breaks in-progress edits
     "$HOME/.openclaw:macos"
+    # Hermes config + state (see also BACKUP_DIRS_LINUX on WSL)
+    "$HOME/.hermes:wsl"
     # "$HOME/some-other-repo:master"
     # "/path/to/another/dir"
 )
@@ -56,7 +58,9 @@ BACKUP_DIRS_LINUX=(
     # "$HOME/workspace/repos/kora:main"  # disabled: auto-backup breaks in-progress edits
     "$HOME/repos/my-utils:main"
     "$HOME/.openclaw:wsl"
+    # ~/.hermes: Hermes home (config, optional secrets — keep remote private). wsl = GitCode branch.
     "$HOME/.hermes:wsl"
+    # Optional second remote branch mirror (only if branch exists locally or on origin)
     "$HOME/.hermes:ucloud"
 )
 # BACKUP_DIRS_WINDOWS=(
@@ -114,6 +118,20 @@ backup_one_dir() {
     if [ ! -d ".git" ]; then
         log "[$name] SKIP: not a git repository"
         return 0
+    fi
+
+    # path:branch means we work on that branch (avoids pushing wrong ref when default branch differs)
+    log "[$name] Checking out branch $branch..."
+    if git checkout -q "$branch" 2>/dev/null; then
+        :
+    elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+        if ! git checkout -q -B "$branch" "origin/$branch"; then
+            log "[$name] ERROR: cannot create local branch $branch from origin/$branch"
+            return 1
+        fi
+    else
+        log "[$name] ERROR: branch $branch not found locally or as origin/$branch"
+        return 1
     fi
 
     # Always try to pull latest from remote before backing up
