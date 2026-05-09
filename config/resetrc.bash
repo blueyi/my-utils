@@ -129,6 +129,13 @@ command -v rbenv >/dev/null && eval "$(rbenv init - 2>/dev/null)" || true
 [ -d /usr/local/opt/rustup/bin ] && case ":$PATH:" in *":/usr/local/opt/rustup/bin:"*) ;; *) export PATH="/usr/local/opt/rustup/bin:$PATH";; esac
 
 # =============================================================================
+# SECTION: OpenClaw — CLI env (doctor: compile cache + no respawn; all shells)
+# =============================================================================
+export NODE_COMPILE_CACHE="${NODE_COMPILE_CACHE:-/var/tmp/openclaw-compile-cache}"
+export OPENCLAW_NO_RESPAWN="${OPENCLAW_NO_RESPAWN:-1}"
+[ -d "$NODE_COMPILE_CACHE" ] || mkdir -p "$NODE_COMPILE_CACHE" 2>/dev/null || true
+
+# =============================================================================
 # SECTION: zsh-only — OpenClaw + fzf
 # =============================================================================
 if [ -n "${ZSH_VERSION:-}" ]; then
