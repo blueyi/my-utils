@@ -354,10 +354,12 @@ def main() -> None:
     parser = build_parser()
 
     # Symlink dispatch: if invoked as encrypt_env / decrypt_env / merge_env,
-    # inject the subcommand at the front of argv (unless user already specified).
+    # inject the subcommand at the front of argv. Allow user to override only
+    # by passing one of the subcommand names explicitly. -h/--help on a symlink
+    # should show the *subcommand's* help, not the top-level dispatcher's.
     forced = detect_symlink_subcommand(sys.argv[0])
     argv = sys.argv[1:]
-    if forced and (not argv or argv[0] not in {"encrypt", "decrypt", "merge", "-h", "--help"}):
+    if forced and (not argv or argv[0] not in {"encrypt", "decrypt", "merge"}):
         argv = [forced, *argv]
 
     args = parser.parse_args(argv)
