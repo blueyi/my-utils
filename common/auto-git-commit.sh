@@ -121,6 +121,20 @@ backup_one_dir() {
     fi
 
     # path:branch means we work on that branch (avoids pushing wrong ref when default branch differs)
+    # SAFETY: skip if a no-auto-backup sentinel file exists (use to pause backup during active work)
+    if [ -f "$dir/.no-auto-backup" ]; then
+        log "[$name] SKIP: .no-auto-backup sentinel present"
+        return 0
+    fi
+
+    # SAFETY: skip if currently on a different branch (don't yank a working session away from its branch)
+    local current_branch
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ -n "$current_branch" ] && [ "$current_branch" != "$branch" ] && [ "$current_branch" != "HEAD" ]; then
+        log "[$name] SKIP: current branch '$current_branch' != target '$branch' (refusing to switch branches)"
+        return 0
+    fi
+
     log "[$name] Checking out branch $branch..."
     if git checkout -q "$branch" 2>/dev/null; then
         :
