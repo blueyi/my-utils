@@ -32,7 +32,14 @@ _detect_os() {
 BACKUP_OS="$(_detect_os)"
 
 # --- Config: list of directories to auto backup (edit these) ---
-# Format: "path" (use default branch) or "path:branch"
+# Format:
+#   "path"          → back up whatever the current branch is.
+#   "path:branch"   → ONLY back up when the current branch is `branch`. Skip
+#                     otherwise. The script NEVER switches branches.
+#
+# Multiple entries with the same path but different branches express
+# "back up this repo under different branches on different machines (or in
+# different sessions)". Exactly one entry will match per host.
 # Default list (used when no OS-specific list is set)
 BACKUP_DIRS=(
     "$HOME/.openclaw"
@@ -98,10 +105,21 @@ _say() {
 }
 
 # Backup one git directory: commit and push if there are changes.
-# Usage: backup_one_dir <directory> [branch]
+# Usage: backup_one_dir <directory> [expected_branch]
+#
+# Semantics of expected_branch:
+#   - If empty: back up whatever the current branch is, push to that same branch.
+#   - If set: ONLY back up when the current branch matches. Otherwise skip.
+#     (Never switch branches — switching mid-session can corrupt working state.)
+#   - This means multiple entries with the same path but different branches in
+#     BACKUP_DIRS_* express "this repo backs up under different branches on
+#     different machines" — exactly one entry will match per host.
+#
+# Other safety nets:
+#   - .no-auto-backup sentinel file in the repo root → skip entirely.
 backup_one_dir() {
     local dir="$1"
-    local branch="${2:-$DEFAULT_BRANCH}"
+    local expected_branch="${2:-}"
     local name
     name="$(basename "$dir")"
 
@@ -120,36 +138,34 @@ backup_one_dir() {
         return 0
     fi
 
-    # path:branch means we work on that branch (avoids pushing wrong ref when default branch differs)
-    # SAFETY: skip if a no-auto-backup sentinel file exists (use to pause backup during active work)
+    # SAFETY: opt-out sentinel — drop a `.no-auto-backup` file in the repo root
+    # to pause auto-backup during long interactive sessions.
     if [ -f "$dir/.no-auto-backup" ]; then
         log "[$name] SKIP: .no-auto-backup sentinel present"
         return 0
     fi
 
-    # SAFETY: skip if currently on a different branch (don't yank a working session away from its branch)
+    # Determine current branch (detached HEAD reports "HEAD")
     local current_branch
     current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-    if [ -n "$current_branch" ] && [ "$current_branch" != "$branch" ] && [ "$current_branch" != "HEAD" ]; then
-        log "[$name] SKIP: current branch '$current_branch' != target '$branch' (refusing to switch branches)"
+    if [ -z "$current_branch" ] || [ "$current_branch" = "HEAD" ]; then
+        log "[$name] SKIP: detached HEAD or unknown branch state"
         return 0
     fi
 
-    log "[$name] Checking out branch $branch..."
-    if git checkout -q "$branch" 2>/dev/null; then
-        :
-    elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-        if ! git checkout -q -B "$branch" "origin/$branch"; then
-            log "[$name] ERROR: cannot create local branch $branch from origin/$branch"
-            return 1
-        fi
-    else
-        log "[$name] ERROR: branch $branch not found locally or as origin/$branch"
-        return 1
+    # SAFETY: if entry pinned a branch, only back up when current matches.
+    # Never switch branches.
+    if [ -n "$expected_branch" ] && [ "$expected_branch" != "$current_branch" ]; then
+        log "[$name] SKIP: current branch '$current_branch' != entry branch '$expected_branch' (no branch switching)"
+        return 0
     fi
 
+    # Branch we'll push to: the entry's branch (if specified) or current.
+    # In normal operation these are equal because the safety check above passed.
+    local branch="${expected_branch:-$current_branch}"
+
     # Always try to pull latest from remote before backing up
-    log "[$name] Updating from remote (git pull --rebase)..."
+    log "[$name] On branch $branch; updating from remote (git pull --rebase)..."
     if ! git pull --rebase 2>&1 | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done; then
         log "[$name] ERROR: git pull --rebase failed (uncommitted changes or conflicts); skip backup for this repo"
         return 1
