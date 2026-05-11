@@ -1,4 +1,10 @@
 # ~/.bashrc — interactive only; then ~/.shell_init.bash → config/shell_init.bash
+
+# Load env vars BEFORE the interactive-only guard so non-interactive bash
+# (e.g. Hermes terminal tool spawning subprocesses like Claude Code) also
+# inherits ANTHROPIC_API_KEY / ANTHROPIC_BASE_URL etc.
+[ -f ~/.env.rc ] && source ~/.env.rc
+
 case $- in
   *i*) ;;
   *) return;;
