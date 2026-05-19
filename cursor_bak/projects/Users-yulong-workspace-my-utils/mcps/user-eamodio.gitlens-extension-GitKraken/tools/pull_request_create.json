@@ -4,6 +4,10 @@
   "arguments": {
     "type": "object",
     "properties": {
+      "assign_to_me": {
+        "description": "Assign the newly created pull request to the current authenticated user when supported by the provider",
+        "type": "boolean"
+      },
       "azure_project": {
         "description": "Optionally set the Azure DevOps project name of the pull request. Required for Azure DevOps",
         "type": "string"
