@@ -1,0 +1,16 @@
+{
+  "name": "git_pull",
+  "description": "Fetch from and integrate with another repository or a local branch (git pull).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "The directory to run git pull in",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

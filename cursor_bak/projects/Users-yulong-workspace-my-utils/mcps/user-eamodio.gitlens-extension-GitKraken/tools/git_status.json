@@ -1,0 +1,16 @@
+{
+  "name": "git_status",
+  "description": " Show the working tree status (git status), will open a UI if client supports it.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

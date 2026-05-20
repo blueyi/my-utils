@@ -1,0 +1,1 @@
+The MCP server errored. If this server is important for completing the task, concisely inform the user and ask them to check the MCP status in Cursor Settings; otherwise continue with a different approach.

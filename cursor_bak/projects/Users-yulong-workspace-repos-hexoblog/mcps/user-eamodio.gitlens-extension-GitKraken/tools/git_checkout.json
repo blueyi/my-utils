@@ -1,0 +1,21 @@
+{
+  "name": "git_checkout",
+  "description": "Switch branches or restore working tree files (git checkout <branch>).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "branch": {
+        "description": "The branch to checkout. This must be a valid branch name without spaces",
+        "type": "string"
+      },
+      "directory": {
+        "description": "The directory to run git checkout in",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory",
+      "branch"
+    ]
+  }
+}
