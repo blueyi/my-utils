@@ -1,0 +1,28 @@
+{
+  "name": "browser_highlight",
+  "description": "Highlight an element by ref in the browser page for visual grounding.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string",
+        "description": "Element ref from browser_snapshot."
+      },
+      "element": {
+        "type": "string",
+        "description": "Human-readable description of the element."
+      },
+      "durationMs": {
+        "type": "number",
+        "description": "Highlight duration in milliseconds. Defaults to 2000."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      }
+    },
+    "required": [
+      "ref"
+    ]
+  }
+}
