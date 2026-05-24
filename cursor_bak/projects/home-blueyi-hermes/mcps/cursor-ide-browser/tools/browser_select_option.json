@@ -1,31 +1,34 @@
 {
   "name": "browser_select_option",
-  "description": "Select an option in a dropdown. Matching priority: exact value match, then exact label match, then partial label match. The snapshot now shows available options for select elements.",
+  "description": "Select one or more options in a select element by ref.",
   "arguments": {
     "type": "object",
     "properties": {
-      "element": {
-        "type": "string",
-        "description": "Human-readable element description used to obtain permission to interact with the element"
-      },
       "ref": {
         "type": "string",
-        "description": "Exact target element reference from the page snapshot"
+        "description": "Element ref from browser_snapshot."
       },
       "values": {
         "type": "array",
         "items": {
           "type": "string"
         },
-        "description": "Array of values to select. Matches against option value first, then label text, then partial label. Use exact values from the snapshot options list when available."
+        "description": "Option values or labels to select."
+      },
+      "element": {
+        "type": "string",
+        "description": "Human-readable description of the element."
       },
       "viewId": {
         "type": "string",
         "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after selection completes. Defaults to false."
       }
     },
     "required": [
-      "element",
       "ref",
       "values"
     ]

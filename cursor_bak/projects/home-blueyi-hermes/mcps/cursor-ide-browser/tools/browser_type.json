@@ -1,40 +1,43 @@
 {
   "name": "browser_type",
-  "description": "Type text into editable element",
+  "description": "Type text into an input, textarea, or contenteditable element by ref.",
   "arguments": {
     "type": "object",
     "properties": {
-      "element": {
-        "type": "string",
-        "description": "Human-readable element description used to obtain permission to interact with the element"
-      },
       "ref": {
         "type": "string",
-        "description": "Exact target element reference from the page snapshot"
+        "description": "Element ref from browser_snapshot."
       },
       "text": {
         "type": "string",
-        "description": "Text to type into the element"
+        "description": "Text to type."
+      },
+      "element": {
+        "type": "string",
+        "description": "Human-readable description of the element."
       },
       "clear": {
         "type": "boolean",
-        "description": "Whether to clear existing content before typing. Use this to replace the current value instead of appending to it. Defaults to false."
+        "description": "When true, clear existing text first."
       },
       "submit": {
         "type": "boolean",
-        "description": "Whether to submit entered text (press Enter after)"
+        "description": "When true, press Enter after typing."
       },
       "slowly": {
         "type": "boolean",
-        "description": "Whether to type one character at a time. Useful for triggering key handlers in the page. By default entire text is filled in at once."
+        "description": "When true, type character by character."
       },
       "viewId": {
         "type": "string",
         "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after typing completes. Defaults to false."
       }
     },
     "required": [
-      "element",
       "ref",
       "text"
     ]
