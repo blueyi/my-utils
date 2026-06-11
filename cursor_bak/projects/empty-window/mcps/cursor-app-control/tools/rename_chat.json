@@ -1,0 +1,20 @@
+{
+  "name": "rename_chat",
+  "description": "Rename the current chat conversation tab title. Uses the active conversation when composerId is not provided by the caller.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "title": {
+        "description": "New title for the current chat conversation.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "required": [
+      "title"
+    ],
+    "additionalProperties": false
+  }
+}

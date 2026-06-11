@@ -24,7 +24,7 @@
           "active",
           "side"
         ],
-        "description": "IMPORTANT: Set to \"side\" if user mentions \"side\", \"beside\", \"side panel\", or \"side by side\". Opens browser in side editor group. Only for action \"new\". Defaults to \"active\"."
+        "description": "Only set for action \"new\" when the user explicitly asks to reveal, show, focus, or open the browser visibly. Set to \"active\" for visible/revealed browser UI, or \"side\" if the user mentions \"side\", \"beside\", \"side panel\", or \"side by side\". Omit this parameter for background automation so focus is preserved."
       }
     },
     "required": [
