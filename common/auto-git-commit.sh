@@ -85,6 +85,23 @@ esac
 DEFAULT_BRANCH="${AUTO_GIT_BRANCH:-main}"
 LOG_FILE="${AUTO_GIT_LOG:-$HOME/workspace/auto-git-backup.log}"
 
+# GitHub + GitCode fallback (same as interactive git wrapper).
+_AUTO_GIT_DUAL_LIB=""
+for _lib_candidate in \
+    "${MY_UTILS_ROOT:-}/common/git-dual-remote-lib.sh" \
+    "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/git-dual-remote-lib.sh"; do
+    if [ -f "$_lib_candidate" ]; then
+        _AUTO_GIT_DUAL_LIB="$_lib_candidate"
+        break
+    fi
+done
+if [ -n "$_AUTO_GIT_DUAL_LIB" ]; then
+    [ -f "${MY_UTILS_ROOT:-}/config/git-dual-remote.env" ] && . "${MY_UTILS_ROOT}/config/git-dual-remote.env"
+    # shellcheck source=git-dual-remote-lib.sh
+    . "$_AUTO_GIT_DUAL_LIB"
+fi
+unset _lib_candidate _AUTO_GIT_DUAL_LIB
+
 # Non-interactive SSH for pull/push (cron, scripts): first connect to a host like gitcode.com
 # otherwise stops at "Are you sure you want to continue connecting". Override by exporting
 # GIT_SSH_COMMAND before running this script.
@@ -164,9 +181,23 @@ backup_one_dir() {
     # In normal operation these are equal because the safety check above passed.
     local branch="${expected_branch:-$current_branch}"
 
-    # Always try to pull latest from remote before backing up
+    # Ensure dual remotes when lib is available (no-op for non-GitHub repos).
+    if declare -F git_dual_ensure_remotes >/dev/null 2>&1; then
+        git_dual_ensure_remotes origin 2>/dev/null || true
+    fi
+
+    # Always try to pull latest from remote before backing up (GitCode fallback on timeout).
     log "[$name] On branch $branch; updating from remote (git pull --rebase)..."
-    if ! git pull --rebase 2>&1 | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done; then
+    local pull_out pull_ret
+    if declare -F git_dual_pull >/dev/null 2>&1; then
+        pull_out=$(git_dual_pull --rebase 2>&1)
+        pull_ret=$?
+    else
+        pull_out=$(git pull --rebase 2>&1)
+        pull_ret=$?
+    fi
+    echo "$pull_out" | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done
+    if [ $pull_ret -ne 0 ]; then
         log "[$name] ERROR: git pull --rebase failed (uncommitted changes or conflicts); skip backup for this repo"
         return 1
     fi
@@ -192,8 +223,13 @@ $changed"
     fi
 
     local push_out push_ret
-    push_out=$(git push origin "$branch" 2>&1)
-    push_ret=$?
+    if declare -F git_dual_push >/dev/null 2>&1; then
+        push_out=$(git_dual_push origin "$branch" 2>&1)
+        push_ret=$?
+    else
+        push_out=$(git push origin "$branch" 2>&1)
+        push_ret=$?
+    fi
     echo "$push_out" | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done
     if [ $push_ret -ne 0 ]; then
         log "[$name] ERROR: git push failed (exit $push_ret)"

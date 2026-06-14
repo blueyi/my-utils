@@ -1,0 +1,20 @@
+# Git dual-remote fragment — included via:
+#   git config --global include.path /path/to/my-utils/config/gitconfig.dual-remote
+# (git-dual-remote.bash adds this automatically on first shell load.)
+
+[http]
+    lowSpeedLimit = 1000
+    lowSpeedTime = 15
+    timeout = 30
+
+[fetch]
+    # Prefer showing origin; gitcode is added per-repo as fallback remote.
+    prune = true
+
+[push]
+    # Do not stop on first pushURL failure when multiple pushurl entries exist.
+    # (Git still reports failure if any URL fails; the shell wrapper handles fallback.)
+    default = current
+
+[init]
+    defaultBranch = main
