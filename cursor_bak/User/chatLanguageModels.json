@@ -1,1 +1,274 @@
-[]
+[
+  {
+    "name": "Yunwu Claude",
+    "vendor": "customendpoint",
+    "apiType": "chat-completions",
+    "apiKey": "${input:chat.lm.secret.yunwu-claude}",
+    "models": [
+      {
+        "id": "claude-opus-4-7",
+        "name": "Yunwu Claude / claude-opus-4-7",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "claude-opus-4-6-thinking",
+        "name": "Yunwu Claude / claude-opus-4-6-thinking",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "claude-sonnet-4-6-thinking",
+        "name": "Yunwu Claude / claude-sonnet-4-6-thinking",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "claude-opus-4-6",
+        "name": "Yunwu Claude / claude-opus-4-6",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "claude-sonnet-4-6",
+        "name": "Yunwu Claude / claude-sonnet-4-6",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      }
+    ]
+  },
+  {
+    "name": "Yunwu Codex",
+    "vendor": "customendpoint",
+    "apiType": "chat-completions",
+    "apiKey": "${input:chat.lm.secret.yunwu-codex}",
+    "models": [
+      {
+        "id": "gpt-5.5-xhigh",
+        "name": "Yunwu Codex / gpt-5.5-xhigh",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "gpt-5.5-high",
+        "name": "Yunwu Codex / gpt-5.5-high",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "gpt-5.3-codex-xhigh",
+        "name": "Yunwu Codex / gpt-5.3-codex-xhigh",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "gpt-5.3-codex-high",
+        "name": "Yunwu Codex / gpt-5.3-codex-high",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "gpt-5.5-medium",
+        "name": "Yunwu Codex / gpt-5.5-medium",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "gpt-5.3-codex-medium",
+        "name": "Yunwu Codex / gpt-5.3-codex-medium",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "gpt-5.3-codex",
+        "name": "Yunwu Codex / gpt-5.3-codex",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      }
+    ]
+  },
+  {
+    "name": "Yunwu Gemini",
+    "vendor": "customendpoint",
+    "apiType": "chat-completions",
+    "apiKey": "${input:chat.lm.secret.yunwu-gemini}",
+    "models": [
+      {
+        "id": "gemini-3.1-pro-preview",
+        "name": "Yunwu Gemini / gemini-3.1-pro-preview",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "gemini-3.1-flash-image-preview",
+        "name": "Yunwu Gemini / gemini-3.1-flash-image-preview",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": false,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "gemini-3.1-flash-tts-preview",
+        "name": "Yunwu Gemini / gemini-3.1-flash-tts-preview",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": false,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "gemini-3.1-pro-preview-thinking",
+        "name": "Yunwu Gemini / gemini-3.1-pro-preview-thinking",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "veo3.1-pro-4k",
+        "name": "Yunwu Gemini / veo3.1-pro-4k",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": false,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      }
+    ]
+  },
+  {
+    "name": "Yunwu All",
+    "vendor": "customendpoint",
+    "apiType": "chat-completions",
+    "apiKey": "${input:chat.lm.secret.yunwu-all}",
+    "models": [
+      {
+        "id": "gpt-image-2",
+        "name": "Yunwu All / gpt-image-2",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": false,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "deepseek-v4-pro",
+        "name": "Yunwu All / deepseek-v4-pro",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "grok-4-20-reasoning",
+        "name": "Yunwu All / grok-4-20-reasoning",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384,
+        "thinking": true
+      },
+      {
+        "id": "speech-2.8-hd",
+        "name": "Yunwu All / speech-2.8-hd",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": false,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "gemini-2.5-pro-preview-tts",
+        "name": "Yunwu All / gemini-2.5-pro-preview-tts",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": false,
+        "vision": true,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      },
+      {
+        "id": "MiniMax-M2.7",
+        "name": "Yunwu All / MiniMax-M2.7",
+        "url": "https://yunwu.ai/v1/chat/completions",
+        "apiType": "chat-completions",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 256000,
+        "maxOutputTokens": 16384
+      }
+    ]
+  }
+]
