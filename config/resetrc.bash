@@ -119,7 +119,7 @@ fi
 # Python versions:
 #   uv python list                         # available & installed interpreters
 #   uv python install 3.12                 # install CPython 3.12 (prebuilt)
-#   uv python install 3.10 --default       # install and set as default `python`
+#   uv python install 3.12 --default       # install and set as default `python`
 #   uv python pin 3.12                     # write .python-version in cwd
 #   uv python pin --global 3.12            # global default (~/.local/share/uv/global-python-pin)
 #   uv python find                         # resolve active interpreter
@@ -147,6 +147,9 @@ fi
 export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-$HOME/.local/share/uv/python}"
 export UV_TOOL_DIR="${UV_TOOL_DIR:-$HOME/.local/share/uv/tools}"
 export UV_CACHE_DIR="${UV_CACHE_DIR:-$HOME/.cache/uv}"
+# Default interpreter for uv (venv / run / pip) when no project .python-version applies
+export UV_DEFAULT_PYTHON="${UV_DEFAULT_PYTHON:-3.12}"
+export UV_PYTHON="${UV_PYTHON:-$UV_DEFAULT_PYTHON}"
 
 # uv binary lives in ~/.local/bin (also prepended later in PATH section)
 if [ -d "$HOME/.local/bin" ]; then

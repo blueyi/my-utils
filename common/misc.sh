@@ -66,18 +66,18 @@ ensure_git && {
 install_omz_plugins() {
   [ -d "$HOME/.oh-my-zsh" ] || return 0
   local custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-  [ ! -d "$custom/plugins/zsh-autosuggestions" ] && {
+  if [ ! -d "$custom/plugins/zsh-autosuggestions" ]; then
     echo "Cloning zsh-autosuggestions..."
     git clone https://github.com/zsh-users/zsh-autosuggestions "$custom/plugins/zsh-autosuggestions" || true
-  }
-  [ ! -d "$custom/plugins/zsh-syntax-highlighting" ] && {
+  fi
+  if [ ! -d "$custom/plugins/zsh-syntax-highlighting" ]; then
     echo "Cloning zsh-syntax-highlighting..."
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$custom/plugins/zsh-syntax-highlighting" || true
-  }
-  [ ! -d "$custom/themes/powerlevel10k" ] && {
+  fi
+  if [ ! -d "$custom/themes/powerlevel10k" ]; then
     echo "Cloning powerlevel10k..."
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$custom/themes/powerlevel10k" || true
-  }
+  fi
 }
 
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -140,9 +140,13 @@ ensure_uv() {
 
 ensure_uv_python_default() {
   command -v uv &>/dev/null || return 0
-  echo "Ensuring default Python 3.10 via uv..."
-  uv python install 3.10 --default || echo "  WARN: uv python install 3.10 failed"
-  uv python pin --global 3.10 2>/dev/null || true
+  local _py="${UV_DEFAULT_PYTHON:-3.12}"
+  echo "Ensuring default Python ${_py} via uv..."
+  uv python install "$_py" --default --preview-features python-install-default 2>/dev/null || \
+    uv python install "$_py" --default || \
+    uv python install "$_py" || \
+    echo "  WARN: uv python install ${_py} failed"
+  uv python pin --global "$_py" 2>/dev/null || true
 }
 
 ensure_uv
