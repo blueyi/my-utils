@@ -18,6 +18,13 @@ _git_dual_real() {
   command git "$@"
 }
 
+# Run real git under timeout(1) / background watchdog (never pass shell function names).
+_git_dual_git_with_timeout() {
+  local secs="$1"
+  shift
+  _git_dual_run_with_timeout "$secs" "$@"
+}
+
 _git_dual_verbose() {
   [[ "${GIT_DUAL_REMOTE_VERBOSE:-}" == 1 ]] || return 0
   printf 'git-dual-remote: %s\n' "$*" >&2
@@ -191,20 +198,22 @@ _git_dual_export_ssh() {
   fi
 }
 
+# GNU timeout exec()s argv[0]; shell functions are not executable — use bash -c + command git.
 _git_dual_run_with_timeout() {
   local secs="$1"
   shift
+
   if command -v timeout >/dev/null 2>&1; then
-    timeout "$secs" "$@"
+    timeout "$secs" bash -c 'command git "$@"' _ "$@"
     return $?
   fi
   if command -v gtimeout >/dev/null 2>&1; then
-    gtimeout "$secs" "$@"
+    gtimeout "$secs" bash -c 'command git "$@"' _ "$@"
     return $?
   fi
   # macOS without GNU coreutils
   (
-    "$@" &
+    command git "$@" &
     local pid=$!
     local timer_pid
     ( sleep "$secs"; kill -TERM "$pid" 2>/dev/null ) &
@@ -341,18 +350,28 @@ _git_dual_resolve_remote_branch() {
 }
 
 git_dual_fetch() {
-  local remote="${1:-origin}"
-  shift || true
+  local -a _saved_args=("$@")
+  local remote="" rest=()
+
+  # git fetch --all / git fetch (no remote) — pass through unchanged.
+  if ((${#_saved_args[@]} == 0)) || [[ "${_saved_args[0]}" == -* ]]; then
+    _git_dual_real fetch "${_saved_args[@]}"
+    return $?
+  fi
+
+  remote="${_saved_args[0]}"
+  rest=("${_saved_args[@]:1}")
+
   local secs out rc fb
 
-  git_dual_in_repo || { _git_dual_real fetch "$remote" "$@"; return $?; }
-  git_dual_ensure_remotes "$remote" || { _git_dual_real fetch "$remote" "$@"; return $?; }
+  git_dual_in_repo || { _git_dual_real fetch "${_saved_args[@]}"; return $?; }
+  git_dual_ensure_remotes "$remote" || { _git_dual_real fetch "${_saved_args[@]}"; return $?; }
 
   _git_dual_export_ssh
   secs="$(_git_dual_timeout_secs)"
   fb="${GIT_DUAL_REMOTE_FALLBACK_REMOTE:-gitcode}"
 
-  out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real fetch "$remote" "$@")"
+  out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" fetch "$remote" "${rest[@]}")"
   rc=$?
   if [[ "$rc" -eq 0 ]]; then
     printf '%s\n' "$out"
@@ -365,7 +384,7 @@ git_dual_fetch() {
   fi
 
   _git_dual_verbose "fetch $remote timed out; trying $fb ..."
-  out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real fetch "$fb" "$@")"
+  out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" fetch "$fb" "${rest[@]}")"
   rc=$?
   printf '%s\n' "$out"
   [[ "$rc" -eq 0 ]] && _git_dual_verbose "fetch OK via $fb"
@@ -373,6 +392,7 @@ git_dual_fetch() {
 }
 
 git_dual_pull() {
+  local -a _saved_args=("$@")
   local remote="" branch="" extra=() use_rebase=0
 
   while [[ $# -gt 0 ]]; do
@@ -399,17 +419,17 @@ git_dual_pull() {
   branch="$(_git_dual_resolve_remote_branch "$remote" "$branch")"
   local secs out rc fb
 
-  git_dual_in_repo || { _git_dual_real pull "$@"; return $?; }
-  git_dual_ensure_remotes "$remote" || { _git_dual_real pull "$@"; return $?; }
+  git_dual_in_repo || { _git_dual_real pull "${_saved_args[@]}"; return $?; }
+  git_dual_ensure_remotes "$remote" || { _git_dual_real pull "${_saved_args[@]}"; return $?; }
 
   _git_dual_export_ssh
   secs="$(_git_dual_timeout_secs)"
   fb="${GIT_DUAL_REMOTE_FALLBACK_REMOTE:-gitcode}"
 
   if ((${#extra[@]})); then
-    out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real pull "${extra[@]}" "$remote" ${branch:+"$branch"})"
+    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" pull "${extra[@]}" "$remote" ${branch:+"$branch"})"
   else
-    out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real pull "$remote" ${branch:+"$branch"})"
+    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" pull "$remote" ${branch:+"$branch"})"
   fi
   rc=$?
   if [[ "$rc" -eq 0 ]]; then
@@ -423,7 +443,7 @@ git_dual_pull() {
   fi
 
   _git_dual_verbose "pull $remote timed out; fetch + merge via $fb ..."
-  out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real fetch "$fb" "$branch")"
+  out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" fetch "$fb" "$branch")"
   rc=$?
   printf '%s\n' "$out"
   [[ "$rc" -ne 0 ]] && return "$rc"
@@ -512,7 +532,7 @@ git_dual_push() {
 
   # Push GitHub first (best-effort), then GitCode mirror.
   if [[ -n "$github_url" ]]; then
-    out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real push "${opts[@]}" "$github_url" "${refs[@]}")"
+    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${opts[@]}" "$github_url" "${refs[@]}")"
     rc=$?
     if [[ "$rc" -eq 0 ]]; then
       gh_ok=1
@@ -524,7 +544,7 @@ git_dual_push() {
   fi
 
   if [[ -n "$gitcode_url" ]]; then
-    out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real push "${opts[@]}" "$gitcode_url" "${refs[@]}")"
+    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${opts[@]}" "$gitcode_url" "${refs[@]}")"
     rc=$?
     if [[ "$rc" -eq 0 ]]; then
       gc_ok=1
@@ -576,9 +596,9 @@ git_dual_clone() {
   clone_url="${github_url:-$url}"
 
   if [[ -n "$target" ]]; then
-    out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real clone "$clone_url" "$target" "${args[@]}")"
+    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$clone_url" "$target" "${args[@]}")"
   else
-    out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real clone "$clone_url" "${args[@]}")"
+    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$clone_url" "${args[@]}")"
   fi
   rc=$?
   printf '%s\n' "$out"
@@ -589,9 +609,9 @@ git_dual_clone() {
     if [[ -n "$gitcode_url" && "$gitcode_url" != "$clone_url" ]]; then
       _git_dual_verbose "clone from GitHub timed out; trying GitCode ..."
       if [[ -n "$target" ]]; then
-        out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real clone "$gitcode_url" "$target" "${args[@]}")"
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$gitcode_url" "$target" "${args[@]}")"
       else
-        out="$(_git_dual_capture _git_dual_run_with_timeout "$secs" _git_dual_real clone "$gitcode_url" "${args[@]}")"
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$gitcode_url" "${args[@]}")"
       fi
       rc=$?
       printf '%s\n' "$out"

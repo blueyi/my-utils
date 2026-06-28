@@ -6,6 +6,16 @@
 : "${MYRC_PATH:=${MY_UTILS_ROOT}/config}"
 export MY_CONF_PATH="${MYRC_PATH}"
 
+# =============================================================================
+# SECTION: User env secrets (~/.env.rc, manual / not in repo)
+# =============================================================================
+# API keys, BASH_ENV for non-interactive bash, etc. Idempotent via MY_UTILS_ENV_RC_LOADED.
+# Non-interactive bash may load this once from config/_bashrc before shell_init returns.
+if [ -z "${MY_UTILS_ENV_RC_LOADED:-}" ] && [ -f "$HOME/.env.rc" ]; then
+  . "$HOME/.env.rc"
+  export MY_UTILS_ENV_RC_LOADED=1
+fi
+
 # Linux + WSL: WSL2 reports Linux in uname; extra probes match common/platform.sh is_wsl for edge cases.
 _is_linux() {
   [[ "$(uname -s)" = Linux* ]] && return 0
@@ -284,6 +294,7 @@ _path_add() { [ -d "$1" ] && case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$
 [ -n "${CMAKE_PATH:-}" ] && _path_add "$CMAKE_PATH"
 [ -n "${LOCAL_BIN_PATH:-}" ] && _path_add "$LOCAL_BIN_PATH"
 _path_add "$HOME/.local/go/bin"
+_path_add "$HOME/go/bin"
 [ -n "${MY_BIN:-}" ] && _path_add "$MY_BIN"
 [ -n "${HOME_BIN:-}" ] && _path_add "$HOME_BIN"
 [ -n "${CUDA_BIN_PATH:-}" ] && _path_add "$CUDA_BIN_PATH"

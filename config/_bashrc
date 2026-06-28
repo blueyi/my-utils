@@ -1,9 +1,9 @@
-# ~/.bashrc — interactive only; then ~/.shell_init.bash → config/shell_init.bash
+# ~/.bashrc — interactive → shell_init.bash; non-interactive → ~/.env.rc only (see resetrc SECTION: env.rc)
 
-# Load env vars BEFORE the interactive-only guard so non-interactive bash
-# (e.g. Hermes terminal tool spawning subprocesses like Claude Code) also
-# inherits ANTHROPIC_API_KEY / ANTHROPIC_BASE_URL etc.
-[ -f ~/.env.rc ] && source ~/.env.rc
+if [ -z "${MY_UTILS_ENV_RC_LOADED:-}" ] && [ -f "$HOME/.env.rc" ]; then
+  . "$HOME/.env.rc"
+  export MY_UTILS_ENV_RC_LOADED=1
+fi
 
 case $- in
   *i*) ;;
