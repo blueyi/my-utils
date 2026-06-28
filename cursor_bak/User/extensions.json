@@ -1,0 +1,158 @@
+[
+  {
+    "id": "anysphere.cpptools",
+    "version": "2.0.2"
+  },
+  {
+    "id": "anysphere.cursor-agent-exec",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-checkout",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-commits",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-explorer",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-mcp",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-ndjson-ingest",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-polyfills-remote",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-retrieval",
+    "version": "0.0.1"
+  },
+  {
+    "id": "anysphere.cursor-shadow-workspace",
+    "version": "1.0.0"
+  },
+  {
+    "id": "anysphere.cursorpyright",
+    "version": "1.0.12"
+  },
+  {
+    "id": "Dart-Code.dart-code",
+    "version": "3.136.1"
+  },
+  {
+    "id": "Dart-Code.flutter",
+    "version": "3.136.0"
+  },
+  {
+    "id": "donebd.vscode-keypromoter",
+    "version": "1.2.0"
+  },
+  {
+    "id": "donjayamanne.githistory",
+    "version": "0.6.20"
+  },
+  {
+    "id": "fill-labs.dependi",
+    "version": "0.7.25"
+  },
+  {
+    "id": "GitHub.vscode-pull-request-github",
+    "version": "0.120.2"
+  },
+  {
+    "id": "Gruntfuggly.todo-tree",
+    "version": "0.0.215"
+  },
+  {
+    "id": "jerrygoyal.shortcut-menu-bar",
+    "version": "3.0.4"
+  },
+  {
+    "id": "jonathan-yeung.mark-sharp",
+    "version": "1.12.1"
+  },
+  {
+    "id": "llvm-vs-code-extensions.vscode-clangd",
+    "version": "0.6.0"
+  },
+  {
+    "id": "llvm-vs-code-extensions.vscode-mlir",
+    "version": "0.0.15"
+  },
+  {
+    "id": "MarceloBarella.cursor-sync",
+    "version": "0.8.0"
+  },
+  {
+    "id": "mechatroner.rainbow-csv",
+    "version": "3.24.1"
+  },
+  {
+    "id": "ms-python.debugpy",
+    "version": "2026.6.0"
+  },
+  {
+    "id": "ms-python.python",
+    "version": "2023.6.0"
+  },
+  {
+    "id": "ms-python.vscode-python-envs",
+    "version": "1.10.0"
+  },
+  {
+    "id": "ms-toolsai.jupyter",
+    "version": "2025.9.1"
+  },
+  {
+    "id": "ms-toolsai.jupyter-renderers",
+    "version": "1.3.0"
+  },
+  {
+    "id": "ms-toolsai.vscode-jupyter-cell-tags",
+    "version": "0.1.9"
+  },
+  {
+    "id": "ms-toolsai.vscode-jupyter-slideshow",
+    "version": "0.1.6"
+  },
+  {
+    "id": "ms-vscode.cmake-tools",
+    "version": "1.23.52"
+  },
+  {
+    "id": "ms-vscode.js-debug",
+    "version": "1.93.0"
+  },
+  {
+    "id": "ms-vscode.makefile-tools",
+    "version": "0.12.17"
+  },
+  {
+    "id": "ms-vscode.vscode-js-profile-table",
+    "version": "1.0.9"
+  },
+  {
+    "id": "rust-lang.rust-analyzer",
+    "version": "0.3.2946"
+  },
+  {
+    "id": "tamasfe.even-better-toml",
+    "version": "0.21.2"
+  },
+  {
+    "id": "vadimcn.vscode-lldb",
+    "version": "1.12.1"
+  },
+  {
+    "id": "yzhang.markdown-all-in-one",
+    "version": "3.6.2"
+  }
+]
