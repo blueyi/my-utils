@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run misc setup (git, oh-my-zsh, pyenv)
+# Run misc setup (git, oh-my-zsh, uv)
 # Zero Python dependency
 
 set -e

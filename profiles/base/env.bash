@@ -1,4 +1,4 @@
-# Base profile - PATH, pyenv, nvm, etc
+# Base profile - PATH, uv, nvm, etc
 # Source: source $MY_UTILS_ROOT/profiles/base/env.bash
 # MY_UTILS_ROOT from ~/.my-utils.env (bootstrap) or derived from this script path (profiles/base/env.bash -> ../..)
 [ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"

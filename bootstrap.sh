@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: $0 [--yes] [--tools packages links misc vimrc cursor]"
       echo "  --yes: run all selected tools without prompting"
       echo "  --tools: run only these (default: all)"
-      echo "  packages=install pkgs, links=symlinks, misc=oh-my-zsh/pyenv, vimrc=vim plugins, cursor=config backup"
+      echo "  packages=install pkgs, links=symlinks, misc=oh-my-zsh/uv, vimrc=vim plugins, cursor=config backup"
       exit 1
       ;;
   esac

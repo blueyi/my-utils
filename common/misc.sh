@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Idempotent misc setup: git, oh-my-zsh, pyenv
+# Idempotent misc setup: git, oh-my-zsh, uv
 # Sourced by run_misc.sh
 
 set -e
@@ -11,7 +11,7 @@ else
 fi
 source "$COMMON_DIR/platform.sh"
 
-# Ensure Homebrew is installed on macOS (required for pyenv and other brew packages)
+# Ensure Homebrew is installed on macOS (required for uv and other brew packages)
 ensure_brew() {
   if command -v brew &>/dev/null; then
     return 0
@@ -118,36 +118,35 @@ if command -v zsh &>/dev/null; then
   unset _zsh_bin
 fi
 
-# pyenv: macOS = brew install (see mac_app_list.txt); Linux = git clone to ~/.pyenv
-if is_macos; then
-  ensure_brew
-  if command -v pyenv &>/dev/null; then
-    echo "pyenv already installed (Homebrew)"
-  else
-    echo "Installing pyenv via Homebrew..."
-    brew install pyenv || echo "  WARN: brew install pyenv failed; run manually: brew install pyenv"
+# uv: macOS = brew install (see mac_app_list.txt); Linux = official install script
+ensure_uv() {
+  if command -v uv &>/dev/null; then
+    echo "uv already installed ($(uv --version 2>/dev/null || echo ok))"
+    return 0
   fi
-else
-  if [ ! -d "$HOME/.pyenv" ]; then
-    echo "Installing pyenv (git clone)..."
-    git clone https://github.com/pyenv/pyenv.git "$HOME/.pyenv"
-    (cd "$HOME/.pyenv" && src/configure && make -C src) || true
+  if is_macos; then
+    ensure_brew
+    echo "Installing uv via Homebrew..."
+    brew install uv || { echo "  WARN: brew install uv failed; run manually: brew install uv"; return 1; }
   else
-    echo "pyenv already installed"
+    echo "Installing uv (official install script)..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh || { echo "  WARN: uv install failed; see https://docs.astral.sh/uv/getting-started/installation/"; return 1; }
+    case ":$PATH:" in
+      *":$HOME/.local/bin:"*) ;;
+      *) export PATH="$HOME/.local/bin:$PATH" ;;
+    esac
   fi
-fi
+}
 
-# pyenv-virtualenv plugin (for `pyenv virtualenv-init`)
-PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
-if [ -d "$PYENV_ROOT" ]; then
-  if [ ! -d "$PYENV_ROOT/plugins/pyenv-virtualenv" ]; then
-    echo "Installing pyenv-virtualenv plugin..."
-    git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_ROOT/plugins/pyenv-virtualenv" || \
-      echo "  WARN: git clone pyenv-virtualenv failed; run manually: git clone https://github.com/pyenv/pyenv-virtualenv.git \"$PYENV_ROOT/plugins/pyenv-virtualenv\""
-  else
-    echo "pyenv-virtualenv plugin already installed"
-  fi
-fi
+ensure_uv_python_default() {
+  command -v uv &>/dev/null || return 0
+  echo "Ensuring default Python 3.10 via uv..."
+  uv python install 3.10 --default || echo "  WARN: uv python install 3.10 failed"
+  uv python pin --global 3.10 2>/dev/null || true
+}
+
+ensure_uv
+ensure_uv_python_default
 
 # --- Hexo blog dependencies (Node.js + hexo-cli), Linux + macOS ---
 ensure_hexo_env() {

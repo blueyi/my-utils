@@ -1,4 +1,4 @@
-# Python profile - pyenv, venv
+# Python profile - uv (versions, venv, packages)
 [ -f "$HOME/.my-utils.env" ] && source "$HOME/.my-utils.env"
 [ -z "${MY_UTILS_ROOT:-}" ] && export MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "$MY_UTILS_ROOT/profiles/base/env.bash"

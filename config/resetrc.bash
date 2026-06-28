@@ -82,15 +82,16 @@ fi
 unset _ninja 2>/dev/null || true
 
 # =============================================================================
-# SECTION: Locale hints + pyenv build defaults
+# SECTION: Locale hints
 # =============================================================================
 # export LANG=zh_CN.UTF-8
 # Skip on WSL (/proc/version contains Microsoft); gnome-terminal is not the host GUI there.
 _is_linux && ! grep -qi microsoft /proc/version 2>/dev/null && export TERMINAL=gnome-terminal
 
-export PYTHON_BUILD_MIRROR_URL="https://www.python.org/ftp/python/"
-export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
-export PYTHON_CONFIGURE_OPTS="--enable-shared"
+# pyenv build defaults (deprecated — uv uses prebuilt CPython; keep commented for reference)
+# export PYTHON_BUILD_MIRROR_URL="https://www.python.org/ftp/python/"
+# export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
+# export PYTHON_CONFIGURE_OPTS="--enable-shared"
 
 # =============================================================================
 # SECTION: NVM
@@ -111,12 +112,65 @@ if [ -d "$HOME/.npm-global/bin" ]; then
 fi
 
 # =============================================================================
-# SECTION: pyenv + virtualenv
+# SECTION: uv (Python toolchain — versions, venv, packages)
 # =============================================================================
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d "$PYENV_ROOT/bin" ]] && case ":$PATH:" in *":$PYENV_ROOT/bin:"*) ;; *) export PATH="$PYENV_ROOT/bin:$PATH";; esac
-command -v pyenv >/dev/null && eval "$(pyenv init -)" || true
-eval "$(pyenv virtualenv-init -)" || true
+# Install:  curl -LsSf https://astral.sh/uv/install.sh | sh   OR   brew install uv
+#
+# Python versions:
+#   uv python list                         # available & installed interpreters
+#   uv python install 3.12                 # install CPython 3.12 (prebuilt)
+#   uv python install 3.10 --default       # install and set as default `python`
+#   uv python pin 3.12                     # write .python-version in cwd
+#   uv python pin --global 3.12            # global default (~/.local/share/uv/global-python-pin)
+#   uv python find                         # resolve active interpreter
+#
+# Virtual environments:
+#   uv venv                                # create .venv (uses pinned / default Python)
+#   uv venv ~/.venvs/myproj -p 3.12        # custom path + version
+#   source .venv/bin/activate
+#
+# Projects (pyproject.toml):
+#   uv init                                # new project
+#   uv add requests                        # add dependency + update lockfile
+#   uv sync                                # install locked deps into .venv
+#   uv run python script.py                # run in project env (no activate)
+#   uv run pytest
+#
+# Ad-hoc packages / CLI tools:
+#   uv pip install numpy
+#   uv tool install ruff                   # isolated tool env under ~/.local/bin
+#
+# Misc:
+#   uv self update
+#   UV_PYTHON=3.11 uv run ...              # one-shot Python override
+#
+export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-$HOME/.local/share/uv/python}"
+export UV_TOOL_DIR="${UV_TOOL_DIR:-$HOME/.local/share/uv/tools}"
+export UV_CACHE_DIR="${UV_CACHE_DIR:-$HOME/.cache/uv}"
+
+# uv binary lives in ~/.local/bin (also prepended later in PATH section)
+if [ -d "$HOME/.local/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+  esac
+fi
+
+if command -v uv >/dev/null 2>&1; then
+  if [ -n "${ZSH_VERSION:-}" ]; then
+    eval "$(uv generate-shell-completion zsh 2>/dev/null)" || true
+  elif [ -n "${BASH_VERSION:-}" ]; then
+    eval "$(uv generate-shell-completion bash 2>/dev/null)" || true
+  fi
+fi
+
+# =============================================================================
+# SECTION: pyenv + virtualenv (deprecated — replaced by uv above)
+# =============================================================================
+# export PYENV_ROOT="$HOME/.pyenv"
+# [[ -d "$PYENV_ROOT/bin" ]] && case ":$PATH:" in *":$PYENV_ROOT/bin:"*) ;; *) export PATH="$PYENV_ROOT/bin:$PATH";; esac
+# command -v pyenv >/dev/null && eval "$(pyenv init -)" || true
+# eval "$(pyenv virtualenv-init -)" || true
 
 # =============================================================================
 # SECTION: rbenv + Rust (rustup)

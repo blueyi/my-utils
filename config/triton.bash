@@ -26,4 +26,4 @@ case "$(uname -s)" in
 esac
 
 # Python / pip: triton is usually `pip install triton`
-# Use pyenv/virtualenv as needed; no change here.
+# Use uv (uv venv / uv run) as needed; no change here.
