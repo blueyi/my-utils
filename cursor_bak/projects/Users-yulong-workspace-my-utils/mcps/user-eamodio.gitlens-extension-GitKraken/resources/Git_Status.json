@@ -1,6 +1,0 @@
-{
-  "uri": "ui://gk-cli/app/git-status",
-  "name": "Git Status",
-  "description": "Git status viewer UI (MCP Apps HTML resource)",
-  "mimeType": "text/html;profile=mcp-app"
-}

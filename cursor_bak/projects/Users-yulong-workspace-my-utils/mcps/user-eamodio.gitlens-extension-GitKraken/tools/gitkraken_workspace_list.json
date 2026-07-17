@@ -1,8 +1,0 @@
-{
-  "name": "gitkraken_workspace_list",
-  "description": " Lists all Gitkraken workspaces",
-  "arguments": {
-    "type": "object",
-    "properties": {}
-  }
-}
