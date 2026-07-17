@@ -81,6 +81,7 @@ case "$BACKUP_OS" in
 esac
 
 LOG_FILE="${AUTO_GIT_LOG:-$HOME/workspace/auto-git-backup.log}"
+LOCK_FILE="${AUTO_GIT_LOCK:-$HOME/workspace/auto-git-commit.lock}"
 
 # GitHub + GitCode fallback (same as interactive git wrapper).
 _AUTO_GIT_DUAL_LIB=""
@@ -239,6 +240,25 @@ $changed"
 
 # --- Main ---
 mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || true
+
+# Single-instance guard (launchd StartInterval can overlap a long run).
+if command -v shlock >/dev/null 2>&1; then
+    if ! shlock -f "$LOCK_FILE" -p $$; then
+        _say "auto-git-commit: another instance is running; exit 0"
+        log "=== auto-git-commit skip (lock held: $LOCK_FILE) ==="
+        exit 0
+    fi
+    trap 'rm -f "$LOCK_FILE"' EXIT
+else
+    # Fallback: mkdir lock (atomic on POSIX).
+    if ! mkdir "$LOCK_FILE" 2>/dev/null; then
+        _say "auto-git-commit: another instance is running; exit 0"
+        log "=== auto-git-commit skip (lock held: $LOCK_FILE) ==="
+        exit 0
+    fi
+    trap 'rmdir "$LOCK_FILE" 2>/dev/null || true' EXIT
+fi
+
 _say "auto-git-commit: started (OS=$BACKUP_OS)"
 _say "auto-git-commit: log file -> $LOG_FILE"
 log "=== auto-git-commit start (OS: $BACKUP_OS) ==="
