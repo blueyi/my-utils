@@ -191,7 +191,11 @@ _git_dual_export_ssh() {
   local base="${GIT_SSH_COMMAND:-}"
   local opts
   opts="$(_git_dual_ssh_opts)"
+  # Never prepend opts onto an existing "ssh ..." command — that becomes
+  # "ssh ... ssh ..." and OpenSSH treats the second "ssh" as a hostname.
   if [[ -z "$base" ]]; then
+    export GIT_SSH_COMMAND="$opts"
+  elif [[ "$base" == ssh\ * || "$base" == */ssh\ * || "$base" == ssh ]]; then
     export GIT_SSH_COMMAND="$opts"
   elif [[ "$base" != *ConnectTimeout=* ]]; then
     export GIT_SSH_COMMAND="$opts $base"
