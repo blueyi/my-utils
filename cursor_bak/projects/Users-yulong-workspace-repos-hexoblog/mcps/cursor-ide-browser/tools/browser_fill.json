@@ -1,0 +1,33 @@
+{
+  "name": "browser_fill",
+  "description": "Set the value of an input, textarea, or contenteditable element by ref.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string",
+        "description": "Element ref from browser_snapshot."
+      },
+      "value": {
+        "type": "string",
+        "description": "Value to set."
+      },
+      "element": {
+        "type": "string",
+        "description": "Human-readable description of the element."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after filling completes. Defaults to false."
+      }
+    },
+    "required": [
+      "ref",
+      "value"
+    ]
+  }
+}

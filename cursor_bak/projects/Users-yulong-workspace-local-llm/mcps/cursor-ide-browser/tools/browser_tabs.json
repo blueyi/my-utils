@@ -1,0 +1,34 @@
+{
+  "name": "browser_tabs",
+  "description": "List, create, close, or select a browser tab",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "list",
+          "new",
+          "close",
+          "select"
+        ],
+        "description": "Operation to perform"
+      },
+      "index": {
+        "type": "number",
+        "description": "Tab index. Required for \"select\". Optional for \"close\" (defaults to current tab)."
+      },
+      "position": {
+        "type": "string",
+        "enum": [
+          "active",
+          "side"
+        ],
+        "description": "Only set for action \"new\" when the user explicitly asks to reveal, show, focus, or open the browser visibly. Set to \"active\" for visible/revealed browser UI, or \"side\" if the user mentions \"side\", \"beside\", \"side panel\", or \"side by side\". Omit this parameter for background automation so focus is preserved."
+      }
+    },
+    "required": [
+      "action"
+    ]
+  }
+}

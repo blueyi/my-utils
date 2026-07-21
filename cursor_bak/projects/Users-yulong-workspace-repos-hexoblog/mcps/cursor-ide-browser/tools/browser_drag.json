@@ -1,0 +1,36 @@
+{
+  "name": "browser_drag",
+  "description": "Drag an element by ref to another ref or viewport coordinates.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "sourceRef": {
+        "type": "string",
+        "description": "Source element ref from browser_snapshot."
+      },
+      "targetRef": {
+        "type": "string",
+        "description": "Optional target element ref from browser_snapshot."
+      },
+      "targetX": {
+        "type": "number",
+        "description": "Optional target viewport x coordinate."
+      },
+      "targetY": {
+        "type": "number",
+        "description": "Optional target viewport y coordinate."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after drag completes. Defaults to false."
+      }
+    },
+    "required": [
+      "sourceRef"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "browser_navigate",
+  "description": "Navigate to a URL. By default reuses an existing tab; set newTab: true to open in a new tab.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "The URL to navigate to"
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "position": {
+        "type": "string",
+        "enum": [
+          "active",
+          "side"
+        ],
+        "description": "Only set when the user explicitly asks to reveal, show, focus, or open the browser visibly. Set to \"active\" for visible/revealed browser UI, or \"side\" if the user mentions \"side\", \"beside\", \"side panel\", or \"side by side\". Omit this parameter for background automation so focus is preserved."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after navigation completes. Defaults to false."
+      },
+      "newTab": {
+        "type": "boolean",
+        "description": "When true, creates a new tab before navigating instead of reusing an existing tab. Defaults to false."
+      }
+    },
+    "required": [
+      "url"
+    ]
+  }
+}

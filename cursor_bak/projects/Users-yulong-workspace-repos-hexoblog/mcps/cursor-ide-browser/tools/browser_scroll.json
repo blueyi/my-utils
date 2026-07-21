@@ -1,0 +1,48 @@
+{
+  "name": "browser_scroll",
+  "description": "Scroll the page, a scrollable container, or an element into view. Use this instead of CDP Input.* wheel events.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string",
+        "description": "Optional element ref from browser_snapshot."
+      },
+      "direction": {
+        "type": "string",
+        "enum": [
+          "up",
+          "down",
+          "left",
+          "right"
+        ],
+        "description": "Scroll direction."
+      },
+      "amount": {
+        "type": "number",
+        "description": "Scroll amount in pixels. Defaults to 300."
+      },
+      "deltaX": {
+        "type": "number",
+        "description": "Explicit horizontal scroll delta."
+      },
+      "deltaY": {
+        "type": "number",
+        "description": "Explicit vertical scroll delta."
+      },
+      "scrollIntoView": {
+        "type": "boolean",
+        "description": "When true, scroll the ref into view."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after scrolling completes. Defaults to false."
+      }
+    },
+    "required": []
+  }
+}
