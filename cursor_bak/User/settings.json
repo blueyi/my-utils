@@ -75,6 +75,14 @@
     "window.zoomLevel": 1,
     "mlir.onSettingsChanged": "restart",
     "python.createEnvironment.trigger": "off",
+    "python.defaultInterpreterPath": "/home/blueyi/.local/bin/python3",
+    "python.terminal.activateEnvironment": false,
+    "python-envs.terminal.autoActivationType": "off",
     "git.openRepositoryInParentFolders": "always",
-    "window.autoDetectColorScheme": false
+    "window.autoDetectColorScheme": false,
+    "remote.SSH.remotePlatform": {
+        "WSL": "linux",
+        "ucloud": "linux",
+        "jd": "linux"
+    }
 }

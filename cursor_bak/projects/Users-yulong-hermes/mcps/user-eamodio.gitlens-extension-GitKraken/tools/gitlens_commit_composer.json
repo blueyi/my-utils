@@ -1,0 +1,20 @@
+{
+  "name": "gitlens_commit_composer",
+  "description": " Gitlens Commit Composer. Organize your changes into well-formed commits with clear messages and descriptions. Useful for breaking large changes into smaller commits.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      },
+      "instructions": {
+        "description": "OPTIONAL. Use this ONLY if the user explicitly provided specific requirements about how commits should be organized, what commit messages should say, or particular commit structure preferences. Do NOT use this parameter unless you are 100% certain about the user's intentions. Examples: 'use conventional commits', 'prefix each commit with JIRA-123', 'keep commit messages under 50 characters'.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

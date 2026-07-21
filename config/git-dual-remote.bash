@@ -36,21 +36,26 @@ git() {
     push)
       shift
       git_dual_push "$@"
+      return $?
       ;;
     pull)
       shift
       git_dual_pull "$@"
+      return $?
       ;;
     fetch)
       shift
       git_dual_fetch "$@"
+      return $?
       ;;
     clone)
       shift
       git_dual_clone "$@"
+      return $?
       ;;
     *)
       command git "$@"
+      return $?
       ;;
   esac
 }

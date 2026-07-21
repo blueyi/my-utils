@@ -234,12 +234,44 @@ _git_dual_run_with_timeout() {
 _git_dual_is_timeout_or_unreachable() {
   local out="$1" code="${2:-1}"
   [[ "$code" -eq 124 ]] && return 0
+  [[ "$code" -eq 143 ]] && return 0   # SIGTERM (e.g. timeout helper on macOS)
+  [[ "$code" -eq 137 ]] && return 0   # SIGKILL
   [[ "$code" -eq 255 ]] && return 0
   [[ "$out" == *"timed out"* || "$out" == *"Timeout"* || "$out" == *"Could not resolve"* || \
      "$out" == *"Connection refused"* || "$out" == *"Network is unreachable"* || \
      "$out" == *"Operation timed out"* || "$out" == *"Connection reset"* || \
      "$out" == *"No route to host"* ]] && return 0
   return 1
+}
+
+# Clone fallback: unreachable OR repo missing on the preferred host.
+_git_dual_should_try_alternate_clone() {
+  local out="$1" code="${2:-1}"
+  _git_dual_is_timeout_or_unreachable "$out" "$code" && return 0
+  [[ "$out" == *"Repository not found"* || "$out" == *"repository not found"* || \
+     "$out" == *"does not exist"* || "$out" == *"Could not read from remote repository"* ]] && return 0
+  return 1
+}
+
+_git_dual_url_is_gitcode() {
+  case "$1" in
+    git@gitcode.com:*|https://gitcode.com/*|http://gitcode.com/*) return 0 ;;
+  esac
+  return 1
+}
+
+_git_dual_url_is_github() {
+  case "$1" in
+    git@github.com:*|https://github.com/*|http://github.com/*) return 0 ;;
+  esac
+  return 1
+}
+
+# Remove incomplete clone target before retry (git leaves an empty dir on failure).
+_git_dual_cleanup_failed_clone_target() {
+  local dir="$1"
+  [[ -n "$dir" && -d "$dir" && ! -d "$dir/.git" ]] || return 0
+  rm -rf "$dir"
 }
 
 _git_dual_capture() {
@@ -265,9 +297,13 @@ git_dual_repo_root() {
 git_dual_ensure_remotes() {
   local remote="${1:-origin}"
   local fetch_url github_url gitcode_url
+  local fetch_is_github=0 fetch_is_gitcode=0
 
   git_dual_in_repo || return 1
   fetch_url="$(_git_dual_real remote get-url "$remote" 2>/dev/null)" || return 1
+
+  _git_dual_url_is_github "$fetch_url" && fetch_is_github=1
+  _git_dual_url_is_gitcode "$fetch_url" && fetch_is_gitcode=1
 
   if ! git_dual_url_is_mirrorable "$fetch_url"; then
     local owner="${GIT_DUAL_REMOTE_GITHUB_USER:-blueyi}"
@@ -288,10 +324,17 @@ git_dual_ensure_remotes() {
   [[ -n "$github_url" ]] || github_url="$fetch_url"
   [[ -n "$gitcode_url" ]] || gitcode_url="$(git_dual_to_gitcode_url "$github_url")" || return 1
 
-  # Fetch URL → GitHub (primary read path).
-  if [[ "$fetch_url" != "$github_url" ]]; then
-    _git_dual_real remote set-url "$remote" "$github_url"
-    _git_dual_verbose "set $remote fetch → $github_url"
+  # Fetch URL: GitHub when origin is GitHub; keep GitCode when cloned from GitCode only.
+  if (( fetch_is_github )); then
+    if [[ "$fetch_url" != "$github_url" ]]; then
+      _git_dual_real remote set-url "$remote" "$github_url"
+      _git_dual_verbose "set $remote fetch → $github_url"
+    fi
+  elif (( fetch_is_gitcode )); then
+    if [[ -n "$gitcode_url" && "$fetch_url" != "$gitcode_url" ]]; then
+      _git_dual_real remote set-url "$remote" "$gitcode_url"
+      _git_dual_verbose "set $remote fetch → $gitcode_url"
+    fi
   fi
 
   # Dual push URLs.
@@ -321,15 +364,17 @@ git_dual_ensure_remotes() {
     _git_dual_verbose "add $remote push → $gitcode_url"
   fi
 
-  # Fallback remote for fetch/pull when GitHub is down.
+  # Fallback remote for fetch/pull when primary host is GitHub (GitHub down → gitcode).
   local fb="${GIT_DUAL_REMOTE_FALLBACK_REMOTE:-gitcode}"
-  if _git_dual_real remote get-url "$fb" &>/dev/null; then
-    local cur_fb
-    cur_fb="$(_git_dual_real remote get-url "$fb" 2>/dev/null)"
-    [[ "$cur_fb" != "$gitcode_url" ]] && _git_dual_real remote set-url "$fb" "$gitcode_url"
-  else
-    _git_dual_real remote add "$fb" "$gitcode_url"
-    _git_dual_verbose "add remote $fb → $gitcode_url"
+  if (( fetch_is_github )); then
+    if _git_dual_real remote get-url "$fb" &>/dev/null; then
+      local cur_fb
+      cur_fb="$(_git_dual_real remote get-url "$fb" 2>/dev/null)"
+      [[ "$cur_fb" != "$gitcode_url" ]] && _git_dual_real remote set-url "$fb" "$gitcode_url"
+    else
+      _git_dual_real remote add "$fb" "$gitcode_url"
+      _git_dual_verbose "add remote $fb → $gitcode_url"
+    fi
   fi
 
   return 0
@@ -587,34 +632,46 @@ git_dual_clone() {
     esac
   done
 
-  local secs out rc clone_url github_url mirrorable=0
+  local rc clone_url github_url gitcode_url mirrorable=0 alt_url=""
 
   _git_dual_export_ssh
-  secs="$(_git_dual_timeout_secs)"
   git_dual_url_is_mirrorable "$url" && mirrorable=1
+  gitcode_url="$(git_dual_to_gitcode_url "$url" 2>/dev/null || true)"
   github_url="$(git_dual_to_github_url "$url" 2>/dev/null || true)"
-  clone_url="${github_url:-$url}"
+
+  # Clone from the host the user specified.
+  if _git_dual_url_is_gitcode "$url"; then
+    clone_url="${gitcode_url:-$url}"
+  elif _git_dual_url_is_github "$url"; then
+    clone_url="${github_url:-$url}"
+  else
+    clone_url="${github_url:-$url}"
+  fi
 
   if [[ -n "$target" ]]; then
-    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$clone_url" "$target" "${args[@]}")"
+    _git_dual_real clone "$clone_url" "$target" "${args[@]}"
   else
-    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$clone_url" "${args[@]}")"
+    _git_dual_real clone "$clone_url" "${args[@]}"
   fi
   rc=$?
-  printf '%s\n' "$out"
 
-  if [[ "$rc" -ne 0 ]] && (( mirrorable )) && _git_dual_is_timeout_or_unreachable "$out" "$rc"; then
-    local gitcode_url
-    gitcode_url="$(git_dual_to_gitcode_url "$url" 2>/dev/null || true)"
-    if [[ -n "$gitcode_url" && "$gitcode_url" != "$clone_url" ]]; then
-      _git_dual_verbose "clone from GitHub timed out; trying GitCode ..."
+  # Fallback to the other mirror host (no wall-clock timeout on clone).
+  if [[ "$rc" -ne 0 ]] && (( mirrorable )); then
+    if [[ "$clone_url" == "$github_url" && -n "$gitcode_url" && "$gitcode_url" != "$clone_url" ]]; then
+      alt_url="$gitcode_url"
+      _git_dual_verbose "clone from GitHub failed; trying GitCode ..."
+    elif [[ "$clone_url" == "$gitcode_url" && -n "$github_url" && "$github_url" != "$clone_url" ]]; then
+      alt_url="$github_url"
+      _git_dual_verbose "clone from GitCode failed; trying GitHub ..."
+    fi
+    if [[ -n "$alt_url" ]]; then
+      _git_dual_cleanup_failed_clone_target "$target"
       if [[ -n "$target" ]]; then
-        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$gitcode_url" "$target" "${args[@]}")"
+        _git_dual_real clone "$alt_url" "$target" "${args[@]}"
       else
-        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" clone "$gitcode_url" "${args[@]}")"
+        _git_dual_real clone "$alt_url" "${args[@]}"
       fi
       rc=$?
-      printf '%s\n' "$out"
     fi
   fi
 

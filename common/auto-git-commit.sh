@@ -42,22 +42,20 @@ BACKUP_OS="$(_detect_os)"
 # different sessions)". Exactly one entry will match per host.
 # Default list (used when no OS-specific list is set)
 BACKUP_DIRS=(
-    "$HOME/.openclaw"
+    "$HOME/.openclaw:macos"
     "$HOME/workspace/my-utils:main"
     "$HOME/workspace/repos/hexoblog:master"
     # "$HOME/workspace/repos/kora:main"  # disabled: auto-backup breaks in-progress edits
-    "$HOME/.openclaw:macos"
-    # Hermes config + state (see also BACKUP_DIRS_LINUX on WSL)
-    "$HOME/.hermes:wsl"
-    # "$HOME/some-other-repo:master"
-    # "/path/to/another/dir"
+    "$HOME/.hermes:macos"
 )
 
 # Optional: per-OS lists — same path can backup to different branches per OS
-# BACKUP_DIRS_MACOS=(
-#     "$HOME/workspace/my-utils:main-macos"
-#     "$HOME/.openclaw"
-# )
+BACKUP_DIRS_MACOS=(
+    "$HOME/.openclaw:macos"
+    "$HOME/workspace/my-utils:main"
+    "$HOME/workspace/repos/hexoblog:master"
+    "$HOME/.hermes:macos"
+)
 BACKUP_DIRS_LINUX=(
     "$HOME/.openclaw:ucloud"
     "$HOME/workspace/my-utils:main"
@@ -82,7 +80,6 @@ case "$BACKUP_OS" in
     windows) declare -p BACKUP_DIRS_WINDOWS &>/dev/null && BACKUP_DIRS=("${BACKUP_DIRS_WINDOWS[@]}") ;;
 esac
 
-DEFAULT_BRANCH="${AUTO_GIT_BRANCH:-main}"
 LOG_FILE="${AUTO_GIT_LOG:-$HOME/workspace/auto-git-backup.log}"
 
 # GitHub + GitCode fallback (same as interactive git wrapper).
@@ -186,7 +183,28 @@ backup_one_dir() {
         git_dual_ensure_remotes origin 2>/dev/null || true
     fi
 
-    # Always try to pull latest from remote before backing up (GitCode fallback on timeout).
+    # Commit local changes FIRST so pull --rebase is not blocked by a dirty tree.
+    local changed=""
+    if ! git diff-index --quiet HEAD -- 2>/dev/null || [ -n "$(git status --porcelain)" ]; then
+        changed=$(git status --porcelain)
+        log "[$name] Changes detected"
+        echo "$changed" | while IFS= read -r line; do [ -n "$line" ] && log "[$name]   $line"; done
+
+        local commit_msg="Auto-backup: $(date '+%Y-%m-%d %H:%M:%S')
+Changed files:
+$changed"
+
+        git add -A
+        if ! git commit -q -m "$commit_msg"; then
+            log "[$name] ERROR: git commit failed"
+            return 1
+        fi
+        log "[$name] Committed local changes"
+    else
+        log "[$name] No local changes to commit"
+    fi
+
+    # Sync with remote, then push (GitCode fallback on timeout when dual lib is loaded).
     log "[$name] On branch $branch; updating from remote (git pull --rebase)..."
     local pull_out pull_ret
     if declare -F git_dual_pull >/dev/null 2>&1; then
@@ -198,27 +216,7 @@ backup_one_dir() {
     fi
     echo "$pull_out" | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done
     if [ $pull_ret -ne 0 ]; then
-        log "[$name] ERROR: git pull --rebase failed (uncommitted changes or conflicts); skip backup for this repo"
-        return 1
-    fi
-
-    if git diff-index --quiet HEAD -- 2>/dev/null && [ -z "$(git status --porcelain)" ]; then
-        log "[$name] No changes after pull"
-        return 0
-    fi
-
-    local changed
-    changed=$(git status --porcelain)
-    log "[$name] Changes detected"
-    echo "$changed" | while IFS= read -r line; do [ -n "$line" ] && log "[$name]   $line"; done
-
-    local commit_msg="Auto-backup: $(date '+%Y-%m-%d %H:%M:%S')
-Changed files:
-$changed"
-
-    git add -A
-    if ! git commit -q -m "$commit_msg"; then
-        log "[$name] ERROR: git commit failed"
+        log "[$name] ERROR: git pull --rebase failed (conflicts or remote error); skip push for this repo"
         return 1
     fi
 
@@ -260,8 +258,9 @@ for entry in "${BACKUP_DIRS[@]}"; do
         branch="${entry#*:}"
         branch=$(echo "$branch" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     else
+        # No ":branch" → back up whatever the current branch is (empty filter).
         dir="$entry"
-        branch="$DEFAULT_BRANCH"
+        branch=""
     fi
     [[ -z "$dir" ]] && continue
 
