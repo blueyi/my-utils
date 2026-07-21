@@ -8,6 +8,10 @@
         "description": "Optionally set the Azure DevOps project name of the pull request. Required for Azure DevOps",
         "type": "string"
       },
+      "fields": {
+        "description": "Optional comma-separated list of top-level fields to keep on each result. Recommended for list/overview calls: omitting it returns every field, which on large lists can overflow the context window. Omit only when you need the full objects. Available fields: timestampCreatedAt, title, description, url, state, owner, repoName, repoHost, provider, id, files, clone, number, merged, draft, approved, authoredByMe, headBranch, baseBranch, headRepo.",
+        "type": "string"
+      },
       "is_closed": {
         "description": "Set to true if you want to search for closed pull requests",
         "type": "boolean"

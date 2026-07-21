@@ -16,6 +16,10 @@
         "description": "Optionally set the Azure DevOps project name. Required for Azure DevOps",
         "type": "string"
       },
+      "fields": {
+        "description": "Optional comma-separated list of top-level fields to keep on each result. Recommended for list/overview calls: omitting it returns every field, which on large lists can overflow the context window. Omit only when you need the full objects. Available fields: id, url, number, provider, repoName, repoOwner, repoHost, project, title, description, issueType, status, assignees, comments, childIssues.",
+        "type": "string"
+      },
       "is_closed": {
         "description": "Set to true to also include closed/done issues. Defaults to false.",
         "type": "boolean"

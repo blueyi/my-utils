@@ -1,0 +1,41 @@
+{
+  "name": "move_agent_to_cloned_root",
+  "description": "Move the current agent to a root workspace directory that is a verbatim clone of the current workspace (for example produced by `cursorfs-clone`) and is already on the agent's recorded branch. Skips the migration-path `git fetch` and ff-merge that `move_agent_to_root` performs. Use ONLY when you already know the target is a sibling clone of the current workspace on the same branch; otherwise use `move_agent_to_root`.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "anyOf": [
+      {
+        "type": "object",
+        "properties": {
+          "rootPath": {
+            "description": "Absolute path to the directory that should become the agent root workspace (e.g. \"/Users/name/projects/my-app\")",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "rootPath"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "rootPaths": {
+            "description": "Array of absolute paths used to create/switch to a multi-root workspace.",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "rootPaths"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  }
+}

@@ -12,6 +12,10 @@
         ],
         "type": "string"
       },
+      "description": {
+        "description": "Optional commit description/body (only applies when action is 'commit')",
+        "type": "string"
+      },
       "directory": {
         "description": "The directory to run git add or commit in",
         "type": "string"
