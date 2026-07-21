@@ -1,6 +1,0 @@
-{
-  "uri": "ui://gk-cli/app/git-resolve",
-  "name": "Git Resolve",
-  "description": "Git conflict resolution UI (MCP Apps HTML resource)",
-  "mimeType": "text/html;profile=mcp-app"
-}

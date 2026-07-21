@@ -5,3 +5,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 source ~/.shell_init.bash
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/yulong/.lmstudio/bin"
+# End of LM Studio CLI section
+

@@ -10,3 +10,8 @@ case $- in
   *) return;;
 esac
 source ~/.shell_init.bash
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/yulong/.lmstudio/bin"
+# End of LM Studio CLI section
+
