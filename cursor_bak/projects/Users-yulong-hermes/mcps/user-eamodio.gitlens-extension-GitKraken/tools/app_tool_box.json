@@ -1,0 +1,24 @@
+{
+  "name": "app_tool_box",
+  "description": " Internal helper for GitKraken MCP apps. App-only — agents must not call this tool.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "description": "App helper action to execute. Supported values: 'git_status_data', 'git_graph_data', 'git_graph_targets', 'compose_history', 'git_status_line_changes', 'open_diff', 'open_file', 'open_in_explorer', 'detected_editors', 'git_push', 'git_pull', 'git_fetch', 'git_add_or_commit', 'git_generate_commit_message', 'git_stash', 'app_feedback', 'gitlens_ping', 'gitlens_open_graph', 'update_user_preferences', 'interaction_telemetry', 'user_status', 'save_auth_code', 'purchase_url', 'start_trial', 'resend_email', 'ai_models_list', 'ai_model_set', 'compose_plan', 'compose_plan_start', 'compose_plan_status', 'compose_plan_cancel', 'compose_apply_plan', 'git_resolve_data', 'git_resolve_prepare_start', 'git_resolve_prepare_status', 'git_resolve_prepare_cancel', 'git_resolve_file_retry', 'git_resolve_file_open_diff', 'git_resolve_apply', 'git_resolve_discard'.",
+        "type": "string"
+      },
+      "directory": {
+        "type": "string"
+      },
+      "options": {
+        "description": "Per-action options. Supported keys depend on the 'action' value and include 'app_name', 'code', 'comment', 'context', 'custom_instructions', 'data', 'description', 'direction', 'file_allow_list', 'file_path', 'files', 'files_json', 'focused_file_paths', 'git_action', 'git_commit_composer_app_collapsed', 'git_graph_app_collapsed', 'git_status_app_collapsed', 'guidance', 'include_untracked', 'instructions', 'interaction', 'job_id', 'message', 'plan_json', 'range_start_sha', 'refresh', 'sentiment', 'session_id', 'source_type', 'staged_only', and 'target_branch'.",
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "required": [
+      "action"
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "issues_assigned_to_me",
+  "description": "Fetch issues assigned to the user. Set assigned_to_me=false to broaden the result to all visible issues (so the caller can then filter client-side). Narrow results server-side with repository_name/repository_organization (GitHub), project/issue_type (Jira), or is_closed.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "assigned_to_me": {
+        "description": "Whether to limit results to issues assigned to you. Defaults to true.",
+        "type": "boolean"
+      },
+      "azure_organization": {
+        "description": "Optionally set the Azure DevOps organization name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "fields": {
+        "description": "Optional comma-separated list of top-level fields to keep on each result. Recommended for list/overview calls: omitting it returns every field, which on large lists can overflow the context window. Omit only when you need the full objects. Available fields: id, url, number, provider, repoName, repoOwner, repoHost, project, title, description, issueType, status, assignees, comments, childIssues.",
+        "type": "string"
+      },
+      "is_closed": {
+        "description": "Set to true to also include closed/done issues. Defaults to false.",
+        "type": "boolean"
+      },
+      "issue_type": {
+        "description": "Issue type. Jira only (e.g. Bug, Story, Task).",
+        "type": "string"
+      },
+      "page": {
+        "description": "Optional parameter to specify the page number, defaults to 1",
+        "type": "number"
+      },
+      "project": {
+        "description": "Project key. Jira only (e.g. GKDEV).",
+        "type": "string"
+      },
+      "provider": {
+        "description": "Specify the issue provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "jira",
+          "azure",
+          "linear",
+          "trello"
+        ],
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Repository name. GitHub only; must be combined with repository_organization.",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Organization name. GitHub only.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "provider"
+    ]
+  }
+}
