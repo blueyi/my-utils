@@ -1,0 +1,18 @@
+{
+  "name": "create_project",
+  "description": "Create a new project at the given path. Creates the directory if it does not exist and initializes a git repository. Use this to bootstrap a new project before moving the agent to it with move_agent_to_root.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "path": {
+        "description": "Absolute path where the new project should be created (e.g. \"/Users/name/projects/my-new-app\")",
+        "type": "string"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "additionalProperties": false
+  }
+}

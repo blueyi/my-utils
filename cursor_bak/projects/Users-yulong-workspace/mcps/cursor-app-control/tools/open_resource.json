@@ -1,0 +1,19 @@
+{
+  "name": "open_resource",
+  "description": "Open a resource by URI: files in the Glass editor panel (with line/column from URI fragment when applicable), terminals, output channels, or http(s) URLs through the default workbench opener. File URIs must be in the agent workspace or under the user ~/.cursor directory. Command and product-protocol URI schemes are not supported.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "uri": {
+        "description": "URI to open in Glass or through the default opener (e.g. file:///path/to/file.ts#L10, vscode-terminal:/workspaceId/3, output:channel-id, https://example.com)",
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": [
+      "uri"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -75,7 +75,7 @@
     "window.zoomLevel": 1,
     "mlir.onSettingsChanged": "restart",
     "python.createEnvironment.trigger": "off",
-    "python.defaultInterpreterPath": "/home/blueyi/.local/bin/python3",
+    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
     "python.terminal.activateEnvironment": false,
     "python-envs.terminal.autoActivationType": "off",
     "git.openRepositoryInParentFolders": "always",

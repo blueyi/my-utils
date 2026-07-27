@@ -1,0 +1,147 @@
+{
+  "name": "cursor_dialog",
+  "description": "Run Cursor-specific actions. Currently supports user rule operations with item=\"rule\", scope=\"user\", and action=\"list\", \"add\", \"update\", or \"remove\". Rule add/update accept content and optional title; update/remove accept id. Use this after asking the user what should be remembered, and list first to avoid duplicates.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "anyOf": [
+      {
+        "type": "object",
+        "properties": {
+          "item": {
+            "description": "The Cursor item type to operate on. Only \"rule\" is currently supported.",
+            "type": "string",
+            "const": "rule"
+          },
+          "scope": {
+            "description": "The rule scope to operate on. Only \"user\" is currently supported.",
+            "type": "string",
+            "const": "user"
+          },
+          "action": {
+            "description": "List the personal rules shown in Cursor Settings.",
+            "type": "string",
+            "const": "list"
+          }
+        },
+        "required": [
+          "item",
+          "scope",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "item": {
+            "description": "The Cursor item type to operate on. Only \"rule\" is currently supported.",
+            "type": "string",
+            "const": "rule"
+          },
+          "scope": {
+            "description": "The rule scope to operate on. Only \"user\" is currently supported.",
+            "type": "string",
+            "const": "user"
+          },
+          "action": {
+            "description": "Add a new personal rule.",
+            "type": "string",
+            "const": "add"
+          },
+          "title": {
+            "description": "Optional short title for the personal rule.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "content": {
+            "description": "The personal rule content to store.",
+            "type": "string",
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "item",
+          "scope",
+          "action",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "item": {
+            "description": "The Cursor item type to operate on. Only \"rule\" is currently supported.",
+            "type": "string",
+            "const": "rule"
+          },
+          "scope": {
+            "description": "The rule scope to operate on. Only \"user\" is currently supported.",
+            "type": "string",
+            "const": "user"
+          },
+          "action": {
+            "description": "Update an existing personal rule.",
+            "type": "string",
+            "const": "update"
+          },
+          "id": {
+            "description": "The personal rule id returned by a previous list or add operation.",
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "description": "Optional short title for the personal rule.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "content": {
+            "description": "The personal rule content to store.",
+            "type": "string",
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "item",
+          "scope",
+          "action",
+          "id",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "item": {
+            "description": "The Cursor item type to operate on. Only \"rule\" is currently supported.",
+            "type": "string",
+            "const": "rule"
+          },
+          "scope": {
+            "description": "The rule scope to operate on. Only \"user\" is currently supported.",
+            "type": "string",
+            "const": "user"
+          },
+          "action": {
+            "description": "Remove an existing personal rule.",
+            "type": "string",
+            "const": "remove"
+          },
+          "id": {
+            "description": "The personal rule id returned by a previous list or add operation.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "item",
+          "scope",
+          "action",
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  }
+}

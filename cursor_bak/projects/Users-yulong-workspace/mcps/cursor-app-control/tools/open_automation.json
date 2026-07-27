@@ -1,0 +1,40 @@
+{
+  "name": "open_automation",
+  "description": "Open the Glass Automations UI, optionally opening an existing automation by automationId or starting a new automation from a templateId and/or structured prefillWorkflowData. Use this instead of opening cursor.com automation URLs or putting raw prefill data in cursor:// URLs. Calls with prefillWorkflowData require tool approval before the data is trusted by the form, and prefill data is sent only to the active Glass view.",
+  "arguments": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "automationId": {
+        "description": "Optional existing automation id to open in the Automations UI.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "view": {
+        "description": "Which existing automation view to open. Defaults to edit. Requires automationId.",
+        "type": "string",
+        "enum": [
+          "edit",
+          "view",
+          "runs"
+        ]
+      },
+      "templateId": {
+        "description": "Optional automation template id to preselect in the new automation form.",
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "prefillWorkflowData": {
+        "description": "Optional workflow data JSON object used to prefill the new automation form. The payload is sent only to the active Glass view and is not put in a URL or browser storage.",
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {}
+      }
+    },
+    "additionalProperties": false
+  }
+}
