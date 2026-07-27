@@ -1,0 +1,20 @@
+{
+  "name": "git_resolve",
+  "description": " Show the conflict resolution UI for a repository, will open a UI if client supports it.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      },
+      "instructions": {
+        "description": "Optional guidance for the AI conflict resolution flow.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

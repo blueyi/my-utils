@@ -1,0 +1,25 @@
+{
+  "name": "gitlens_start_work",
+  "description": " Gitlens Start Work. Creates a work based on an issue. This tool will create a branch and link it with the issue, keeping context visible throughout your work.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      },
+      "instructions": {
+        "description": "OPTIONAL. Use this ONLY if the user explicitly provided specific requirements about the implementation approach, or additional context to supplement the issue. Do NOT use this parameter unless you are 100% certain about the user's intentions.",
+        "type": "string"
+      },
+      "issue_url": {
+        "description": "URL of the issue to start work on.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory",
+      "issue_url"
+    ]
+  }
+}
