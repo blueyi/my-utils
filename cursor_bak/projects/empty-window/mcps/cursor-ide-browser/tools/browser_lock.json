@@ -1,0 +1,24 @@
+{
+  "name": "browser_lock",
+  "description": "Lock or unlock the browser to control whether the user can interact while you work. Set action to \"lock\" or \"unlock\". When locked, the user can still click \"Take Control\" to unlock if needed.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "lock",
+          "unlock"
+        ],
+        "description": "Whether to lock or unlock the browser for user interaction."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      }
+    },
+    "required": [
+      "action"
+    ]
+  }
+}

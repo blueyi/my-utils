@@ -1,0 +1,38 @@
+{
+  "name": "browser_mouse_click_xy",
+  "description": "Click at viewport coordinates. Prefer browser_click with refs when possible.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "x": {
+        "type": "number",
+        "description": "Viewport x coordinate."
+      },
+      "y": {
+        "type": "number",
+        "description": "Viewport y coordinate."
+      },
+      "button": {
+        "type": "string",
+        "enum": [
+          "left",
+          "right",
+          "middle"
+        ],
+        "description": "Mouse button. Defaults to left."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after the click completes. Defaults to false."
+      }
+    },
+    "required": [
+      "x",
+      "y"
+    ]
+  }
+}

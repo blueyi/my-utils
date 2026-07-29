@@ -1,0 +1,67 @@
+{
+  "name": "browser_click",
+  "description": "Click an element by ref from browser_snapshot. Use this instead of CDP Input.* methods.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string",
+        "description": "Element ref from browser_snapshot."
+      },
+      "element": {
+        "type": "string",
+        "description": "Human-readable description of the element."
+      },
+      "offsetX": {
+        "type": "number",
+        "description": "Optional x offset from the element center."
+      },
+      "offsetY": {
+        "type": "number",
+        "description": "Optional y offset from the element center."
+      },
+      "doubleClick": {
+        "type": "boolean",
+        "description": "When true, double-click the element."
+      },
+      "button": {
+        "type": "string",
+        "enum": [
+          "left",
+          "right",
+          "middle"
+        ],
+        "description": "Mouse button. Defaults to left."
+      },
+      "modifiers": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "Control",
+            "Shift",
+            "Alt",
+            "Meta",
+            "ControlOrMeta"
+          ]
+        },
+        "description": "Optional modifier keys."
+      },
+      "holdDurationMs": {
+        "type": "number",
+        "description": "Optional mouse hold duration before release."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after the click completes. Defaults to false."
+      }
+    },
+    "required": [
+      "ref"
+    ]
+  }
+}
