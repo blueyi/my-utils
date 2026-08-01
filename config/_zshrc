@@ -6,9 +6,5 @@ fi
 
 source ~/.shell_init.bash
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/yulong/.lmstudio/bin"
-# End of LM Studio CLI section
-
 # OpenClaw Completion
 [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"

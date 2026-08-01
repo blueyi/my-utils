@@ -157,9 +157,12 @@ fi
 export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-$HOME/.local/share/uv/python}"
 export UV_TOOL_DIR="${UV_TOOL_DIR:-$HOME/.local/share/uv/tools}"
 export UV_CACHE_DIR="${UV_CACHE_DIR:-$HOME/.cache/uv}"
-# Default interpreter for uv (venv / run / pip) when no project .python-version applies
+# Preferred Python when you explicitly create a new venv, e.g.:
+#   uv venv --python "$UV_DEFAULT_PYTHON"
+# Do NOT export UV_PYTHON globally — a pinned UV_PYTHON bypasses existing
+# project/tool venvs (breaks e.g. hermes-agent on 3.11 during `hermes update`).
 export UV_DEFAULT_PYTHON="${UV_DEFAULT_PYTHON:-3.12}"
-export UV_PYTHON="${UV_PYTHON:-$UV_DEFAULT_PYTHON}"
+unset UV_PYTHON
 
 # uv binary lives in ~/.local/bin (also prepended later in PATH section)
 if [ -d "$HOME/.local/bin" ]; then
