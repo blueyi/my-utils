@@ -341,31 +341,29 @@ git_dual_ensure_remotes() {
     fi
   fi
 
-  # Dual push URLs.
+  # Dual push URLs (dedupe: rebuild when duplicates or missing mirror).
   local -a push_urls=()
-  local u
+  local u saw_gh=0 saw_gc=0 dup=0
   while IFS= read -r u; do
-    [[ -n "$u" ]] && push_urls+=("$u")
+    [[ -n "$u" ]] || continue
+    if [[ "$u" == "$github_url" ]]; then
+      ((saw_gh)) && dup=1
+      saw_gh=1
+    elif [[ "$u" == "$gitcode_url" ]]; then
+      ((saw_gc)) && dup=1
+      saw_gc=1
+    else
+      dup=1
+    fi
+    push_urls+=("$u")
   done < <(_git_dual_real remote get-url --push --all "$remote" 2>/dev/null || true)
 
-  local need_gh=1 need_gc=1
-  for u in "${push_urls[@]}"; do
-    [[ "$u" == "$github_url" ]] && need_gh=0
-    [[ "$u" == "$gitcode_url" ]] && need_gc=0
-  done
-
-  if ((${#push_urls[@]} == 0)); then
+  if ((${#push_urls[@]} == 0 || dup || !saw_gh || !saw_gc)); then
+    # `remote set-url --push` fails when multiple pushurl values already exist.
+    _git_dual_real config --unset-all "remote.${remote}.pushurl" 2>/dev/null || true
     _git_dual_real remote set-url --push "$remote" "$github_url"
-    push_urls=("$github_url")
-    need_gh=0
-  fi
-  if ((need_gh)); then
-    _git_dual_real remote set-url --add --push "$remote" "$github_url"
-    _git_dual_verbose "add $remote push → $github_url"
-  fi
-  if ((need_gc)); then
     _git_dual_real remote set-url --add --push "$remote" "$gitcode_url"
-    _git_dual_verbose "add $remote push → $gitcode_url"
+    _git_dual_verbose "set $remote push → $github_url + $gitcode_url"
   fi
 
   # Fallback remote for fetch/pull when primary host is GitHub (GitHub down → gitcode).
@@ -396,6 +394,38 @@ _git_dual_resolve_remote_branch() {
     branch="$(_git_dual_current_branch)"
   fi
   printf '%s' "$branch"
+}
+
+# Map a push refspec to the destination branch name on the remote.
+# Examples: HEAD → current branch; master → master; HEAD:refs/heads/foo → foo
+_git_dual_dst_branch_from_refspec() {
+  local ref="$1" src dst
+  src="${ref%%:*}"
+  if [[ "$ref" == *:* ]]; then
+    dst="${ref#*:}"
+  else
+    dst="$src"
+  fi
+  dst="${dst#refs/heads/}"
+  if [[ -z "$dst" || "$dst" == "HEAD" ]]; then
+    dst="$(_git_dual_current_branch)"
+  fi
+  [[ -n "$dst" && "$dst" != "HEAD" && "$dst" != *'/'* ]] || return 1
+  printf '%s' "$dst"
+}
+
+# After pushing via a raw URL, git does not update refs/remotes/<remote>/*.
+# Sync local tracking refs so `git status` stays accurate.
+_git_dual_sync_tracking_after_push() {
+  local remote="$1"
+  shift
+  local ref src dst branch sha
+  for ref in "$@"; do
+    src="${ref%%:*}"
+    branch="$(_git_dual_dst_branch_from_refspec "$ref")" || continue
+    sha="$(_git_dual_real rev-parse "$src" 2>/dev/null)" || continue
+    _git_dual_real update-ref "refs/remotes/$remote/$branch" "$sha" 2>/dev/null || true
+  done
 }
 
 git_dual_fetch() {
@@ -516,7 +546,7 @@ git_dual_push() {
     return $?
   fi
 
-  local remote="" saw_remote=0
+  local remote="" saw_remote=0 set_upstream=0
   local -a opts=() refs=()
 
   while [[ $# -gt 0 ]]; do
@@ -534,10 +564,12 @@ git_dual_push() {
         opts+=("$1")
         shift
         ;;
+      # -u/--set-upstream takes NO value. Do not consume the next token
+      # (that is usually the remote name, e.g. `git push -u origin HEAD`).
       -u|--set-upstream)
+        set_upstream=1
         opts+=("$1")
         shift
-        [[ $# -gt 0 && "$1" != --* ]] && { opts+=("$1"); shift; }
         ;;
       --force|-f|--force-with-lease|--no-force-with-lease|--no-verify|--porcelain|--quiet|-q)
         opts+=("$1")
@@ -573,15 +605,35 @@ git_dual_push() {
   github_url="$(git_dual_to_github_url "$fetch_url" 2>/dev/null || echo "$fetch_url")"
   gitcode_url="$(_git_dual_real remote get-url "$fb" 2>/dev/null || git_dual_to_gitcode_url "$github_url" 2>/dev/null || true)"
 
-  # Bare `git push` — use upstream when no refs given.
+  # Bare `git push` / `git push -u` — use named remote (honors dual pushurl).
   if ((${#refs[@]} == 0)); then
-    _git_dual_real push "${opts[@]}" "$remote"
+    if ((${#opts[@]})); then
+      _git_dual_real push "${opts[@]}" "$remote"
+    else
+      _git_dual_real push "$remote"
+    fi
     return $?
   fi
 
+  # When pushing to raw URLs, never pass -u: git would set branch.remote to the URL.
+  # Apply --set-upstream against the named remote after a successful push instead.
+  local -a push_opts=()
+  local o
+  for o in "${opts[@]}"; do
+    case "$o" in
+      -u|--set-upstream) ;;
+      *) push_opts+=("$o") ;;
+    esac
+  done
+
   # Push GitHub first (best-effort), then GitCode mirror.
+  # Note: with `set -u`, empty `"${push_opts[@]}"` is unsafe on some bash versions.
   if [[ -n "$github_url" ]]; then
-    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${opts[@]}" "$github_url" "${refs[@]}")"
+    if ((${#push_opts[@]})); then
+      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$github_url" "${refs[@]}")"
+    else
+      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$github_url" "${refs[@]}")"
+    fi
     rc=$?
     if [[ "$rc" -eq 0 ]]; then
       gh_ok=1
@@ -593,7 +645,11 @@ git_dual_push() {
   fi
 
   if [[ -n "$gitcode_url" ]]; then
-    out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${opts[@]}" "$gitcode_url" "${refs[@]}")"
+    if ((${#push_opts[@]})); then
+      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$gitcode_url" "${refs[@]}")"
+    else
+      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$gitcode_url" "${refs[@]}")"
+    fi
     rc=$?
     if [[ "$rc" -eq 0 ]]; then
       gc_ok=1
@@ -604,6 +660,19 @@ git_dual_push() {
     fi
   else
     rc=1
+  fi
+
+  if ((gc_ok || gh_ok)); then
+    _git_dual_sync_tracking_after_push "$remote" "${refs[@]}"
+    if ((set_upstream)); then
+      local branch last_ref="" r
+      for r in "${refs[@]}"; do last_ref="$r"; done
+      branch="$(_git_dual_dst_branch_from_refspec "$last_ref")" || \
+        branch="$(_git_dual_current_branch)"
+      if [[ -n "$branch" ]]; then
+        _git_dual_real branch --set-upstream-to="$remote/$branch" "$branch" 2>/dev/null || true
+      fi
+    fi
   fi
 
   if ((gc_ok)); then
