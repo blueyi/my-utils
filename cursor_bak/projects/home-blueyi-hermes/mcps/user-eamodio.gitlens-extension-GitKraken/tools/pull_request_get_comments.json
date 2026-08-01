@@ -1,0 +1,41 @@
+{
+  "name": "pull_request_get_comments",
+  "description": "Get all the comments in a pull requests",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name of the pull request. Required for Azure DevOps",
+        "type": "string"
+      },
+      "provider": {
+        "description": "Specify the git provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "bitbucket",
+          "azure"
+        ],
+        "type": "string"
+      },
+      "pull_request_id": {
+        "description": "ID of the pull request to add the comment to",
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Set the repository name of the pull request",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Set the organization name of the pull request",
+        "type": "string"
+      }
+    },
+    "required": [
+      "repository_name",
+      "repository_organization",
+      "pull_request_id",
+      "provider"
+    ]
+  }
+}

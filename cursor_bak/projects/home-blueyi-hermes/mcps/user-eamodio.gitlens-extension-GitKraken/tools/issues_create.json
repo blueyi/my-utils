@@ -1,0 +1,63 @@
+{
+  "name": "issues_create",
+  "description": "Create a new issue. For Jira, repository_name is the project key. For Linear, repository_organization is the team UUID, key, or name.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "assignees": {
+        "description": "Optional list of assignees. GitHub: usernames; GitLab: user IDs; Jira/Linear/Azure: first entry is used",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "azure_organization": {
+        "description": "Optionally set the Azure DevOps organization name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "azure_project": {
+        "description": "Optionally set the Azure DevOps project name. Required for Azure DevOps",
+        "type": "string"
+      },
+      "body": {
+        "description": "The body/description of the issue (markdown supported where the provider allows)",
+        "type": "string"
+      },
+      "labels": {
+        "description": "Optional list of label names to apply",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "provider": {
+        "description": "Specify the issue provider",
+        "enum": [
+          "github",
+          "gitlab",
+          "jira",
+          "azure",
+          "linear",
+          "trello"
+        ],
+        "type": "string"
+      },
+      "repository_name": {
+        "description": "Repository name. Required for GitHub/GitLab; for Jira this is the project key",
+        "type": "string"
+      },
+      "repository_organization": {
+        "description": "Organization name. Required for GitHub/GitLab; for Linear use as team identifier",
+        "type": "string"
+      },
+      "title": {
+        "description": "The title of the issue",
+        "type": "string"
+      }
+    },
+    "required": [
+      "provider",
+      "title"
+    ]
+  }
+}
