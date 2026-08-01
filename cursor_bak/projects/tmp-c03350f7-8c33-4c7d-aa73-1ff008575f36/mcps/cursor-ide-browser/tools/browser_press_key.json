@@ -1,0 +1,24 @@
+{
+  "name": "browser_press_key",
+  "description": "Press a key in the browser page using DOM keyboard events.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "key": {
+        "type": "string",
+        "description": "Key to press, for example Enter, Escape, Tab, ArrowDown, or a single character."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after the key press completes. Defaults to false."
+      }
+    },
+    "required": [
+      "key"
+    ]
+  }
+}

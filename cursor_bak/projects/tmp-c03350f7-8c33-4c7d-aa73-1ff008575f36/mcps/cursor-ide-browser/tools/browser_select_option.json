@@ -1,0 +1,36 @@
+{
+  "name": "browser_select_option",
+  "description": "Select one or more options in a select element by ref.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "string",
+        "description": "Element ref from browser_snapshot."
+      },
+      "values": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Option values or labels to select."
+      },
+      "element": {
+        "type": "string",
+        "description": "Human-readable description of the element."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after selection completes. Defaults to false."
+      }
+    },
+    "required": [
+      "ref",
+      "values"
+    ]
+  }
+}

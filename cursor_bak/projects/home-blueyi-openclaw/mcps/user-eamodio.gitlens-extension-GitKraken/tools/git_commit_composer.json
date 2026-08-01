@@ -1,0 +1,30 @@
+{
+  "name": "git_commit_composer",
+  "description": " Show the commit composer for a repository, will open a UI if client supports it.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "custom_instructions": {
+        "description": "Free-form guidance for the AI commit composer. Only meaningful when 'direction' is 'custom'.",
+        "type": "string"
+      },
+      "direction": {
+        "description": "Initial grouping preset for the composer. 'auto' lets the AI choose; 'area' groups by codebase area / subsystem; 'type' groups by conventional commit type; 'custom' uses the supplied 'custom_instructions' text. Defaults to 'auto'.",
+        "enum": [
+          "auto",
+          "area",
+          "type",
+          "custom"
+        ],
+        "type": "string"
+      },
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory"
+    ]
+  }
+}

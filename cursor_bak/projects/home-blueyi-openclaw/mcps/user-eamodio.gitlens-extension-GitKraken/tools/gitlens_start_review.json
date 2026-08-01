@@ -1,0 +1,25 @@
+{
+  "name": "gitlens_start_review",
+  "description": " Gitlens Start Review. Creates a dedicated worktree and reviews your PR with an AI agent.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "directory": {
+        "description": "Path of the working directory.",
+        "type": "string"
+      },
+      "instructions": {
+        "description": "OPTIONAL. Use this ONLY if the user explicitly provided specific requirements about the review focus, review criteria, or what aspects to check. Do NOT use this parameter unless you are 100% certain about the user's intentions. Examples: 'focus on security issues', 'check for performance regressions', 'review only the authentication logic'.",
+        "type": "string"
+      },
+      "pr_url": {
+        "description": "URL of the PR to start review.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory",
+      "pr_url"
+    ]
+  }
+}

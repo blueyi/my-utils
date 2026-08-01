@@ -1,0 +1,32 @@
+{
+  "name": "git_commit",
+  "description": "Record changes to the repository (git commit -m <message> [files...]).",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "description": {
+        "description": "Optional commit description/body",
+        "type": "string"
+      },
+      "directory": {
+        "description": "The directory to run git commit in",
+        "type": "string"
+      },
+      "files": {
+        "description": "Optional array of files to commit. If omitted, all staged changes are committed.",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "message": {
+        "description": "The commit message",
+        "type": "string"
+      }
+    },
+    "required": [
+      "directory",
+      "message"
+    ]
+  }
+}
