@@ -1,12 +1,12 @@
 {
   "name": "browser_scroll",
-  "description": "Scroll the page or a specific element. Use this to bring elements into view, scroll to content, or navigate long pages. Can scroll in any direction by specifying delta values or using directional shortcuts.",
+  "description": "Scroll the page, a scrollable container, or an element into view. Use this instead of CDP Input.* wheel events.",
   "arguments": {
     "type": "object",
     "properties": {
       "ref": {
         "type": "string",
-        "description": "Element reference to scroll into view, or to scroll within (for scrollable containers)"
+        "description": "Optional element ref from browser_snapshot."
       },
       "direction": {
         "type": "string",
@@ -16,27 +16,31 @@
           "left",
           "right"
         ],
-        "description": "Direction to scroll. Shorthand for setting deltaX/deltaY."
+        "description": "Scroll direction."
       },
       "amount": {
         "type": "number",
-        "description": "Amount to scroll in pixels when using direction. Defaults to 300."
+        "description": "Scroll amount in pixels. Defaults to 300."
       },
       "deltaX": {
         "type": "number",
-        "description": "Horizontal scroll amount in pixels. Positive scrolls right, negative scrolls left."
+        "description": "Explicit horizontal scroll delta."
       },
       "deltaY": {
         "type": "number",
-        "description": "Vertical scroll amount in pixels. Positive scrolls down, negative scrolls up."
+        "description": "Explicit vertical scroll delta."
       },
       "scrollIntoView": {
         "type": "boolean",
-        "description": "If true and ref is provided, scrolls the element into view instead of scrolling within it. Defaults to true when ref is provided without delta values."
+        "description": "When true, scroll the ref into view."
       },
       "viewId": {
         "type": "string",
         "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after scrolling completes. Defaults to false."
       }
     },
     "required": []

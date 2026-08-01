@@ -1,16 +1,16 @@
 {
   "name": "browser_get_bounding_box",
-  "description": "Get bounding box details for an element.",
+  "description": "Get the viewport bounding box for an element ref.",
   "arguments": {
     "type": "object",
     "properties": {
-      "element": {
-        "type": "string",
-        "description": "Human-readable element description used to obtain permission to inspect the element"
-      },
       "ref": {
         "type": "string",
-        "description": "Exact target element reference from the page snapshot"
+        "description": "Element ref from browser_snapshot."
+      },
+      "element": {
+        "type": "string",
+        "description": "Human-readable description of the element."
       },
       "viewId": {
         "type": "string",
@@ -18,7 +18,6 @@
       }
     },
     "required": [
-      "element",
       "ref"
     ]
   }
