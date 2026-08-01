@@ -132,6 +132,49 @@ _say() {
 #
 # Other safety nets:
 #   - .no-auto-backup sentinel file in the repo root → skip entirely.
+#   - .auto-backup-include (optional): if present, only `git add` listed paths
+#     (one path per line; # comments / blanks ignored). Used by ~/.hermes to
+#     avoid committing runtime noise (sessions, logs, heartbeats, caches).
+#   - Skip commit when the include filter (or full tree) has no staged diff —
+#     "substantive change only".
+#
+# Stage paths for commit. Returns 0 if anything was staged, 1 if nothing to commit.
+_auto_git_stage_for_backup() {
+    local include_file=".auto-backup-include"
+
+    # Always start from a clean index relative to HEAD so we only commit what
+    # we intentionally stage (avoids leftover staged noise).
+    git reset -q HEAD -- . 2>/dev/null || true
+
+    if [ ! -f "$include_file" ]; then
+        git add -A
+    else
+        local path line staged_any=0
+        while IFS= read -r line || [ -n "$line" ]; do
+            # trim
+            line="${line#"${line%%[![:space:]]*}"}"
+            line="${line%"${line##*[![:space:]]}"}"
+            [[ -z "$line" || "$line" == \#* ]] && continue
+            path="$line"
+            # Allow trailing slashes for directories
+            if [ -e "$path" ] || [ -d "$path" ] || git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+                if git add -A -- "$path" 2>/dev/null; then
+                    staged_any=1
+                fi
+            fi
+        done < "$include_file"
+        if [ "$staged_any" -eq 0 ]; then
+            return 1
+        fi
+    fi
+
+    # Nothing staged → no substantive backup payload
+    if git diff --cached --quiet 2>/dev/null; then
+        return 1
+    fi
+    return 0
+}
+
 backup_one_dir() {
     local dir="$1"
     local expected_branch="${2:-}"
@@ -186,26 +229,53 @@ backup_one_dir() {
 
     # Commit local changes FIRST so pull --rebase is not blocked by a dirty tree.
     local changed=""
+    local has_worktree_noise=0
     if ! git diff-index --quiet HEAD -- 2>/dev/null || [ -n "$(git status --porcelain)" ]; then
-        changed=$(git status --porcelain)
-        log "[$name] Changes detected"
-        echo "$changed" | while IFS= read -r line; do [ -n "$line" ] && log "[$name]   $line"; done
+        has_worktree_noise=1
+    fi
 
-        local commit_msg="Auto-backup: $(date '+%Y-%m-%d %H:%M:%S')
+    if [ "$has_worktree_noise" -eq 1 ] || [ -f ".auto-backup-include" ]; then
+        if ! _auto_git_stage_for_backup; then
+            # Unstage anything left; leave worktree dirty for non-include paths.
+            git reset -q HEAD -- . 2>/dev/null || true
+            if [ -f ".auto-backup-include" ]; then
+                log "[$name] No substantive changes in .auto-backup-include (skip commit)"
+            else
+                log "[$name] No local changes to commit"
+            fi
+        else
+            changed=$(git diff --cached --name-status)
+            log "[$name] Substantive changes staged for backup"
+            echo "$changed" | while IFS= read -r line; do [ -n "$line" ] && log "[$name]   $line"; done
+
+            local commit_msg="Auto-backup: $(date '+%Y-%m-%d %H:%M:%S')
 Changed files:
 $changed"
 
-        git add -A
-        if ! git commit -q -m "$commit_msg"; then
-            log "[$name] ERROR: git commit failed"
-            return 1
+            if ! git commit -q -m "$commit_msg"; then
+                log "[$name] ERROR: git commit failed"
+                git reset -q HEAD -- . 2>/dev/null || true
+                return 1
+            fi
+            log "[$name] Committed local changes"
         fi
-        log "[$name] Committed local changes"
     else
         log "[$name] No local changes to commit"
     fi
 
     # Sync with remote, then push (GitCode fallback on timeout when dual lib is loaded).
+    # With .auto-backup-include, the worktree may still be dirty (runtime files).
+    # Stash that dirt so pull --rebase is not blocked; restore afterward.
+    local stashed=0
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        if git stash push -u -q -m "auto-git-commit: pre-pull $(date '+%Y-%m-%d %H:%M:%S')" 2>/dev/null; then
+            stashed=1
+            log "[$name] Stashed leftover worktree changes before pull"
+        else
+            log "[$name] WARN: could not stash leftover changes; pull may fail"
+        fi
+    fi
+
     log "[$name] On branch $branch; updating from remote (git pull --rebase)..."
     local pull_out pull_ret
     if declare -F git_dual_pull >/dev/null 2>&1; then
@@ -218,6 +288,9 @@ $changed"
     echo "$pull_out" | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done
     if [ $pull_ret -ne 0 ]; then
         log "[$name] ERROR: git pull --rebase failed (conflicts or remote error); skip push for this repo"
+        if [ "$stashed" -eq 1 ]; then
+            git stash pop -q 2>/dev/null || log "[$name] WARN: stash pop after failed pull had issues"
+        fi
         return 1
     fi
 
@@ -230,6 +303,15 @@ $changed"
         push_ret=$?
     fi
     echo "$push_out" | while IFS= read -r line; do [ -n "$line" ] && log "[$name] $line"; done
+
+    if [ "$stashed" -eq 1 ]; then
+        if git stash pop -q 2>/dev/null; then
+            log "[$name] Restored stashed worktree changes"
+        else
+            log "[$name] WARN: stash pop failed — check 'git stash list'"
+        fi
+    fi
+
     if [ $push_ret -ne 0 ]; then
         log "[$name] ERROR: git push failed (exit $push_ret)"
         return 1
