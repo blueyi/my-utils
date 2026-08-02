@@ -1,0 +1,21 @@
+{
+  "name": "app_update_user_preferences",
+  "description": " Update GitKraken CLI user preferences for MCP apps. App-only; agents must not call this tool.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "git_commit_composer_app_collapsed": {
+        "description": "When true, future Git Commit Composer overview app loads start in the collapsed state.",
+        "type": "boolean"
+      },
+      "git_graph_app_collapsed": {
+        "description": "When true, future Git Graph overview app loads start in the collapsed state.",
+        "type": "boolean"
+      },
+      "git_status_app_collapsed": {
+        "description": "When true, future Git Status overview app loads start in the collapsed state.",
+        "type": "boolean"
+      }
+    }
+  }
+}
