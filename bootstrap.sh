@@ -237,8 +237,11 @@ for tool in "${SELECTED_TOOLS[@]}"; do
     echo "  Skip $tool (already done; use --force to re-run)"
     continue
   fi
-  run_tool "$tool"
-  write_tool_stamp "$tool"
+  if run_tool "$tool"; then
+    write_tool_stamp "$tool"
+  else
+    echo "  WARN: $tool failed; stamp not written (will retry on next run)"
+  fi
 done
 
 echo ""

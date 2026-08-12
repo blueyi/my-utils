@@ -34,7 +34,7 @@ brew "cloc"
 
 # --- languages / tooling ---
 brew "uv"
-brew "pyenv"
+# brew "pyenv"
 brew "rustup"
 brew "ffmpeg"
 brew "ollama"
@@ -64,22 +64,21 @@ cask "microsoft-edge"
 cask "cursor"
 cask "visual-studio-code"
 cask "obsidian"
-cask "discord"
-cask "github"              # GitHub Desktop
-cask "lark"
+# cask "discord"
+# cask "lark"
 
 # --- utilities / sync / remote ---
 cask "maccy"
-cask "nutstore"
-cask "tailscale-app"       # Tailscale
-cask "teamviewer"
-cask "clash-verge-rev"     # Clash Verge
+# cask "nutstore"
+# cask "tailscale-app"       # Tailscale
+# cask "teamviewer"
+# cask "clash-verge-rev"     # Clash Verge
 
 # --- media / AI / office (non–App Store) ---
 cask "qqmusic"
 cask "neteasemusic"
-cask "lm-studio"
-cask "openclaw"
+# cask "lm-studio"
+# cask "openclaw"
 
 # Telegram / WeChat / WhatsApp / WPS are installed via Mac App Store → use mas below
 # (avoid listing both cask + mas for the same app).

@@ -16,6 +16,8 @@ cursor_bak/projects/*/agent-tools/
 cursor_bak/projects/*/worker.log
 cursor_bak/projects/*/.workspace-trusted
 cursor_bak/projects/*/canvases/node_modules/
+# Cursor auto-generates identical tsconfig per workspace canvases dir
+cursor_bak/projects/*/canvases/tsconfig.json
 cursor_bak/projects/*/mcps/
 cursor_bak/projects/.agent-data-cleanup-*
 # macOS temp workspace dirs (var-folders-*), not meaningful to version

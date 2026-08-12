@@ -122,6 +122,34 @@ install_brew_cask() {
   fi
 }
 
+brewfile_has_mas_apps() {
+  local file="$1"
+  grep -qE '^[[:space:]]*mas[[:space:]]+"[^"]+"[[:space:]]*,[[:space:]]*id:[[:space:]]*[0-9]+' "$file"
+}
+
+# mas CLI is required for Brewfile `mas` lines; brew bundle may leave it missing
+# when network fails mid-run. Install (or repair) it explicitly.
+ensure_mas_cli() {
+  local file="$1"
+  brewfile_has_mas_apps "$file" || return 0
+  # brew may be installed but not yet on PATH in this shell
+  for p in /opt/homebrew/bin /usr/local/bin; do
+    [ -x "$p/mas" ] && export PATH="$p:$PATH"
+  done
+  if command -v mas &>/dev/null; then
+    return 0
+  fi
+  echo "  Installing mas (required for Brewfile App Store apps)..."
+  if ! brew install mas; then
+    echo "  ERROR: failed to install mas; App Store apps will be skipped"
+    return 1
+  fi
+  for p in /opt/homebrew/bin /usr/local/bin; do
+    [ -x "$p/mas" ] && export PATH="$p:$PATH"
+  done
+  command -v mas &>/dev/null
+}
+
 install_mas() {
   local id="$1"
   local name="${2:-$id}"
@@ -142,7 +170,28 @@ install_mas() {
   fi
 }
 
+# Install any Brewfile mas apps still missing (after brew bundle or as recovery).
+install_mas_apps_from_brewfile() {
+  local file="$1"
+  local line name id
+  brewfile_has_mas_apps "$file" || return 0
+  if ! command -v mas &>/dev/null; then
+    return 0
+  fi
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"
+    line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+    [ -z "$line" ] && continue
+    if [[ "$line" =~ ^mas[[:space:]]+\"([^\"]+)\"[[:space:]]*,[[:space:]]*id:[[:space:]]*([0-9]+) ]]; then
+      name="${BASH_REMATCH[1]}"
+      id="${BASH_REMATCH[2]}"
+      install_mas "$id" "$name"
+    fi
+  done < "$file"
+}
+
 # Process declarative Brewfile (brew / cask / mas lines)
+# Returns 1 if Brewfile needs mas but mas CLI is still missing after recovery.
 process_brewfile() {
   local file="$1"
   local line name id
@@ -150,10 +199,24 @@ process_brewfile() {
   # brew bundle path installs in file order instead.
   if ! force_mode; then
     echo "  brew bundle --file=$file"
-    brew bundle --file="$file" || echo "  WARN: brew bundle reported errors; continuing..."
+    if ! brew bundle --file="$file"; then
+      echo "  WARN: brew bundle reported errors; attempting mas recovery..."
+    fi
+    # Always ensure mas + missing App Store apps: brew bundle can report success
+    # for formulae while still skipping mas lines if mas was unavailable earlier,
+    # or fail entirely on network and leave mas / WeChat etc. missing.
+    if ! ensure_mas_cli "$file"; then
+      return 1
+    fi
+    # Cover brew-bundle partial failure / skipped mas lines
+    install_mas_apps_from_brewfile "$file"
+    if brewfile_has_mas_apps "$file" && ! command -v mas &>/dev/null; then
+      return 1
+    fi
     return 0
   fi
   echo "  Processing Brewfile with --force (reinstall)..."
+  ensure_mas_cli "$file" || true
   while IFS= read -r line || [ -n "$line" ]; do
     line="${line%%#*}"
     line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
@@ -168,6 +231,10 @@ process_brewfile() {
       install_mas "$id" "$name"
     fi
   done < "$file"
+  if brewfile_has_mas_apps "$file" && ! command -v mas &>/dev/null; then
+    return 1
+  fi
+  return 0
 }
 
 install_from_list_file() {
@@ -213,7 +280,10 @@ case "$PM" in
       echo "  Hint: Install Xcode Command Line Tools for C/C++: xcode-select --install"
     fi
     if [ -f "$COMMON_DIR/Brewfile" ]; then
-      process_brewfile "$COMMON_DIR/Brewfile"
+      if ! process_brewfile "$COMMON_DIR/Brewfile"; then
+        echo "=== Packages incomplete (mas / Brewfile recovery failed) ==="
+        exit 1
+      fi
     else
       install_from_list_file "$COMMON_DIR/mac_app_list.txt"
     fi
