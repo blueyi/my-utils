@@ -6,7 +6,8 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 
 - Linux (Ubuntu / Debian / Fedora) and macOS
 - Configs managed via symlinks; edits stay in repo for backup and version control
-- One-shot or selective install; `--yes` for non-interactive mode
+- One-shot or selective install; `--yes` for non-interactive mode; `--force` to re-run / reinstall
+- macOS: declarative [`common/Brewfile`](common/Brewfile) (formulae / casks / `mas` App Store apps); `--new-mac` for new-machine checks
 - Profile presets: C++, Python, AI Infra (LLVM / MLIR); optional Triton (GPU kernel) via `config/triton.bash`
 - **One env file:** `config/resetrc.bash` holds all shared env as **`# SECTION: …`** blocks (nvm, pyenv, CUDA, LLVM, …). Edit **that file** to affect **bash, zsh, and profiles**; optional Fish uses the same file via `emit_fish_env.bash` when linked.
 
@@ -20,7 +21,7 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 
 **Multi-OS**
 
-- **Packages:** [`common/install_packages.sh`](common/install_packages.sh) + [`common/deb_app_list.ini`](common/deb_app_list.ini) / [`common/mac_app_list.txt`](common/mac_app_list.txt) / [`common/rpm_app_list.ini`](common/rpm_app_list.ini).
+- **Packages:** [`common/install_packages.sh`](common/install_packages.sh) + [`common/deb_app_list.ini`](common/deb_app_list.ini) / [`common/Brewfile`](common/Brewfile) (macOS; falls back to [`common/mac_app_list.txt`](common/mac_app_list.txt)) / [`common/rpm_app_list.ini`](common/rpm_app_list.ini). Already-installed packages are skipped unless `--force`.
 - **Env:** [`config/resetrc.bash`](config/resetrc.bash) uses **`_is_linux` / `_is_macos`** inside sections (PATH, CUDA, brew kegs, …).
 
 **Multi-shell**
@@ -40,6 +41,8 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 git clone https://github.com/your-user/my-utils.git ~/repos/my-utils
 cd ~/repos/my-utils
 
+./bootstrap.sh --help
+
 # One-shot init (no prompts): packages, links, misc, vimrc, cursor
 ./bootstrap.sh --yes
 
@@ -49,9 +52,33 @@ cd ~/repos/my-utils
 exec $SHELL
 ```
 
+### New Mac
+
+```bash
+# 1) Xcode CLT (if needed)
+xcode-select --install
+
+# 2) Sign in to the Mac App Store (required for Brewfile `mas` entries)
+
+# 3) Clone and bootstrap
+git clone https://github.com/your-user/my-utils.git ~/repos/my-utils
+cd ~/repos/my-utils
+./bootstrap.sh --new-mac --yes
+
+# Re-run is safe: successful tools and already-installed packages are skipped.
+# Force a full redo:
+./bootstrap.sh --new-mac --force --yes
+
+exec $SHELL
+```
+
+Edit [`common/Brewfile`](common/Brewfile) to change the macOS software set (add `cask` / `mas` lines as needed). Changing the Brewfile invalidates the `packages` stamp so the next `--yes` re-runs packages without `--force`.
+
 ## Install Options
 
 ```bash
+./bootstrap.sh --help                             # full usage
+
 # Without --yes: prompts for each step (packages / links / misc / vimrc / cursor)
 ./bootstrap.sh
 
@@ -59,11 +86,18 @@ exec $SHELL
 ./bootstrap.sh --yes                              # all steps
 ./bootstrap.sh --tools packages --yes             # system packages only
 ./bootstrap.sh --tools links --yes                # symlinks only (vimrc, bashrc, zshrc, etc.)
-./bootstrap.sh --tools misc --yes                 # oh-my-zsh, pyenv
+./bootstrap.sh --tools misc --yes                 # oh-my-zsh, uv, fzf, …
 ./bootstrap.sh --tools vimrc --yes                # vim plugins
 ./bootstrap.sh --tools cursor --yes               # Cursor config backup link
 ./bootstrap.sh --tools packages links cursor --yes # multiple steps
+
+# New Mac + force reinstall / ignore stamps
+./bootstrap.sh --new-mac --yes
+./bootstrap.sh --force --yes
+./bootstrap.sh --tools packages --force --yes
 ```
+
+**Idempotency:** successful tools write stamps under `~/.local/state/my-utils/bootstrap/`. Later runs skip those tools unless `--force`. Within `packages`, already-installed apt/yum/brew packages are also skipped unless `--force` (then reinstall).
 
 ## Config Layout
 

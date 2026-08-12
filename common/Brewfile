@@ -1,0 +1,120 @@
+# macOS declarative package list (Homebrew Bundle)
+# Prefer this file over mac_app_list.txt on macOS.
+# Edit and re-run: ./bootstrap.sh --tools packages --yes
+# (Brewfile hash change invalidates the packages stamp automatically.)
+#
+# Generated / refreshed from this machine's Applications + brew + mas.
+# App Store apps require: signed-in App Store + ownership of each title.
+
+# --- core CLI ---
+brew "vim"
+brew "node"
+brew "curl"
+brew "wget"
+brew "git"
+brew "zsh"
+brew "tmux"
+brew "tree"
+brew "ripgrep"
+brew "gh"
+brew "fzf"
+brew "ctags"
+brew "procs"
+# brew "fish"  # optional
+
+# --- c/c++ / docs ---
+brew "llvm"
+brew "lld"
+brew "cmake"
+brew "ninja"
+brew "gdb"
+brew "doxygen"
+brew "graphviz"
+brew "cloc"
+
+# --- languages / tooling ---
+brew "uv"
+brew "pyenv"
+brew "rustup"
+brew "ffmpeg"
+brew "ollama"
+brew "gnu-getopt"
+brew "espeak-ng"
+
+# --- App Store CLI (required for mas lines) ---
+brew "mas"
+
+# =============================================================================
+# GUI — Homebrew Casks
+# (Apps already present under /Applications; installable via brew)
+# =============================================================================
+
+# --- already installed via brew on this Mac ---
+cask "codex"
+cask "codexbar"
+cask "font-jacques-francois-shadow"
+cask "libreoffice"
+cask "motrix"
+cask "wave"
+
+# --- browsers / editors / chat ---
+cask "google-chrome"
+cask "firefox"
+cask "microsoft-edge"
+cask "cursor"
+cask "visual-studio-code"
+cask "obsidian"
+cask "discord"
+cask "github"              # GitHub Desktop
+cask "lark"
+
+# --- utilities / sync / remote ---
+cask "maccy"
+cask "nutstore"
+cask "tailscale-app"       # Tailscale
+cask "teamviewer"
+cask "clash-verge-rev"     # Clash Verge
+
+# --- media / AI / office (non–App Store) ---
+cask "qqmusic"
+cask "neteasemusic"
+cask "lm-studio"
+cask "openclaw"
+
+# Telegram / WeChat / WhatsApp / WPS are installed via Mac App Store → use mas below
+# (avoid listing both cask + mas for the same app).
+
+# =============================================================================
+# Mac App Store (mas list on this Mac)
+# =============================================================================
+mas "Copilot", id: 6738511300
+mas "iShot", id: 1485844094
+mas "State", id: 1472818562
+# mas "Telegram", id: 747648890
+# mas "V2BOX", id: 6446814690
+mas "WeChat", id: 836500024
+# mas "WhatsApp", id: 310633997
+mas "WPS Office", id: 1468073139
+# mas "OneDrive", id: 823766827
+mas "Microsoft Excel", id: 462058435
+mas "Microsoft Word", id: 462054704
+mas "Microsoft PowerPoint", id: 462062816
+mas "Microsoft OneNote", id: 784801555
+mas "Microsoft Outlook", id: 985367838
+mas "Microsoft To Do", id: 1274495053
+
+# Apple iWork / creative (often preinstalled; keep for reinstall on new Mac)
+# mas "Keynote", id: 361285480
+# mas "Numbers", id: 361304891
+# mas "Pages", id: 361309726
+# mas "GarageBand", id: 682658836
+# mas "iMovie", id: 408981434
+
+# =============================================================================
+# Not found on Homebrew / mas (manual install on new Mac if needed)
+# =============================================================================
+# Bionic          — /Applications/Bionic.app (ai.elementlabs.bionic)
+# Helix AI        — /Applications/Helix AI.app (com.wepulse.metisbot)
+# Youwee          — /Applications/Youwee.app (com.vanloctech.youwee)
+# Keynote/Numbers/Pages Creator Studio — third-party; no brew cask
+# Safari / Utilities — system

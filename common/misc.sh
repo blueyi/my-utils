@@ -28,9 +28,17 @@ ensure_brew() {
   fi
 }
 
+_misc_force() {
+  [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]
+}
+
 # Ensure git is installed before configuring (bootstrap order: packages before misc; here we install if still missing)
 ensure_git() {
   if command -v git &>/dev/null; then
+    if _misc_force && is_macos && command -v brew &>/dev/null && brew list git &>/dev/null 2>/dev/null; then
+      echo "Reinstalling git (Homebrew, --force)..."
+      brew reinstall git || echo "  WARN: brew reinstall git failed"
+    fi
     return 0
   fi
   if is_macos; then
@@ -93,12 +101,28 @@ fi
 if is_macos; then
   ensure_brew
   if command -v brew &>/dev/null; then
-    brew list fzf &>/dev/null || brew install fzf || echo "  WARN: brew install fzf failed"
+    if brew list fzf &>/dev/null; then
+      if _misc_force; then
+        echo "Reinstalling fzf (Homebrew, --force)..."
+        brew reinstall fzf || echo "  WARN: brew reinstall fzf failed"
+      else
+        echo "fzf already installed (use --force to reinstall)"
+      fi
+    else
+      brew install fzf || echo "  WARN: brew install fzf failed"
+    fi
   fi
 else
   case "$(detect_package_manager)" in
     apt)
-      if ! command -v fzf &>/dev/null; then
+      if command -v fzf &>/dev/null; then
+        if _misc_force; then
+          echo "Reinstalling fzf (apt, --force)..."
+          sudo apt-get install --reinstall -y fzf || echo "  WARN: apt reinstall fzf failed"
+        else
+          echo "fzf already installed (use --force to reinstall)"
+        fi
+      else
         echo "Installing fzf (apt)..."
         sudo apt-get update -qq && sudo apt-get install -y fzf || echo "  WARN: apt install fzf failed"
       fi
@@ -118,10 +142,15 @@ if command -v zsh &>/dev/null; then
   unset _zsh_bin
 fi
 
-# uv: macOS = brew install (see mac_app_list.txt); Linux = official install script
+# uv: macOS = brew install (see Brewfile / mac_app_list.txt); Linux = official install script
 ensure_uv() {
   if command -v uv &>/dev/null; then
-    echo "uv already installed ($(uv --version 2>/dev/null || echo ok))"
+    if _misc_force && is_macos && command -v brew &>/dev/null && brew list uv &>/dev/null 2>/dev/null; then
+      echo "Reinstalling uv via Homebrew (--force)..."
+      brew reinstall uv || echo "  WARN: brew reinstall uv failed"
+    else
+      echo "uv already installed ($(uv --version 2>/dev/null || echo ok); use --force to reinstall)"
+    fi
     return 0
   fi
   if is_macos; then
@@ -156,7 +185,10 @@ ensure_uv_python_default
 ensure_hexo_env() {
   # Ensure Node.js is available
   if command -v node &>/dev/null && command -v npm &>/dev/null; then
-    : # already have node/npm (e.g. from nvm, brew, or system)
+    if _misc_force && is_macos && command -v brew &>/dev/null && brew list node &>/dev/null 2>/dev/null; then
+      echo "Reinstalling Node.js (Homebrew, --force)..."
+      brew reinstall node || echo "  WARN: brew reinstall node failed"
+    fi
   else
     if is_macos; then
       ensure_brew
@@ -187,7 +219,12 @@ ensure_hexo_env() {
   fi
   # Install hexo-cli globally if not present
   if command -v hexo &>/dev/null; then
-    echo "hexo-cli already installed"
+    if _misc_force && command -v npm &>/dev/null; then
+      echo "Reinstalling hexo-cli (npm, --force)..."
+      npm install -g hexo-cli || echo "  WARN: npm reinstall hexo-cli failed"
+    else
+      echo "hexo-cli already installed (use --force to reinstall)"
+    fi
   elif command -v npm &>/dev/null; then
     echo "Installing hexo-cli (npm install -g hexo-cli)..."
     npm install -g hexo-cli || echo "  WARN: npm install -g hexo-cli failed; run manually if needed"

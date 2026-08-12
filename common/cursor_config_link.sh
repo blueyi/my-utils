@@ -78,7 +78,12 @@ link_app_item() {
     expected_canon=$(cd "$(dirname "$dst")" 2>/dev/null && pwd -P)/$(basename "$dst")
     existing_canon=$(cd "$(dirname "$existing_abs")" 2>/dev/null && pwd -P)/$(basename "$existing_abs") 2>/dev/null || true
     if [[ -n "$expected_canon" && "$existing_canon" == "$expected_canon" ]]; then
-      echo "  $src (already points to expected)"
+      if [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]; then
+        ln -sf "$dst" "$src"
+        echo "  $src -> $dst (forced)"
+      else
+        echo "  $src (already points to expected)"
+      fi
       return 0
     fi
   fi
@@ -140,7 +145,12 @@ link_rules() {
     expected_canon=$(cd "$CURSOR_BAK/rules" 2>/dev/null && pwd -P) || true
     existing_canon=$(cd "$existing_abs" 2>/dev/null && pwd -P) || true
     if [[ -n "$expected_canon" && "$existing_canon" == "$expected_canon" ]]; then
-      echo "  $CURSOR_RULES (already points to expected)"
+      if [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]; then
+        ln -sf "$CURSOR_BAK/rules" "$CURSOR_RULES"
+        echo "  $CURSOR_RULES -> $CURSOR_BAK/rules (forced)"
+      else
+        echo "  $CURSOR_RULES (already points to expected)"
+      fi
       return 0
     fi
     if [[ "$existing" != "$CURSOR_BAK/rules"* ]]; then
@@ -167,7 +177,12 @@ link_projects() {
     expected_canon=$(cd "$CURSOR_BAK/projects" 2>/dev/null && pwd -P) || true
     existing_canon=$(cd "$existing_abs" 2>/dev/null && pwd -P) || true
     if [[ -n "$expected_canon" && "$existing_canon" == "$expected_canon" ]]; then
-      echo "  $CURSOR_PROJECTS (already points to expected)"
+      if [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]; then
+        ln -sf "$CURSOR_BAK/projects" "$CURSOR_PROJECTS"
+        echo "  $CURSOR_PROJECTS -> $CURSOR_BAK/projects (forced)"
+      else
+        echo "  $CURSOR_PROJECTS (already points to expected)"
+      fi
       return 0
     fi
     rm "$CURSOR_PROJECTS"

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Cross-platform package installation (apt/brew/yum)
 # Zero Python dependency
+#
+# Respects MY_UTILS_FORCE=1 from bootstrap --force:
+#   already-installed packages are reinstalled instead of skipped.
 
 set -e
 # Use MY_UTILS_ROOT from bootstrap when set; else resolve from script location
@@ -13,6 +16,10 @@ fi
 source "$COMMON_DIR/platform.sh"
 OS=$(detect_os)
 PM=$(detect_package_manager)
+
+force_mode() {
+  [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]
+}
 
 # Ensure Homebrew is installed on macOS
 ensure_brew() {
@@ -39,29 +46,59 @@ if [ "$OS" = "unknown" ] || [ "$PM" = "unknown" ]; then
 fi
 
 echo "=== Install packages ($OS / $PM) ==="
+force_mode && echo "  (force: reinstall already-installed packages)"
+
+pkg_installed() {
+  local pkg="$1"
+  case "$PM" in
+    apt)  dpkg -s "$pkg" &>/dev/null ;;
+    yum)  rpm -q "$pkg" &>/dev/null ;;
+    brew) brew list "$pkg" &>/dev/null 2>/dev/null || brew list --cask "$pkg" &>/dev/null 2>/dev/null ;;
+    *)    return 1 ;;
+  esac
+}
 
 install_one() {
   local pkg="$1"
   case "$PM" in
     apt)
-      if dpkg -s "$pkg" &>/dev/null; then
-        echo "  $pkg (already installed)"
+      if pkg_installed "$pkg"; then
+        if force_mode; then
+          echo "  Reinstalling $pkg..."
+          sudo apt-get install --reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+        else
+          echo "  $pkg (already installed; use --force to reinstall)"
+        fi
       else
         echo "  Installing $pkg..."
         sudo apt-get install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
       fi
       ;;
     yum)
-      if rpm -q "$pkg" &>/dev/null; then
-        echo "  $pkg (already installed)"
+      if pkg_installed "$pkg"; then
+        if force_mode; then
+          echo "  Reinstalling $pkg..."
+          if command -v dnf &>/dev/null; then
+            sudo dnf reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+          else
+            sudo yum reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+          fi
+        else
+          echo "  $pkg (already installed; use --force to reinstall)"
+        fi
       else
         echo "  Installing $pkg..."
         sudo yum install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
       fi
       ;;
     brew)
-      if brew list "$pkg" &>/dev/null 2>/dev/null; then
-        echo "  $pkg (already installed)"
+      if pkg_installed "$pkg"; then
+        if force_mode; then
+          echo "  Reinstalling $pkg..."
+          brew reinstall "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+        else
+          echo "  $pkg (already installed; use --force to reinstall)"
+        fi
       else
         echo "  Installing $pkg..."
         brew install "$pkg" || echo "  WARN: $pkg install failed, continuing..."
@@ -70,14 +107,104 @@ install_one() {
   esac
 }
 
+install_brew_cask() {
+  local pkg="$1"
+  if brew list --cask "$pkg" &>/dev/null 2>/dev/null; then
+    if force_mode; then
+      echo "  Reinstalling cask $pkg..."
+      brew reinstall --cask "$pkg" || echo "  WARN: cask $pkg reinstall failed, continuing..."
+    else
+      echo "  cask $pkg (already installed; use --force to reinstall)"
+    fi
+  else
+    echo "  Installing cask $pkg..."
+    brew install --cask "$pkg" || echo "  WARN: cask $pkg install failed, continuing..."
+  fi
+}
+
+install_mas() {
+  local id="$1"
+  local name="${2:-$id}"
+  if ! command -v mas &>/dev/null; then
+    echo "  WARN: mas not installed; skip App Store id $id ($name)"
+    return 0
+  fi
+  if mas list 2>/dev/null | grep -qE "^${id}[[:space:]]"; then
+    if force_mode; then
+      echo "  Reinstalling mas $name ($id)..."
+      mas install "$id" || echo "  WARN: mas install $id failed, continuing..."
+    else
+      echo "  mas $name ($id) (already installed; use --force to reinstall)"
+    fi
+  else
+    echo "  Installing mas $name ($id)..."
+    mas install "$id" || echo "  WARN: mas install $id failed (sign in to App Store?), continuing..."
+  fi
+}
+
+# Process declarative Brewfile (brew / cask / mas lines)
+process_brewfile() {
+  local file="$1"
+  local line name id
+  # Ensure mas is available before mas lines when force-installing piecemeal;
+  # brew bundle path installs in file order instead.
+  if ! force_mode; then
+    echo "  brew bundle --file=$file"
+    brew bundle --file="$file" || echo "  WARN: brew bundle reported errors; continuing..."
+    return 0
+  fi
+  echo "  Processing Brewfile with --force (reinstall)..."
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"
+    line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+    [ -z "$line" ] && continue
+    if [[ "$line" =~ ^brew[[:space:]]+\"([^\"]+)\" ]]; then
+      install_one "${BASH_REMATCH[1]}"
+    elif [[ "$line" =~ ^cask[[:space:]]+\"([^\"]+)\" ]]; then
+      install_brew_cask "${BASH_REMATCH[1]}"
+    elif [[ "$line" =~ ^mas[[:space:]]+\"([^\"]+)\"[[:space:]]*,[[:space:]]*id:[[:space:]]*([0-9]+) ]]; then
+      name="${BASH_REMATCH[1]}"
+      id="${BASH_REMATCH[2]}"
+      install_mas "$id" "$name"
+    fi
+  done < "$file"
+}
+
+install_from_list_file() {
+  local list_file="$1"
+  if [ ! -f "$list_file" ]; then
+    echo "Package list not found: $list_file"
+    exit 1
+  fi
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"
+    # Keep internal spaces intact (e.g. `uname -r`); only trim ends.
+    line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+    line="${line//$'\r'/}"
+    [ -z "$line" ] && continue
+    # Expand e.g. linux-headers-`uname -r` on Linux
+    pkg=$(eval echo "$line")
+    # WSL: linux-headers-$(uname -r) is not published in Ubuntu repos (Microsoft kernel)
+    if [ "$PM" = apt ] && is_wsl; then
+      case "$pkg" in
+        linux-headers-*)
+          echo "  Skip $pkg (WSL: kernel headers not in distro repos; native Linux keeps this line in deb_app_list.ini)"
+          continue
+          ;;
+      esac
+    fi
+    install_one "$pkg"
+  done < "$list_file"
+}
+
 case "$PM" in
   apt)
     sudo apt-get update -y 2>/dev/null || true
-    list_file="$COMMON_DIR/deb_app_list.ini"
+    install_from_list_file "$COMMON_DIR/deb_app_list.ini"
     ;;
   yum)
     sudo yum update -y 2>/dev/null || true
-    list_file="$COMMON_DIR/rpm_app_list.ini"
+    install_from_list_file "$COMMON_DIR/rpm_app_list.ini"
     ;;
   brew)
     ensure_brew
@@ -85,37 +212,16 @@ case "$PM" in
     if ! command -v clang &>/dev/null; then
       echo "  Hint: Install Xcode Command Line Tools for C/C++: xcode-select --install"
     fi
-    list_file="$COMMON_DIR/mac_app_list.txt"
+    if [ -f "$COMMON_DIR/Brewfile" ]; then
+      process_brewfile "$COMMON_DIR/Brewfile"
+    else
+      install_from_list_file "$COMMON_DIR/mac_app_list.txt"
+    fi
     ;;
   *)
     echo "No package list for $PM"
     exit 1
     ;;
 esac
-
-if [ ! -f "$list_file" ]; then
-  echo "Package list not found: $list_file"
-  exit 1
-fi
-
-while IFS= read -r line || [ -n "$line" ]; do
-  line="${line%%#*}"
-  # Keep internal spaces intact (e.g. `uname -r`); only trim ends.
-  line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-  line="${line//$'\r'/}"
-  [ -z "$line" ] && continue
-  # Expand e.g. linux-headers-`uname -r` on Linux
-  pkg=$(eval echo "$line")
-  # WSL: linux-headers-$(uname -r) is not published in Ubuntu repos (Microsoft kernel)
-  if [ "$PM" = apt ] && is_wsl; then
-    case "$pkg" in
-      linux-headers-*)
-        echo "  Skip $pkg (WSL: kernel headers not in distro repos; native Linux keeps this line in deb_app_list.ini)"
-        continue
-        ;;
-    esac
-  fi
-  install_one "$pkg"
-done < "$list_file"
 
 echo "=== Packages installed ==="

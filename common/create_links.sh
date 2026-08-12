@@ -70,7 +70,12 @@ while IFS= read -r line || [ -n "$line" ]; do
     expected_canon=$(cd "$(dirname "$src_full")" 2>/dev/null && echo "$(pwd -P)/$(basename "$src_full")") || true
     current_canon=$(cd "$(dirname "$current_abs")" 2>/dev/null && echo "$(pwd -P)/$(basename "$current_abs")") || true
     if [[ -n "$expected_canon" && -n "$current_canon" && "$current_canon" == "$expected_canon" ]]; then
-      echo "  $tgt_full (already points to expected)"
+      if [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]; then
+        ln -sf "$src_full" "$tgt_full"
+        echo "  $tgt_full -> $src_full (forced)"
+      else
+        echo "  $tgt_full (already points to expected)"
+      fi
       continue
     fi
   fi

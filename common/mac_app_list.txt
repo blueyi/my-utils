@@ -1,4 +1,5 @@
-# macOS Homebrew package list
+# macOS Homebrew package list (legacy fallback)
+# Prefer common/Brewfile when present (install_packages.sh uses Brewfile first).
 # One package per line, # for comment
 
 # core
