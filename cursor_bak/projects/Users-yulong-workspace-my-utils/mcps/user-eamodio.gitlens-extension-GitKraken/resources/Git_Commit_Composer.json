@@ -1,6 +1,0 @@
-{
-  "uri": "ui://gk-cli/app/git-commit-composer",
-  "name": "Git Commit Composer",
-  "description": "Git commit composer UI (MCP Apps HTML resource)",
-  "mimeType": "text/html;profile=mcp-app"
-}

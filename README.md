@@ -211,7 +211,7 @@ Sync Cursor settings to `cursor_bak/` and use symlinks so edits stay in the repo
 - **Preferences** – app-level preferences file
 - **ide_state.json** – when present
 - **~/.cursor/rules** → `cursor_bak/rules`
-- **~/.cursor/projects** → `cursor_bak/projects` (per-workspace state; `terminals/` and `agent-transcripts/` are gitignored)
+- **~/.cursor/projects** → `cursor_bak/projects` (per-workspace state; `terminals/`, `agent-transcripts/`, `mcps/` schema caches, and `canvases/node_modules/` are gitignored — user MCP config is in `User/mcp.json`)
 
 **Included in default tool list** (both `./bootstrap.sh --yes` and interactive `./bootstrap.sh` will include cursor unless you use `--tools` to limit):
 

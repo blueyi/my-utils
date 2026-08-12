@@ -8,12 +8,16 @@ common/.ropeproject
 cursor_bak/User/History/
 cursor_bak/User/globalStorage/
 cursor_bak/User/workspaceStorage/
-# Cursor projects: ephemeral per-workspace data (keep mcps/ for MCP config)
+# Cursor projects: ephemeral per-workspace data
+# Real MCP user config lives in cursor_bak/User/mcp.json (not projects/*/mcps schema caches)
 cursor_bak/projects/*/terminals/
 cursor_bak/projects/*/agent-transcripts/
 cursor_bak/projects/*/agent-tools/
 cursor_bak/projects/*/worker.log
 cursor_bak/projects/*/.workspace-trusted
+cursor_bak/projects/*/canvases/node_modules/
+cursor_bak/projects/*/mcps/
+cursor_bak/projects/.agent-data-cleanup-*
 # macOS temp workspace dirs (var-folders-*), not meaningful to version
 cursor_bak/projects/var-folders-*/
 
