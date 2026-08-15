@@ -1,0 +1,33 @@
+# Optional macOS Homebrew Bundle entries (not installed by default).
+# Core set: common/Brewfile
+#
+# Install:
+#   brew bundle --file=common/Brewfile.optional
+#   # or:
+#   ./bootstrap.sh --tools packages --optional --yes
+#
+# App Store lines still need a signed-in Apple ID.
+
+# --- GUI (optional) ---
+cask "discord"
+cask "lark"
+cask "nutstore"
+cask "tailscale-app"
+cask "teamviewer"
+cask "clash-verge-rev"
+cask "lm-studio"
+cask "openclaw"
+cask "github"              # GitHub Desktop
+
+# --- Mac App Store (optional) ---
+mas "Telegram", id: 747648890
+mas "V2BOX", id: 6446814690
+mas "WhatsApp", id: 310633997
+mas "OneDrive", id: 823766827
+mas "Keynote", id: 361285480
+mas "Numbers", id: 361304891
+mas "Pages", id: 361309726
+mas "GarageBand", id: 682658836
+mas "iMovie", id: 408981434
+
+# Manual (no brew/mas): Bionic, Helix AI, Youwee, Creator Studio apps

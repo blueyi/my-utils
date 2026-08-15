@@ -1,0 +1,7 @@
+# npm registry (npmmirror). Linked as ~/.npmrc.
+# Override one install: npm install --registry=https://registry.npmjs.org <pkg>
+# Disable: unlink ~/.npmrc  (MY_UTILS_MIRRORS=off does not affect this file)
+# Electron / Playwright / node-sass mirrors are env vars in config/mirrors.bash
+# (npm 11 rejects those keys in npmrc).
+
+registry=https://registry.npmmirror.com

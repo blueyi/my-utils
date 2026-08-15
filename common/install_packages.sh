@@ -284,6 +284,17 @@ case "$PM" in
         echo "=== Packages incomplete (mas / Brewfile recovery failed) ==="
         exit 1
       fi
+      if [ "${MY_UTILS_BREW_OPTIONAL:-}" = "1" ] || [ "${MY_UTILS_BREW_OPTIONAL:-}" = "true" ]; then
+        if [ -f "$COMMON_DIR/Brewfile.optional" ]; then
+          echo "=== Optional Brewfile ==="
+          if ! process_brewfile "$COMMON_DIR/Brewfile.optional"; then
+            echo "=== Optional packages incomplete ==="
+            exit 1
+          fi
+        else
+          echo "  WARN: MY_UTILS_BREW_OPTIONAL set but Brewfile.optional missing"
+        fi
+      fi
     else
       install_from_list_file "$COMMON_DIR/mac_app_list.txt"
     fi

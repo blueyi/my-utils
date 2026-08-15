@@ -32,6 +32,13 @@ _is_macos() { [[ "$(uname -s)" = Darwin* ]]; }
 [ -f "$MYRC_PATH/proxy.bash" ] && source "$MYRC_PATH/proxy.bash"
 
 # =============================================================================
+# SECTION: Mainland China mirrors (Go / Node binaries / uv Python)
+# =============================================================================
+# npm registry + Cargo index live in linked files (npmrc, cargo/config.toml).
+# Toggle env mirrors: MY_UTILS_MIRRORS=off in ~/.env.rc
+[ -f "$MYRC_PATH/mirrors.bash" ] && source "$MYRC_PATH/mirrors.bash"
+
+# =============================================================================
 # SECTION: Baseline PATH / macOS Homebrew keg flags
 # =============================================================================
 if _is_macos; then

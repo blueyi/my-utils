@@ -1,0 +1,8 @@
+# crates.io sparse index via USTC. Linked as ~/.cargo/config.toml.
+# Disable: unlink ~/.cargo/config.toml  (MY_UTILS_MIRRORS=off does not affect this file)
+
+[source.crates-io]
+replace-with = "ustc"
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"

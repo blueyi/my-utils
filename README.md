@@ -7,7 +7,8 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 - Linux (Ubuntu / Debian / Fedora) and macOS
 - Configs managed via symlinks; edits stay in repo for backup and version control
 - One-shot or selective install; `--yes` for non-interactive mode; `--force` to re-run / reinstall
-- macOS: declarative [`common/Brewfile`](common/Brewfile) (formulae / casks / `mas` App Store apps); `--new-mac` for new-machine checks
+- macOS: declarative [`common/Brewfile`](common/Brewfile) + optional [`common/Brewfile.optional`](common/Brewfile.optional); `--new-mac` for new-machine checks
+- Mainland China mirrors (Go / Node / uv / npm / Cargo) via [`config/mirrors.bash`](config/mirrors.bash) + linked `~/.npmrc` / `~/.cargo/config.toml`
 - Profile presets: C++, Python, AI Infra (LLVM / MLIR); optional Triton (GPU kernel) via `config/triton.bash`
 - **One env file:** `config/resetrc.bash` holds all shared env as **`# SECTION: …`** blocks (nvm, pyenv, CUDA, LLVM, …). Edit **that file** to affect **bash, zsh, and profiles**; optional Fish uses the same file via `emit_fish_env.bash` when linked.
 
@@ -21,8 +22,8 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 
 **Multi-OS**
 
-- **Packages:** [`common/install_packages.sh`](common/install_packages.sh) + [`common/deb_app_list.ini`](common/deb_app_list.ini) / [`common/Brewfile`](common/Brewfile) (macOS; falls back to [`common/mac_app_list.txt`](common/mac_app_list.txt)) / [`common/rpm_app_list.ini`](common/rpm_app_list.ini). Already-installed packages are skipped unless `--force`.
-- **Env:** [`config/resetrc.bash`](config/resetrc.bash) uses **`_is_linux` / `_is_macos`** inside sections (PATH, CUDA, brew kegs, …).
+- **Packages:** [`common/install_packages.sh`](common/install_packages.sh) + [`common/deb_app_list.ini`](common/deb_app_list.ini) / [`common/Brewfile`](common/Brewfile) (macOS; falls back to [`common/mac_app_list.txt`](common/mac_app_list.txt)) / [`common/rpm_app_list.ini`](common/rpm_app_list.ini). Already-installed packages are skipped unless `--force`. Optional GUI/mas set: [`common/Brewfile.optional`](common/Brewfile.optional).
+- **Env:** [`config/resetrc.bash`](config/resetrc.bash) uses **`_is_linux` / `_is_macos`** inside sections (PATH, CUDA, brew kegs, …). Mainland mirrors: [`config/mirrors.bash`](config/mirrors.bash) (default on; `MY_UTILS_MIRRORS=off` in `~/.env.rc` to disable env mirrors).
 
 **Multi-shell**
 
@@ -38,15 +39,15 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-user/my-utils.git ~/repos/my-utils
-cd ~/repos/my-utils
+git clone https://github.com/blueyi/my-utils.git ~/workspace/my-utils
+cd ~/workspace/my-utils
 
 ./bootstrap.sh --help
 
 # One-shot init (no prompts): packages, links, misc, vimrc, cursor
 ./bootstrap.sh --yes
 
-# Interactive: asks which of (packages, links, misc, vimrc, cursor) to run
+# Interactive: asks which tools to run
 ./bootstrap.sh
 
 exec $SHELL
@@ -61,9 +62,16 @@ xcode-select --install
 # 2) Sign in to the Mac App Store (required for Brewfile `mas` entries)
 
 # 3) Clone and bootstrap
-git clone https://github.com/your-user/my-utils.git ~/repos/my-utils
-cd ~/repos/my-utils
+git clone https://github.com/blueyi/my-utils.git ~/workspace/my-utils
+cd ~/workspace/my-utils
 ./bootstrap.sh --new-mac --yes
+
+# Optional extra apps (discord, lark, Telegram, …):
+./bootstrap.sh --tools packages --optional --yes
+
+# Optional secrets (needs SYNC_ENV_KEY + encrypted backup on this machine):
+# export SYNC_ENV_KEY='…'
+# ./bootstrap.sh --tools env --yes
 
 # Re-run is safe: successful tools and already-installed packages are skipped.
 # Force a full redo:
@@ -72,32 +80,43 @@ cd ~/repos/my-utils
 exec $SHELL
 ```
 
-Edit [`common/Brewfile`](common/Brewfile) to change the macOS software set (add `cask` / `mas` lines as needed). Changing the Brewfile invalidates the `packages` stamp so the next `--yes` re-runs packages without `--force`.
+Edit [`common/Brewfile`](common/Brewfile) for the core macOS set; put extras in [`common/Brewfile.optional`](common/Brewfile.optional). Changing either file (when used) invalidates the `packages` stamp. Changing [`common/link.ini`](common/link.ini) invalidates the `links` stamp so new symlinks (e.g. npmrc / cargo) apply on the next `--yes`.
+
+### Mainland China mirrors
+
+Default **on** after links + shell init:
+
+- Env: Go / Node dist / Electron / uv Python → [`config/mirrors.bash`](config/mirrors.bash)
+- Files: `~/.npmrc` → [`config/npm/npmrc`](config/npm/npmrc); `~/.cargo/config.toml` → [`config/cargo/config.toml`](config/cargo/config.toml)
+
+Disable env mirrors: `export MY_UTILS_MIRRORS=off` in `~/.env.rc`. Unlink the two files to fully revert npm/Cargo registries.
 
 ## Install Options
 
 ```bash
 ./bootstrap.sh --help                             # full usage
 
-# Without --yes: prompts for each step (packages / links / misc / vimrc / cursor)
+# Without --yes: prompts for each step
 ./bootstrap.sh
 
 # With --yes: run selected steps with no prompts
-./bootstrap.sh --yes                              # all steps
-./bootstrap.sh --tools packages --yes             # system packages only
-./bootstrap.sh --tools links --yes                # symlinks only (vimrc, bashrc, zshrc, etc.)
-./bootstrap.sh --tools misc --yes                 # oh-my-zsh, uv, fzf, …
-./bootstrap.sh --tools vimrc --yes                # vim plugins
-./bootstrap.sh --tools cursor --yes               # Cursor config backup link
-./bootstrap.sh --tools packages links cursor --yes # multiple steps
+./bootstrap.sh --yes                              # packages links misc vimrc cursor
+./bootstrap.sh --tools packages --yes
+./bootstrap.sh --tools packages --optional --yes  # + Brewfile.optional
+./bootstrap.sh --tools links --yes
+./bootstrap.sh --tools misc --yes
+./bootstrap.sh --tools vimrc --yes
+./bootstrap.sh --tools cursor --yes
+./bootstrap.sh --tools env --yes                  # secrets hint / decrypt if SYNC_ENV_KEY set
+./bootstrap.sh --tools packages links cursor --yes
 
-# New Mac + force reinstall / ignore stamps
+# New Mac + force
 ./bootstrap.sh --new-mac --yes
 ./bootstrap.sh --force --yes
 ./bootstrap.sh --tools packages --force --yes
 ```
 
-**Idempotency:** successful tools write stamps under `~/.local/state/my-utils/bootstrap/`. Later runs skip those tools unless `--force`. Within `packages`, already-installed apt/yum/brew packages are also skipped unless `--force` (then reinstall).
+**Idempotency:** successful tools write stamps under `~/.local/state/my-utils/bootstrap/`. Later runs skip those tools unless `--force`. `packages` also re-runs when Brewfile (+ optional, if used) changes; `links` re-runs when `link.ini` changes. Within `packages`, already-installed apt/yum/brew packages are skipped unless `--force` (then reinstall).
 
 ## Config Layout
 
@@ -109,6 +128,10 @@ config/
 ├── p10k.zsh                  → ~/.p10k.zsh (Powerlevel10k theme)
 ├── shell_init.bash           → ~/.shell_init.bash
 ├── resetrc.bash              # monolithic env (comment sections; search SECTION:)
+├── mirrors.bash              # Mainland China env mirrors (GOPROXY, NODEJS_ORG_MIRROR, …)
+├── npm/npmrc                 → ~/.npmrc
+├── cargo/config.toml         → ~/.cargo/config.toml
+├── zprofile.brew.bash        # reference snippet; misc appends brew shellenv to ~/.zprofile
 ├── sections/README.md        # pointer only (old split layout archived in deprecated/)
 ├── bash_interactive.bash     # bash-only prompt, completion
 ├── zsh_entry.zsh             # Oh My Zsh + theme/plugins, then resetrc

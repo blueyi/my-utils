@@ -232,3 +232,86 @@ ensure_hexo_env() {
 }
 
 ensure_hexo_env
+
+# --- macOS: brew on login PATH (~/.zprofile / ~/.bash_profile) ---
+ensure_brew_login_path() {
+  is_macos || return 0
+  local brew_bin="" begin end target tmp
+  if [ -x /opt/homebrew/bin/brew ]; then
+    brew_bin=/opt/homebrew/bin/brew
+  elif [ -x /usr/local/bin/brew ]; then
+    brew_bin=/usr/local/bin/brew
+  elif command -v brew &>/dev/null; then
+    brew_bin="$(command -v brew)"
+  else
+    echo "  Skip brew login PATH (brew not found)"
+    return 0
+  fi
+  begin="# >>> my-utils brew >>>"
+  end="# <<< my-utils brew <<<"
+  for target in "$HOME/.zprofile" "$HOME/.bash_profile"; do
+    touch "$target"
+    if grep -qF "$begin" "$target" 2>/dev/null; then
+      if _misc_force; then
+        tmp="$(mktemp)"
+        awk -v b="$begin" -v e="$end" '
+          $0 == b { skip=1; next }
+          $0 == e { skip=0; next }
+          !skip { print }
+        ' "$target" > "$tmp"
+        {
+          echo ""
+          echo "$begin"
+          echo "# Managed by my-utils misc (idempotent)."
+          echo "if [ -x \"$brew_bin\" ]; then"
+          echo "  eval \"\$(\"$brew_bin\" shellenv)\""
+          echo "fi"
+          echo "$end"
+        } >> "$tmp"
+        mv "$tmp" "$target"
+        echo "  Updated brew shellenv block in $target (forced)"
+      else
+        echo "  brew shellenv already in $target"
+      fi
+    else
+      {
+        echo ""
+        echo "$begin"
+        echo "# Managed by my-utils misc (idempotent)."
+        echo "if [ -x \"$brew_bin\" ]; then"
+        echo "  eval \"\$(\"$brew_bin\" shellenv)\""
+        echo "fi"
+        echo "$end"
+      } >> "$target"
+      echo "  Added brew shellenv to $target"
+    fi
+  done
+  eval "$("$brew_bin" shellenv)" 2>/dev/null || true
+}
+
+# --- rustup: ensure a default toolchain so cargo/rustc work ---
+ensure_rustup_default() {
+  if ! command -v rustup &>/dev/null; then
+    for p in /opt/homebrew/opt/rustup/bin /usr/local/opt/rustup/bin; do
+      [ -x "$p/rustup" ] && export PATH="$p:$PATH"
+    done
+  fi
+  command -v rustup &>/dev/null || {
+    echo "  Skip rustup default (rustup not installed yet; run packages first)"
+    return 0
+  }
+  if rustup show 2>/dev/null | grep -q '(default)'; then
+    if _misc_force; then
+      echo "Reinstalling default rust toolchain (stable, --force)..."
+      rustup default stable || echo "  WARN: rustup default stable failed"
+    else
+      echo "rustup default toolchain already set"
+    fi
+    return 0
+  fi
+  echo "Setting rustup default toolchain to stable..."
+  rustup default stable || echo "  WARN: rustup default stable failed"
+}
+
+ensure_brew_login_path
+ensure_rustup_default
