@@ -61,11 +61,11 @@ BACKUP_DIRS_LINUX=(
     "$HOME/workspace/my-utils:main"
     "$HOME/workspace/repos/hexoblog:master"
     # "$HOME/workspace/repos/kora:main"  # disabled: auto-backup breaks in-progress edits
-    "$HOME/repos/my-utils:main"
-    "$HOME/.openclaw:wsl"
-    # ~/.hermes: Hermes home (config, optional secrets — keep remote private). wsl = GitCode branch.
-    "$HOME/.hermes:wsl"
-    # Optional second remote branch mirror (only if branch exists locally or on origin)
+    # "$HOME/repos/my-utils:main"  # stale path on ucloud; workspace copy above is canonical
+    # WSL hosts only — never match on ucloud (script skips when HEAD != pinned branch):
+    # "$HOME/.openclaw:wsl"
+    # "$HOME/.hermes:wsl"
+    # ucloud host: pin ~/.hermes to ucloud only (macos uses :macos). Never switch branches.
     "$HOME/.hermes:ucloud"
 )
 # BACKUP_DIRS_WINDOWS=(
