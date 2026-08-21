@@ -9,19 +9,10 @@
             }
         }
     },
-    "Key Promoter.suggestKeybindingCreation": false,
-    "Key Promoter.ignoredCommands": [
-        "type",
-        "inlineChat.hideHint",
-        "closeReferenceSearch",
-        "closeMarkersNavigation",
-        "closeParameterHints",
-        "actions.find",
-        "editor.action.clipboardCopyAction",
-        "workbench.action.files.save"
-    ],
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.cStandard": "c17",
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "clangd.path": "clangd",
     "vim.handleKeys": {
         "<C-a>": false,
         "<C-c>": false,
@@ -36,13 +27,7 @@
         "<C-K, M>": false,
         "<C-K>": false
     },
-    "marscode.codeCompletionPro": {
-        "enableCodeCompletionPro": true
-    },
     "editor.unicodeHighlight.nonBasicASCII": false,
-    "gitlens.ai.model": "vscode",
-    "gitlens.ai.vscode.model": "copilot:gpt-4o",
-    "trae.codeCompletionPro": {},
     "debug.onTaskErrors": "showErrors",
     "security.workspace.trust.untrustedFiles": "open",
     "workbench.secondarySideBar.defaultVisibility": "hidden",
@@ -55,15 +40,8 @@
         "editor.suggest.insertMode": "replace"
     },
     "[cmake-cache]": {},
-    "github.copilot.nextEditSuggestions.enabled": true,
     "vim.digraphs": {},
     "vim.commandLineModeKeyBindings": [],
-    "github.copilot.enable": {
-        "*": true,
-        "plaintext": true,
-        "markdown": false,
-        "scminput": false
-    },
     "files.autoSave": "afterDelay",
     "cursor.cpp.disabledLanguages": [
         "markdown",
@@ -77,12 +55,12 @@
     "python.createEnvironment.trigger": "off",
     "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
     "python.terminal.activateEnvironment": false,
-    "python-envs.terminal.autoActivationType": "off",
     "git.openRepositoryInParentFolders": "always",
     "window.autoDetectColorScheme": false,
     "remote.SSH.remotePlatform": {
         "WSL": "linux",
         "ucloud": "linux",
         "jd": "linux"
-    }
+    },
+    "Key Promoter.suggestKeybindingCreation": false
 }
