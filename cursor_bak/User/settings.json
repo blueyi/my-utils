@@ -62,5 +62,9 @@
         "ucloud": "linux",
         "jd": "linux"
     },
-    "Key Promoter.suggestKeybindingCreation": false
+    "Key Promoter.suggestKeybindingCreation": false,
+    "cursor.general.disableHttp2": true,
+    "cursor.composer.queueMessageDefaultBehavior": "steer",
+    "terminal.integrated.mouseWheelScrollSensitivity": 3,
+    "terminal.integrated.gpuAcceleration": "off"
 }

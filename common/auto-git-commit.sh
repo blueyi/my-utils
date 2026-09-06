@@ -55,6 +55,7 @@ BACKUP_DIRS_MACOS=(
     "$HOME/workspace/my-utils:main"
     "$HOME/workspace/repos/hexoblog:master"
     "$HOME/.hermes:macos"
+    "$HOME/.hermes:macos-xy"
 )
 BACKUP_DIRS_LINUX=(
     "$HOME/.openclaw:ucloud"

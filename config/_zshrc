@@ -8,3 +8,23 @@ source ~/.shell_init.bash
 
 # OpenClaw Completion
 [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
+
+# Codex / Claude Code (user npm prefix)
+export PATH="$HOME/.local/npm-global/bin:$PATH"
+
+# Hermes BYOK keys for Codex / Claude Code
+if [ -f "$HOME/.hermes/.env" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  . "$HOME/.hermes/.env"
+  set +a
+fi
+
+# Claude Code BYOK → Hermes OpenLux
+export ANTHROPIC_BASE_URL="https://api.openlux.ai"
+export ANTHROPIC_AUTH_TOKEN="${HERMES_OPENLUX_API_KEY:-}"
+export ANTHROPIC_API_KEY=""
+export ANTHROPIC_MODEL="claude-sonnet-5"
+export ANTHROPIC_SMALL_FAST_MODEL="claude-haiku-4-5-20251001"
+export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
+

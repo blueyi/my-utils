@@ -10,6 +10,8 @@
 #   GIT_DUAL_REMOTE_ENABLED, GIT_DUAL_REMOTE_GITHUB_USER, GIT_DUAL_REMOTE_GITCODE_USER
 #   GIT_DUAL_REMOTE_TIMEOUT, GIT_DUAL_REMOTE_FALLBACK_REMOTE, GIT_DUAL_REMOTE_VERBOSE
 # Bypass wrapper: GIT_DUAL_REMOTE=0 command git push ...
+# Push: tries GitHub then GitCode per URL; if either succeeds → exit 0 + warning
+# for the failed host (reason included). Both fail → non-zero.
 
 [[ -n "${_GIT_DUAL_REMOTE_LIB_LOADED:-}" ]] && return 0
 _GIT_DUAL_REMOTE_LIB_LOADED=1
@@ -28,6 +30,62 @@ _git_dual_git_with_timeout() {
 _git_dual_verbose() {
   [[ "${GIT_DUAL_REMOTE_VERBOSE:-}" == 1 ]] || return 0
   printf 'git-dual-remote: %s\n' "$*" >&2
+}
+
+# Always-visible warning (partial push success, skipped remotes, etc.).
+_git_dual_warn() {
+  printf 'git-dual-remote: warning: %s\n' "$*" >&2
+}
+
+# Human-readable reason for a failed push (used in partial-success warnings).
+_git_dual_push_fail_reason() {
+  local out="$1" code="${2:-1}" line
+
+  if [[ "$code" -eq 124 || "$code" -eq 143 || "$code" -eq 137 ]]; then
+    printf 'timed out / killed (exit %s)' "$code"
+    return 0
+  fi
+  if [[ "$code" -eq 255 ]] || [[ "$out" == *"Could not resolve"* || "$out" == *"Connection refused"* || \
+       "$out" == *"Network is unreachable"* || "$out" == *"Operation timed out"* || \
+       "$out" == *"Connection reset"* || "$out" == *"No route to host"* || \
+       "$out" == *"timed out"* || "$out" == *"Timeout"* ]]; then
+    printf 'remote unreachable or network error (exit %s)' "$code"
+    return 0
+  fi
+  if [[ "$out" == *"Repository not found"* || "$out" == *"repository not found"* ]]; then
+    printf 'repository not found (missing on host, or SSH account has no access)'
+    return 0
+  fi
+  if [[ "$out" == *"Permission denied"* || "$out" == *"permission denied"* || \
+       "$out" == *"Authentication failed"* || "$out" == *"could not read Username"* ]]; then
+    printf 'authentication / permission denied'
+    return 0
+  fi
+  if [[ "$out" == *"Could not read from remote repository"* ]]; then
+    printf 'could not read from remote (access rights or repo missing)'
+    return 0
+  fi
+  if [[ "$out" == *"rejected"* || "$out" == *"non-fast-forward"* || "$out" == *"fetch first"* ]]; then
+    printf 'push rejected (non-fast-forward or remote has divergent commits)'
+    return 0
+  fi
+  if [[ "$out" == *"protected branch"* || "$out" == *"GH006"* ]]; then
+    printf 'protected branch rules blocked the push'
+    return 0
+  fi
+  if [[ "$out" == *"src refspec"* && "$out" == *"does not match"* ]]; then
+    printf 'invalid refspec (local ref does not exist)'
+    return 0
+  fi
+
+  # First non-empty stderr/stdout line as a short hint.
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -n "$line" ]] || continue
+    printf 'exit %s: %s' "$code" "$line"
+    return 0
+  done <<<"$out"
+
+  printf 'failed with exit %s' "$code"
 }
 
 git_dual_remote_enabled() {
@@ -215,24 +273,37 @@ _git_dual_run_with_timeout() {
     gtimeout "$secs" bash -c 'command git "$@"' _ "$@"
     return $?
   fi
-  # macOS without GNU coreutils
-  (
-    command git "$@" &
-    local pid=$!
-    local timer_pid
-    ( sleep "$secs"; kill -TERM "$pid" 2>/dev/null ) &
-    timer_pid=$!
-    wait "$pid" 2>/dev/null
-    local st=$?
-    kill "$timer_pid" 2>/dev/null
-    wait "$timer_pid" 2>/dev/null
-    if kill -0 "$pid" 2>/dev/null; then
-      kill -KILL "$pid" 2>/dev/null
-      wait "$pid" 2>/dev/null
-      return 124
+  # macOS without GNU coreutils.
+  # Do not use `kill -0` alone to detect completion — zombies still look alive.
+  # Do not wrap in `(…)` with a background `sleep` watchdog — an unkillable sleep
+  # blocks subshell exit for the full timeout (common in restricted environments).
+  local status_file pid elapsed=0 st
+  status_file="$(mktemp -t gitdual.XXXXXX 2>/dev/null || mktemp)"
+  : >"$status_file"
+  ( command git "$@"; echo $? >"$status_file" ) &
+  pid=$!
+  while (( elapsed < secs )); do
+    # status file becomes non-empty when the child writes its exit code
+    if [[ -s "$status_file" ]]; then
+      wait "$pid" 2>/dev/null || true
+      st="$(cat "$status_file" 2>/dev/null || echo 1)"
+      rm -f "$status_file"
+      return "$st"
     fi
+    sleep 1
+    elapsed=$((elapsed + 1))
+  done
+  kill -TERM "$pid" 2>/dev/null || true
+  sleep 1
+  kill -KILL "$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || true
+  if [[ -s "$status_file" ]]; then
+    st="$(cat "$status_file" 2>/dev/null || echo 124)"
+    rm -f "$status_file"
     return "$st"
-  )
+  fi
+  rm -f "$status_file"
+  return 124
 }
 
 _git_dual_is_timeout_or_unreachable() {
@@ -597,6 +668,8 @@ git_dual_push() {
 
   _git_dual_export_ssh
   local secs out rc github_url gitcode_url fb gh_ok=0 gc_ok=0
+  local gh_out="" gc_out="" gh_rc=0 gc_rc=0
+  local reason=""
   secs="$(_git_dual_timeout_secs)"
   fb="${GIT_DUAL_REMOTE_FALLBACK_REMOTE:-gitcode}"
 
@@ -605,36 +678,51 @@ git_dual_push() {
   github_url="$(git_dual_to_github_url "$fetch_url" 2>/dev/null || echo "$fetch_url")"
   gitcode_url="$(_git_dual_real remote get-url "$fb" 2>/dev/null || git_dual_to_gitcode_url "$github_url" 2>/dev/null || true)"
 
-  # Bare `git push` / `git push -u` — use named remote (honors dual pushurl).
-  if ((${#refs[@]} == 0)); then
-    if ((${#opts[@]})); then
-      _git_dual_real push "${opts[@]}" "$remote"
-    else
-      _git_dual_real push "$remote"
-    fi
-    return $?
+  # Bare `git push` / `git push -u` / `git push origin`: push per URL (not dual
+  # pushurl). Native multi-pushurl is all-or-nothing; we want partial success.
+  # Guard empty-array expansion: with `set -u`, `"${opts[@]}"` is unbound on bash 3.2/4.4+.
+  local has_all_or_tags=0 o
+  if ((${#opts[@]})); then
+    for o in "${opts[@]}"; do
+      case "$o" in --all|--tags) has_all_or_tags=1 ;; esac
+    done
+  fi
+  if ((${#refs[@]} == 0)) && (( !has_all_or_tags )); then
+    refs=(HEAD)
   fi
 
   # When pushing to raw URLs, never pass -u: git would set branch.remote to the URL.
   # Apply --set-upstream against the named remote after a successful push instead.
   local -a push_opts=()
-  local o
-  for o in "${opts[@]}"; do
-    case "$o" in
-      -u|--set-upstream) ;;
-      *) push_opts+=("$o") ;;
-    esac
-  done
+  if ((${#opts[@]})); then
+    for o in "${opts[@]}"; do
+      case "$o" in
+        -u|--set-upstream) ;;
+        *) push_opts+=("$o") ;;
+      esac
+    done
+  fi
 
   # Push GitHub first (best-effort), then GitCode mirror.
   # Note: with `set -u`, empty `"${push_opts[@]}"` is unsafe on some bash versions.
   if [[ -n "$github_url" ]]; then
-    if ((${#push_opts[@]})); then
-      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$github_url" "${refs[@]}")"
+    if ((${#refs[@]})); then
+      if ((${#push_opts[@]})); then
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$github_url" "${refs[@]}")"
+      else
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$github_url" "${refs[@]}")"
+      fi
     else
-      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$github_url" "${refs[@]}")"
+      # --all / --tags with no explicit refs
+      if ((${#push_opts[@]})); then
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$github_url")"
+      else
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$github_url")"
+      fi
     fi
     rc=$?
+    gh_rc=$rc
+    gh_out="$out"
     if [[ "$rc" -eq 0 ]]; then
       gh_ok=1
       printf '%s\n' "$out"
@@ -642,15 +730,28 @@ git_dual_push() {
       printf '%s\n' "$out" >&2
       _git_dual_verbose "push to GitHub failed (exit $rc); will still try $fb"
     fi
+  else
+    gh_rc=1
+    gh_out="no GitHub URL configured"
   fi
 
   if [[ -n "$gitcode_url" ]]; then
-    if ((${#push_opts[@]})); then
-      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$gitcode_url" "${refs[@]}")"
+    if ((${#refs[@]})); then
+      if ((${#push_opts[@]})); then
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$gitcode_url" "${refs[@]}")"
+      else
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$gitcode_url" "${refs[@]}")"
+      fi
     else
-      out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$gitcode_url" "${refs[@]}")"
+      if ((${#push_opts[@]})); then
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "${push_opts[@]}" "$gitcode_url")"
+      else
+        out="$(_git_dual_capture _git_dual_git_with_timeout "$secs" push "$gitcode_url")"
+      fi
     fi
     rc=$?
+    gc_rc=$rc
+    gc_out="$out"
     if [[ "$rc" -eq 0 ]]; then
       gc_ok=1
       printf '%s\n' "$out"
@@ -659,15 +760,18 @@ git_dual_push() {
       printf '%s\n' "$out" >&2
     fi
   else
-    rc=1
+    gc_rc=1
+    gc_out="no GitCode URL configured"
   fi
 
   if ((gc_ok || gh_ok)); then
-    _git_dual_sync_tracking_after_push "$remote" "${refs[@]}"
+    if ((${#refs[@]})); then
+      _git_dual_sync_tracking_after_push "$remote" "${refs[@]}"
+    fi
     if ((set_upstream)); then
       local branch last_ref="" r
       for r in "${refs[@]}"; do last_ref="$r"; done
-      branch="$(_git_dual_dst_branch_from_refspec "$last_ref")" || \
+      branch="$(_git_dual_dst_branch_from_refspec "${last_ref:-HEAD}")" || \
         branch="$(_git_dual_current_branch)"
       if [[ -n "$branch" ]]; then
         _git_dual_real branch --set-upstream-to="$remote/$branch" "$branch" 2>/dev/null || true
@@ -675,13 +779,27 @@ git_dual_push() {
     fi
   fi
 
-  if ((gc_ok)); then
-    ((gh_ok)) || _git_dual_verbose "GitHub unreachable; GitCode push succeeded"
+  # Partial success: one remote OK → overall success + warning for the other.
+  if ((gh_ok && gc_ok)); then
     return 0
   fi
-  if ((gh_ok)); then
+  if ((gh_ok || gc_ok)); then
+    if (( !gh_ok )); then
+      reason="$(_git_dual_push_fail_reason "$gh_out" "$gh_rc")"
+      _git_dual_warn "GitHub push did not succeed: $reason"
+      [[ -n "$github_url" ]] && _git_dual_warn "  remote: $github_url"
+    else
+      _git_dual_verbose "push OK via GitHub"
+    fi
+    if (( !gc_ok )); then
+      reason="$(_git_dual_push_fail_reason "$gc_out" "$gc_rc")"
+      _git_dual_warn "GitCode push did not succeed: $reason"
+      [[ -n "$gitcode_url" ]] && _git_dual_warn "  remote: $gitcode_url"
+    fi
+    _git_dual_warn "marked success (at least one remote accepted the push)"
     return 0
   fi
+
   return "${rc:-1}"
 }
 

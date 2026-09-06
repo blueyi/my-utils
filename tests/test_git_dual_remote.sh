@@ -224,6 +224,140 @@ assert_eq "$(_git_dual_dst_branch_from_refspec 'HEAD')" "feature-x" "HEAD → cu
 assert_eq "$(_git_dual_dst_branch_from_refspec 'master')" "master" "master → master"
 assert_eq "$(_git_dual_dst_branch_from_refspec 'HEAD:refs/heads/release')" "release" "HEAD:refs/heads/release"
 
+echo "=== _git_dual_push_fail_reason ==="
+load_lib
+assert_eq "$(_git_dual_push_fail_reason $'ERROR: Repository not found.\nfatal: Could not read from remote repository.' 1)" \
+  "repository not found (missing on host, or SSH account has no access)" \
+  "reason: repository not found"
+assert_eq "$(_git_dual_push_fail_reason 'ssh: Could not resolve hostname github.com' 255)" \
+  "remote unreachable or network error (exit 255)" \
+  "reason: unreachable"
+assert_eq "$(_git_dual_push_fail_reason '' 124)" \
+  "timed out / killed (exit 124)" \
+  "reason: timeout"
+
+echo "=== git_dual_push partial success (GitHub fail, GitCode OK) ==="
+MOCK_DIR="$(mktemp -d)"
+MOCK_LOG="$MOCK_DIR/git.log"
+export MOCK_LOG
+cat >"$MOCK_DIR/git" <<'MOCK'
+#!/usr/bin/env bash
+echo "$*" >> "${MOCK_LOG}"
+case "$1" in
+  rev-parse)
+    case "${2:-}" in
+      --is-inside-work-tree) exit 0 ;;
+      --abbrev-ref) echo "main"; exit 0 ;;
+      HEAD|main) echo "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"; exit 0 ;;
+      *) exit 0 ;;
+    esac
+    ;;
+  remote)
+    if [[ "${2:-}" == "get-url" ]]; then
+      if [[ "${3:-}" == "--push" ]]; then
+        echo "git@github.com:blueyi/onetrack.git"
+        echo "git@gitcode.com:blueyi/onetrack.git"
+        exit 0
+      fi
+      if [[ "${3:-}" == "gitcode" ]]; then
+        echo "git@gitcode.com:blueyi/onetrack.git"
+        exit 0
+      fi
+      echo "git@gitcode.com:blueyi/onetrack.git"
+      exit 0
+    fi
+    exit 0 ;;
+  update-ref|branch|config) exit 0 ;;
+  push)
+    # Fail GitHub, succeed GitCode
+    if [[ "$*" == *git@github.com:* ]]; then
+      echo "ERROR: Repository not found." >&2
+      echo "fatal: Could not read from remote repository." >&2
+      exit 1
+    fi
+    if [[ "$*" == *git@gitcode.com:* ]]; then
+      echo "To git@gitcode.com:blueyi/onetrack.git"
+      echo " * [new branch]      HEAD -> main"
+      exit 0
+    fi
+    echo "mock $*"; exit 0 ;;
+  *) echo "mock $*"; exit 0 ;;
+esac
+MOCK
+chmod +x "$MOCK_DIR/git"
+export PATH="$MOCK_DIR:$PATH"
+load_lib
+GIT_DUAL_REMOTE_VERBOSE=0
+: >"$MOCK_LOG"
+warn_out="$(git_dual_push 2>&1)"
+push_rc=$?
+assert_ok "$push_rc" "bare git push exits 0 when only GitCode succeeds"
+[[ "$warn_out" == *"warning: GitHub push did not succeed"* ]] && \
+  pass "warns about GitHub failure" || \
+  fail "warns about GitHub failure (out=$warn_out)"
+[[ "$warn_out" == *"repository not found"* ]] && \
+  pass "warning includes failure reason" || \
+  fail "warning includes failure reason (out=$warn_out)"
+[[ "$warn_out" == *"marked success"* ]] && \
+  pass "marks partial push as success" || \
+  fail "marks partial push as success (out=$warn_out)"
+grep -q 'push git@github.com:blueyi/onetrack.git HEAD' "$MOCK_LOG" && \
+  pass "bare push hits GitHub with HEAD" || \
+  fail "bare push hits GitHub with HEAD"
+grep -q 'push git@gitcode.com:blueyi/onetrack.git HEAD' "$MOCK_LOG" && \
+  pass "bare push hits GitCode with HEAD" || \
+  fail "bare push hits GitCode with HEAD"
+teardown_mock_git
+
+echo "=== git_dual_push both remotes fail → non-zero ==="
+MOCK_DIR="$(mktemp -d)"
+MOCK_LOG="$MOCK_DIR/git.log"
+export MOCK_LOG
+cat >"$MOCK_DIR/git" <<'MOCK'
+#!/usr/bin/env bash
+echo "$*" >> "${MOCK_LOG}"
+case "$1" in
+  rev-parse)
+    case "${2:-}" in
+      --is-inside-work-tree) exit 0 ;;
+      --abbrev-ref) echo "main"; exit 0 ;;
+      HEAD|main) echo "cccccccccccccccccccccccccccccccccccccccc"; exit 0 ;;
+      *) exit 0 ;;
+    esac
+    ;;
+  remote)
+    if [[ "${2:-}" == "get-url" ]]; then
+      if [[ "${3:-}" == "--push" ]]; then
+        echo "git@github.com:blueyi/onetrack.git"
+        echo "git@gitcode.com:blueyi/onetrack.git"
+        exit 0
+      fi
+      if [[ "${3:-}" == "gitcode" ]]; then
+        echo "git@gitcode.com:blueyi/onetrack.git"
+        exit 0
+      fi
+      echo "git@github.com:blueyi/onetrack.git"
+      exit 0
+    fi
+    exit 0 ;;
+  update-ref|branch|config) exit 0 ;;
+  push)
+    echo "ERROR: Repository not found." >&2
+    exit 1 ;;
+  *) echo "mock $*"; exit 0 ;;
+esac
+MOCK
+chmod +x "$MOCK_DIR/git"
+export PATH="$MOCK_DIR:$PATH"
+load_lib
+GIT_DUAL_REMOTE_VERBOSE=0
+set +e
+git_dual_push origin HEAD >/dev/null 2>&1
+both_fail_rc=$?
+set -e
+assert_ne_ok "$both_fail_rc" "both remotes fail → non-zero exit"
+teardown_mock_git
+
 if [[ "$failures" -eq 0 ]]; then
   echo "All tests passed."
   exit 0
