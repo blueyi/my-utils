@@ -305,7 +305,9 @@ _path_add() { [ -d "$1" ] && case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$
 [ -n "${LOCAL_BIN_PATH:-}" ] && _path_add "$LOCAL_BIN_PATH"
 _path_add "$HOME/.local/go/bin"
 _path_add "$HOME/go/bin"
-# local-llm unified CLI (`lm`): local LLM / image-gen stack (macOS host with ~/workspace/local-llm)
+# local-llm unified CLI (`lm`): local LLM / image-gen stack
+# canonical cross-machine path: ~/workspace/repos/local-llm (legacy: ~/workspace/local-llm)
+_path_add "$HOME/workspace/repos/local-llm/bin"
 _path_add "$HOME/workspace/local-llm/bin"
 [ -n "${MY_BIN:-}" ] && _path_add "$MY_BIN"
 [ -n "${HOME_BIN:-}" ] && _path_add "$HOME_BIN"
