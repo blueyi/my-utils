@@ -1,7 +1,7 @@
 [
   {
     "id": "Anthropic.claude-code",
-    "version": "2.1.233"
+    "version": "2.1.274"
   },
   {
     "id": "anysphere.cpptools",
@@ -53,11 +53,19 @@
   },
   {
     "id": "anysphere.remote-ssh",
-    "version": "1.1.14"
+    "version": "1.1.15"
   },
   {
     "id": "cursor.cursor-browser-automation",
     "version": "1.0.0"
+  },
+  {
+    "id": "cursor.cursor-computer-use",
+    "version": "1.0.0"
+  },
+  {
+    "id": "Dart-Code.dart-code",
+    "version": "3.142.0"
   },
   {
     "id": "DavidAnson.vscode-markdownlint",
@@ -69,7 +77,7 @@
   },
   {
     "id": "eamodio.gitlens",
-    "version": "19.0.1"
+    "version": "19.2.0"
   },
   {
     "id": "everysphere.worktree-textmate",
@@ -77,11 +85,11 @@
   },
   {
     "id": "fill-labs.dependi",
-    "version": "0.7.26"
+    "version": "1.20.0"
   },
   {
     "id": "GitByBit.gitbybit",
-    "version": "1.5.0"
+    "version": "1.5.1"
   },
   {
     "id": "GitHub.vscode-pull-request-github",
@@ -89,7 +97,7 @@
   },
   {
     "id": "Gruntfuggly.todo-tree",
-    "version": "0.0.215"
+    "version": "0.0.226"
   },
   {
     "id": "llvm-vs-code-extensions.vscode-clangd",
@@ -109,7 +117,7 @@
   },
   {
     "id": "MermaidChart.vscode-mermaid-chart",
-    "version": "2.7.6"
+    "version": "2.7.8"
   },
   {
     "id": "MS-CEINTL.vscode-language-pack-zh-hans",
@@ -121,7 +129,7 @@
   },
   {
     "id": "ms-python.python",
-    "version": "2025.6.1"
+    "version": "2026.0.0"
   },
   {
     "id": "ms-toolsai.jupyter",
@@ -137,7 +145,7 @@
   },
   {
     "id": "ms-vscode.cmake-tools",
-    "version": "1.23.52"
+    "version": "1.24.42"
   },
   {
     "id": "ms-vscode.js-debug",
@@ -153,19 +161,15 @@
   },
   {
     "id": "ms-vscode.vscode-js-profile-table",
-    "version": "1.0.9"
+    "version": "1.0.11"
   },
   {
     "id": "PKief.material-icon-theme",
-    "version": "5.37.0"
-  },
-  {
-    "id": "rust-lang.rust-analyzer",
-    "version": "0.3.3008"
+    "version": "5.38.1"
   },
   {
     "id": "shd101wyy.markdown-preview-enhanced",
-    "version": "0.8.30"
+    "version": "0.8.35"
   },
   {
     "id": "tamasfe.even-better-toml",
@@ -185,10 +189,10 @@
   },
   {
     "id": "vadimcn.vscode-lldb",
-    "version": "1.12.2"
+    "version": "1.12.1"
   },
   {
     "id": "yzhang.markdown-all-in-one",
-    "version": "3.6.2"
+    "version": "3.6.3"
   }
 ]
