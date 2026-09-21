@@ -51,7 +51,9 @@ Thumbs.db
 .env.local
 common/ssServerInstall.py
 
-# my-utils env backup artifacts (must stay out of git)
+# Accidental env enc outside the privacy vault
 tools/env_sync/tmp/
 *.env.rc.enc
 *.envrc.enc
+# Vault ciphertext is intentionally tracked:
+#   privacy/*.enc

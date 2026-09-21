@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Optional env.rc sync helper for bootstrap --tools env
-# Does not decrypt without SYNC_ENV_KEY. Never stores secrets in the repo.
+# Privacy vault helper — backup or restore privacy/*.enc
+# Usage:
+#   run_env_sync.sh [backup|restore]
+#   MY_UTILS_VAULT_ACTION=backup run_env_sync.sh
+# Default: restore (bootstrap --tools env)
 
 set -e
 if [ -n "${MY_UTILS_ROOT:-}" ]; then
@@ -10,11 +13,21 @@ else
 fi
 
 ENV_SYNC="$ROOT/tools/env_sync/env_sync.py"
-ENC_DEFAULT="${XDG_STATE_HOME:-$HOME/.local/state}/my-utils/env.rc.enc"
+MANIFEST="$ROOT/privacy/manifest"
+ACTION="${1:-${MY_UTILS_VAULT_ACTION:-restore}}"
+FORCE_ARGS=()
+[ "${MY_UTILS_FORCE:-}" = "1" ] && FORCE_ARGS+=(--force)
 
-echo "=== Env sync (optional) ==="
-echo "Encrypted backup default: $ENC_DEFAULT"
-echo "Set SYNC_ENV_KEY in the environment (or ~/.env.rc) before decrypt/merge."
+case "$ACTION" in
+  backup|restore) ;;
+  *)
+    echo "Usage: $0 [backup|restore]" >&2
+    exit 2
+    ;;
+esac
+
+echo "=== Privacy vault ($ACTION) ==="
+echo "Manifest: $MANIFEST"
 echo ""
 
 if [ ! -f "$ENV_SYNC" ]; then
@@ -22,31 +35,48 @@ if [ ! -f "$ENV_SYNC" ]; then
   exit 0
 fi
 
+if [ ! -f "$MANIFEST" ]; then
+  echo "  WARN: no privacy/manifest — nothing to do"
+  exit 0
+fi
+
 if [ -z "${SYNC_ENV_KEY:-}" ]; then
-  echo "  SYNC_ENV_KEY unset — skip decrypt (by design)."
-  echo "  Examples:"
-  echo "    export SYNC_ENV_KEY='…'"
-  echo "    python3 \"$ENV_SYNC\" decrypt --output /tmp/env.rc.backup"
-  echo "    python3 \"$ENV_SYNC\" merge --local ~/.env.rc --backup /tmp/env.rc.backup --dry-run"
-  echo "  Or after bootstrap:"
-  echo "    ./bootstrap.sh --tools env --yes   # still needs SYNC_ENV_KEY to decrypt"
+  if [ -t 0 ]; then
+    echo "  SYNC_ENV_KEY unset — will prompt for password (≥8 chars)."
+  else
+    echo "  SYNC_ENV_KEY unset and no TTY — cannot prompt."
+    echo "  export SYNC_ENV_KEY='…' then re-run: ./myu vault $ACTION"
+    exit 1
+  fi
+fi
+
+if [ "$ACTION" = "backup" ]; then
+  echo "  Encrypting sources → privacy/*.enc …"
+  python3 "$ENV_SYNC" vault-backup --manifest "$MANIFEST" "${FORCE_ARGS[@]}"
+  echo "=== Privacy vault backup done ==="
+  echo "  Next:"
+  echo "    git add privacy/*.enc privacy/manifest"
+  echo "    git commit -m \"Update privacy vault\""
+  echo "    git push"
   exit 0
 fi
 
-if [ ! -f "$ENC_DEFAULT" ]; then
-  echo "  No encrypted backup at $ENC_DEFAULT"
-  echo "  Create one on the old machine: python3 \"$ENV_SYNC\" encrypt"
+# restore
+enc_count=0
+for f in "$ROOT"/privacy/*.enc; do
+  [ -f "$f" ] || continue
+  enc_count=$((enc_count + 1))
+done
+
+if [ "$enc_count" -eq 0 ]; then
+  echo "  No privacy/*.enc in repo yet."
+  echo "  On the old machine:"
+  echo "    ./myu vault backup"
+  echo "    git add privacy/*.enc && git commit && git push"
   exit 0
 fi
 
-echo "  Decrypting $ENC_DEFAULT …"
-if python3 "$ENV_SYNC" decrypt --output /tmp/my-utils-env.rc.backup; then
-  echo "  Wrote /tmp/my-utils-env.rc.backup"
-  echo "  Review, then merge:"
-  echo "    python3 \"$ENV_SYNC\" merge --local ~/.env.rc --backup /tmp/my-utils-env.rc.backup"
-else
-  echo "  WARN: decrypt failed"
-  exit 1
-fi
-
-echo "=== Env sync done ==="
+echo "  Found $enc_count encrypted blob(s). Restoring…"
+python3 "$ENV_SYNC" vault-restore --manifest "$MANIFEST" "${FORCE_ARGS[@]}"
+echo "=== Privacy vault restore done ==="
+echo "  Tip: exec \$SHELL  # reload ~/.env.rc / optional_home snippets"

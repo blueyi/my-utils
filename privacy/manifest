@@ -1,0 +1,33 @@
+# privacy vault manifest
+# Format (pipe-separated):
+#   name|mode|source_path
+#
+# name  → encrypted blob privacy/<name>.enc (committed to git)
+# mode  → file       write dest if missing (use --force to overwrite)
+#         env-merge  decrypt then merge into dest (keep local values; add missing keys)
+# source_path → path on this machine (~ expanded)
+#
+# Encrypt (old machine):
+#   export SYNC_ENV_KEY='…'   # ≥8 chars
+#   ./myu vault backup
+#   git add privacy/*.enc && git commit && git push
+#
+# Restore (new machine after clone):
+#   ./myu vault restore
+#   # or: ./bootstrap.sh --tools env / ./myu setup --new-mac
+
+# Shell env secrets (optional; create ~/.env.rc on old machine if needed)
+env.rc|env-merge|~/.env.rc
+
+# SSH
+ssh-config|file|~/.ssh/config
+ssh-id_rsa|file|~/.ssh/id_rsa
+ssh-id_rsa.pub|file|~/.ssh/id_rsa.pub
+
+# Home snippets sourced by optional_home.bash
+claude_conf|file|~/claude_conf.bash
+codex-load-env|file|~/.codex/load-env.sh
+
+# Hermes API keys / tokens (also mirrored via private ~/.hermes git; vault is portable)
+hermes-env|file|~/.hermes/.env
+hermes-auth|file|~/.hermes/auth.json

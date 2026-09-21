@@ -9,6 +9,7 @@
 #   ./bootstrap.sh --force --yes
 #   ./bootstrap.sh --tools packages --optional --yes
 #   ./bootstrap.sh --tools env --yes
+# Prefer the unified CLI: ./myu help
 
 set -e
 MY_UTILS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -44,14 +45,19 @@ Options:
   --optional              Also install common/Brewfile.optional (with packages)
   --tools T [T ...]       Run only these tools (default: all except env)
                           packages | links | misc | vimrc | cursor | env
+                          | vault-backup | vault-restore
 
 Tools:
-  packages   Install system packages (apt/yum, or macOS Brewfile / brew)
-  links      Symlink configs from link.ini into \$HOME
-  misc       Oh My Zsh, fzf, uv, rustup default, brew login PATH, …
-  vimrc      Vim plugins (vim-plug)
-  cursor     Cursor config backup / symlink into cursor_bak/
-  env        Optional env.rc decrypt hint (needs SYNC_ENV_KEY; not in default set)
+  packages      Install system packages (apt/yum, or macOS Brewfile / brew)
+  links         Symlink configs from link.ini into \$HOME
+  misc          Oh My Zsh, fzf, uv, rustup default, brew login PATH, …
+  vimrc         Vim plugins (vim-plug)
+  cursor        Cursor config backup / symlink into cursor_bak/
+  env           Privacy vault restore (alias of vault-restore)
+  vault-restore Decrypt privacy/*.enc (prompt SYNC_ENV_KEY, ≥8 chars)
+  vault-backup  Encrypt manifest sources → privacy/*.enc
+
+Tip: prefer the unified CLI \`./myu\` (see: ./myu help).
 
 Idempotency (two layers):
   1) Per-tool stamps under \$XDG_STATE_HOME/my-utils/bootstrap/
@@ -64,6 +70,9 @@ Examples:
   $0 --new-mac --yes
   $0 --tools packages --optional --yes
   $0 --tools env --yes
+  $0 --tools vault-backup --yes
+  ./myu setup --new-mac --yes
+  ./myu vault backup
   $0 --force --yes
 EOF
 }
@@ -96,6 +105,10 @@ ALL_TOOLS=(packages links misc vimrc cursor)
 
 if [ ${#SELECTED_TOOLS[@]} -eq 0 ]; then
   SELECTED_TOOLS=("${ALL_TOOLS[@]}")
+  # New Mac: also offer privacy vault restore after links/misc
+  if [ "$NEW_MAC" = true ]; then
+    SELECTED_TOOLS+=(env)
+  fi
 fi
 
 if [ "$FORCE_MODE" = true ]; then
@@ -204,12 +217,17 @@ ensure_macos_new_mac() {
 run_tool() {
   local name="$1"
   case "$name" in
-    packages) "$COMMON/install_packages.sh" ;;
-    links)    "$COMMON/create_links.sh" ;;
-    misc)     "$COMMON/run_misc.sh" ;;
-    vimrc)    "$COMMON/install_vim_plugins.sh" ;;
-    cursor)   "$COMMON/cursor_config_link.sh" ;;
-    env)      "$COMMON/run_env_sync.sh" ;;
+    packages)      "$COMMON/install_packages.sh" ;;
+    links)         "$COMMON/create_links.sh" ;;
+    misc)          "$COMMON/run_misc.sh" ;;
+    vimrc)         "$COMMON/install_vim_plugins.sh" ;;
+    cursor)        "$COMMON/cursor_config_link.sh" ;;
+    env|vault-restore)
+      MY_UTILS_VAULT_ACTION=restore "$COMMON/run_env_sync.sh" restore
+      ;;
+    vault-backup)
+      MY_UTILS_VAULT_ACTION=backup "$COMMON/run_env_sync.sh" backup
+      ;;
     *)
       echo "Unknown tool: $name"
       return 1
@@ -252,7 +270,8 @@ print_summary() {
       echo "             or: brew bundle --file=$COMMON/Brewfile.optional"
       ;;
   esac
-  echo "  Optional secrets: export SYNC_ENV_KEY=… then ./bootstrap.sh --tools env --yes"
+  echo "  Secrets vault:    ./myu vault restore     # or: ./bootstrap.sh --tools env"
+  echo "  Vault backup:     ./myu vault backup"
   echo "  Reload shell:     exec \$SHELL"
 }
 

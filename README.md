@@ -42,13 +42,11 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 git clone https://github.com/blueyi/my-utils.git ~/workspace/my-utils
 cd ~/workspace/my-utils
 
-./bootstrap.sh --help
+./myu help                    # unified CLI (short for my-utils)
 
 # One-shot init (no prompts): packages, links, misc, vimrc, cursor
-./bootstrap.sh --yes
-
-# Interactive: asks which tools to run
-./bootstrap.sh
+./myu setup --yes
+# same as: ./bootstrap.sh --yes
 
 exec $SHELL
 ```
@@ -64,18 +62,17 @@ xcode-select --install
 # 3) Clone and bootstrap
 git clone https://github.com/blueyi/my-utils.git ~/workspace/my-utils
 cd ~/workspace/my-utils
-./bootstrap.sh --new-mac --yes
+./myu setup --new-mac --yes
 
 # Optional extra apps (discord, lark, Telegram, …):
-./bootstrap.sh --tools packages --optional --yes
+./myu packages --optional --yes
 
-# Optional secrets (needs SYNC_ENV_KEY + encrypted backup on this machine):
-# export SYNC_ENV_KEY='…'
-# ./bootstrap.sh --tools env --yes
+# Privacy vault (prompt for password ≥8 chars; decrypt privacy/*.enc):
+# ./myu vault restore
 
 # Re-run is safe: successful tools and already-installed packages are skipped.
 # Force a full redo:
-./bootstrap.sh --new-mac --force --yes
+./myu setup --new-mac --force --yes
 
 exec $SHELL
 ```
@@ -93,27 +90,22 @@ Disable env mirrors: `export MY_UTILS_MIRRORS=off` in `~/.env.rc`. Unlink the tw
 
 ## Install Options
 
+Preferred entry: **`./myu`** (short for my-utils). `bootstrap.sh` still works as the underlying runner.
+
 ```bash
-./bootstrap.sh --help                             # full usage
+./myu help
 
-# Without --yes: prompts for each step
-./bootstrap.sh
+./myu setup --yes                             # packages links misc vimrc cursor
+./myu packages --yes
+./myu packages --optional --yes
+./myu links --force --yes
+./myu vault backup                            # encrypt → privacy/*.enc
+./myu vault restore                           # decrypt (password prompt, ≥8 chars)
+./myu setup --new-mac --yes                   # includes vault restore
 
-# With --yes: run selected steps with no prompts
-./bootstrap.sh --yes                              # packages links misc vimrc cursor
-./bootstrap.sh --tools packages --yes
-./bootstrap.sh --tools packages --optional --yes  # + Brewfile.optional
-./bootstrap.sh --tools links --yes
-./bootstrap.sh --tools misc --yes
-./bootstrap.sh --tools vimrc --yes
-./bootstrap.sh --tools cursor --yes
-./bootstrap.sh --tools env --yes                  # secrets hint / decrypt if SYNC_ENV_KEY set
-./bootstrap.sh --tools packages links cursor --yes
-
-# New Mac + force
-./bootstrap.sh --new-mac --yes
-./bootstrap.sh --force --yes
-./bootstrap.sh --tools packages --force --yes
+# Equivalent low-level:
+./bootstrap.sh --tools env --yes
+./bootstrap.sh --tools vault-backup --yes
 ```
 
 **Idempotency:** successful tools write stamps under `~/.local/state/my-utils/bootstrap/`. Later runs skip those tools unless `--force`. `packages` also re-runs when Brewfile (+ optional, if used) changes; `links` re-runs when `link.ini` changes. Within `packages`, already-installed apt/yum/brew packages are skipped unless `--force` (then reinstall).
@@ -189,42 +181,26 @@ cmake ..
 
 **Linux (apt):** Install packages with `./bootstrap.sh --tools packages --yes`. If the terminal didn’t load your rc, run `source .../config/cmake_env.bash` before cmake.
 
-## Env RC encrypted backup (repo-external)
+## Privacy vault (encrypted secrets in git)
 
-`my-utils` now includes env backup helpers compatible with the `sync-config` skill's `.env.rc` encryption format, but with a safer default: **encrypted output lives outside the repo**.
+Password-encrypt machine-local secrets into [`privacy/*.enc`](privacy/), commit ciphertext to GitHub, and restore on a new machine after clone.
 
-Unified command:
-
-- `tools/env_sync/env_sync.py`
-
-Legacy helper scripts still exist for now, but the recommended entrypoint is the single unified command above.
-
-Default encrypted backup path:
+| Command | Purpose |
+|---------|---------|
+| `./myu vault backup` | Encrypt paths in [`privacy/manifest`](privacy/manifest) |
+| `./myu vault restore` | Decrypt into `$HOME` (prompts if `SYNC_ENV_KEY` unset) |
+| `./myu setup --new-mac` | Bootstrap + restore at the end |
 
 ```bash
-~/.local/state/my-utils/env.rc.enc
+# Old machine
+./myu vault backup
+git add privacy/*.enc privacy/manifest && git commit -m "Update privacy vault" && git push
+
+# New machine
+./myu vault restore
 ```
 
-Typical usage:
-
-```bash
-export SYNC_ENV_KEY="your-secure-key-here"
-
-# Encrypt ~/.env.rc to repo-external backup file
-python3 tools/env_sync/env_sync.py encrypt
-
-# Decrypt to stdout or a temp file
-python3 tools/env_sync/env_sync.py decrypt --output /tmp/env.rc.backup
-
-# Compare / merge (keep local values, add missing keys from backup)
-python3 tools/env_sync/env_sync.py merge --local ~/.env.rc --backup /tmp/env.rc.backup --dry-run
-```
-
-Notes:
-
-- Format is intentionally compatible with `workspace/skills/sync-config/scripts/{encrypt,decrypt,merge}_env.py`
-- The encrypted artifact is **not stored in this repo** by default
-- `SYNC_ENV_KEY` is required and should stay in your local shell env / `~/.env.rc`
+Password: `SYNC_ENV_KEY` or interactive prompt, **≥8 characters**. Crypto: OpenSSL AES-256-CBC + PBKDF2. Edit `privacy/manifest` (`name|mode|path`). Modes: `file`, `env-merge`.
 
 ## Cursor Config Backup
 

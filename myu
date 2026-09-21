@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# myu — CLI for my-utils (short for "my-utils")
+#
+# One entry for machine setup + privacy vault + bootstrap tools.
+#
+#   ./myu help
+#   ./myu setup [--new-mac] [--yes] …
+#   ./myu vault backup|restore [--force]
+#   ./myu packages|links|misc|vimrc|cursor|env [bootstrap flags…]
+
+set -e
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+export MY_UTILS_ROOT="$ROOT"
+BOOTSTRAP="$ROOT/bootstrap.sh"
+VAULT_SH="$ROOT/common/run_env_sync.sh"
+
+usage() {
+  cat <<EOF
+myu — my-utils CLI (machine setup & secrets vault)
+
+Usage:
+  myu <command> [args…]
+
+Commands:
+  help                 Show this help
+  setup | bootstrap    Run bootstrap.sh (packages, links, misc, …)
+  vault backup         Encrypt privacy/manifest sources → privacy/*.enc
+  vault restore        Decrypt privacy/*.enc into \$HOME (password prompt)
+  packages|links|misc|vimrc|cursor|env
+                       Run a single bootstrap tool (pass-through flags OK)
+
+Examples:
+  ./myu setup --new-mac --yes          # new machine
+  ./myu vault backup                   # encrypt secrets (then git commit/push)
+  ./myu vault restore                  # restore secrets after clone
+  ./myu vault restore --force          # overwrite existing files
+  ./myu links --force --yes
+  ./myu packages --optional --yes
+
+Password: set SYNC_ENV_KEY (≥8 chars) or enter when prompted.
+EOF
+}
+
+if [ $# -eq 0 ]; then
+  usage
+  exit 0
+fi
+
+cmd="$1"
+shift
+
+case "$cmd" in
+  -h|--help|help)
+    usage
+    ;;
+
+  setup|bootstrap)
+    exec "$BOOTSTRAP" "$@"
+    ;;
+
+  vault)
+    if [ $# -lt 1 ]; then
+      echo "Usage: myu vault backup|restore [--force]" >&2
+      exit 2
+    fi
+    action="$1"
+    shift
+    force=false
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --force|-f) force=true; shift ;;
+        --yes|-y) shift ;; # ignored; vault always runs when invoked
+        -h|--help)
+          echo "Usage: myu vault backup|restore [--force]"
+          exit 0
+          ;;
+        *)
+          echo "Unknown vault option: $1" >&2
+          exit 2
+          ;;
+      esac
+    done
+    case "$action" in
+      backup|restore) ;;
+      *)
+        echo "Usage: myu vault backup|restore [--force]" >&2
+        exit 2
+        ;;
+    esac
+    [ "$force" = true ] && export MY_UTILS_FORCE=1
+    exec "$VAULT_SH" "$action"
+    ;;
+
+  packages|links|misc|vimrc|cursor|env|vault-backup|vault-restore)
+    # Map vault-* aliases to bootstrap tools if present; env = restore
+    tool="$cmd"
+    case "$cmd" in
+      vault-backup)  export MY_UTILS_VAULT_ACTION=backup; tool=env ;;
+      vault-restore) export MY_UTILS_VAULT_ACTION=restore; tool=env ;;
+    esac
+    exec "$BOOTSTRAP" --tools "$tool" "$@"
+    ;;
+
+  *)
+    echo "Unknown command: $cmd" >&2
+    echo "" >&2
+    usage >&2
+    exit 1
+    ;;
+esac
