@@ -18,7 +18,7 @@ proxy () {
 
 #        echo -e "Acquire::http::Proxy \"http://192.168.123.176:10809\";" | sudo tee -a /etc/apt/apt.conf > /dev/null
 #        echo -e "Acquire::https::Proxy \"http://192.168.123.176:10809\";" | sudo tee -a /etc/apt/apt.conf > /dev/null
-        curl myip.ipip.net
+        [ "${1-}" = "-q" ] || curl myip.ipip.net
         }
 
 noproxy () {
@@ -36,5 +36,8 @@ noproxy () {
         unset no_proxy
 #        sudo sed -i -e '/Acquire::http::Proxy/d' /etc/apt/apt.conf
 #        sudo sed -i -e '/Acquire::https::Proxy/d' /etc/apt/apt.conf
-        curl myip.ipip.net
+        [ "${1-}" = "-q" ] || curl myip.ipip.net
         }
+
+# Auto-enable when sourced (quiet: skip curl on shell startup)
+proxy -q
