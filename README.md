@@ -189,12 +189,18 @@ Password-encrypt machine-local secrets into [`privacy/*.enc`](privacy/), commit 
 |---------|---------|
 | `./myu vault backup` | Encrypt paths in [`privacy/manifest`](privacy/manifest) |
 | `./myu vault restore` | Decrypt into `$HOME` (prompts if `SYNC_ENV_KEY` unset) |
+| `./myu vault encrypt -i SRC -o DST.enc` | Encrypt one file |
+| `./myu vault decrypt -i SRC.enc [-o DST]` | Decrypt one file (stdout if `-o` omitted) |
 | `./myu setup --new-mac` | Bootstrap + restore at the end |
 
 ```bash
-# Old machine
+# Old machine (batch)
 ./myu vault backup
 git add privacy/*.enc privacy/manifest && git commit -m "Update privacy vault" && git push
+
+# Single file
+./myu vault encrypt -i ~/.ssh/config -o privacy/ssh-config.enc
+./myu vault decrypt -i privacy/ssh-config.enc -o ~/.ssh/config
 
 # New machine
 ./myu vault restore

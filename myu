@@ -6,6 +6,8 @@
 #   ./myu help
 #   ./myu setup [--new-mac] [--yes] …
 #   ./myu vault backup|restore [--force]
+#   ./myu vault encrypt -i FILE -o FILE.enc
+#   ./myu vault decrypt -i FILE.enc [-o FILE]
 #   ./myu packages|links|misc|vimrc|cursor|env [bootstrap flags…]
 
 set -e
@@ -13,6 +15,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 export MY_UTILS_ROOT="$ROOT"
 BOOTSTRAP="$ROOT/bootstrap.sh"
 VAULT_SH="$ROOT/common/run_env_sync.sh"
+ENV_SYNC="$ROOT/tools/env_sync/env_sync.py"
 
 usage() {
   cat <<EOF
@@ -24,20 +27,46 @@ Usage:
 Commands:
   help                 Show this help
   setup | bootstrap    Run bootstrap.sh (packages, links, misc, …)
-  vault backup         Encrypt privacy/manifest sources → privacy/*.enc
-  vault restore        Decrypt privacy/*.enc into \$HOME (password prompt)
+  vault …              Secrets encrypt / decrypt (see Vault below)
   packages|links|misc|vimrc|cursor|env
                        Run a single bootstrap tool (pass-through flags OK)
 
+Vault:
+  myu vault backup              Encrypt all paths in privacy/manifest → privacy/*.enc
+  myu vault restore [--force]   Decrypt privacy/*.enc into \$HOME
+  myu vault encrypt -i SRC -o DST.enc   Encrypt one file (password prompt)
+  myu vault decrypt -i SRC.enc [-o DST] Decrypt one file (default: stdout)
+
 Examples:
-  ./myu setup --new-mac --yes          # new machine
-  ./myu vault backup                   # encrypt secrets (then git commit/push)
-  ./myu vault restore                  # restore secrets after clone
-  ./myu vault restore --force          # overwrite existing files
+  ./myu setup --new-mac --yes
+  ./myu vault backup
+  ./myu vault restore
+  ./myu vault restore --force
+  ./myu vault encrypt -i ~/.ssh/config -o privacy/ssh-config.enc
+  ./myu vault decrypt -i privacy/ssh-config.enc -o ~/.ssh/config
+  ./myu vault decrypt -i privacy/ssh-config.enc          # print to terminal
   ./myu links --force --yes
   ./myu packages --optional --yes
 
 Password: set SYNC_ENV_KEY (≥8 chars) or enter when prompted.
+After vault backup: git add privacy/*.enc && git commit && git push
+EOF
+}
+
+vault_usage() {
+  cat <<EOF
+Usage:
+  myu vault backup [--force]
+  myu vault restore [--force]
+  myu vault encrypt -i SRC -o DST.enc [--key PASS]
+  myu vault decrypt -i SRC.enc [-o DST] [--key PASS]
+
+  backup    Encrypt privacy/manifest sources → privacy/*.enc
+  restore   Decrypt privacy/*.enc into \$HOME (skip existing unless --force)
+  encrypt   Encrypt a single file
+  decrypt   Decrypt a single file (stdout if -o omitted)
+
+Password: \$SYNC_ENV_KEY, --key, or interactive prompt (≥8 chars).
 EOF
 }
 
@@ -60,39 +89,105 @@ case "$cmd" in
 
   vault)
     if [ $# -lt 1 ]; then
-      echo "Usage: myu vault backup|restore [--force]" >&2
+      vault_usage >&2
       exit 2
     fi
     action="$1"
     shift
-    force=false
-    while [ $# -gt 0 ]; do
-      case "$1" in
-        --force|-f) force=true; shift ;;
-        --yes|-y) shift ;; # ignored; vault always runs when invoked
-        -h|--help)
-          echo "Usage: myu vault backup|restore [--force]"
-          exit 0
-          ;;
-        *)
-          echo "Unknown vault option: $1" >&2
-          exit 2
-          ;;
-      esac
-    done
+
     case "$action" in
-      backup|restore) ;;
+      -h|--help|help)
+        vault_usage
+        exit 0
+        ;;
+
+      backup|restore)
+        force=false
+        while [ $# -gt 0 ]; do
+          case "$1" in
+            --force|-f) force=true; shift ;;
+            --yes|-y) shift ;;
+            -h|--help)
+              vault_usage
+              exit 0
+              ;;
+            *)
+              echo "Unknown vault $action option: $1" >&2
+              vault_usage >&2
+              exit 2
+              ;;
+          esac
+        done
+        [ "$force" = true ] && export MY_UTILS_FORCE=1
+        exec "$VAULT_SH" "$action"
+        ;;
+
+      encrypt|decrypt)
+        if [ ! -f "$ENV_SYNC" ]; then
+          echo "ERROR: missing $ENV_SYNC" >&2
+          exit 1
+        fi
+        # Pass through flags; always enable password prompt when key unset.
+        # Require -i for both; encrypt also requires -o (env_sync defaults are awkward for ad-hoc).
+        has_in=false
+        has_out=false
+        key_args=()
+        io_args=()
+        while [ $# -gt 0 ]; do
+          case "$1" in
+            -i|--input)
+              [ $# -ge 2 ] || { echo "ERROR: $1 needs a path" >&2; exit 2; }
+              io_args+=(--input "$2")
+              has_in=true
+              shift 2
+              ;;
+            -o|--output)
+              [ $# -ge 2 ] || { echo "ERROR: $1 needs a path" >&2; exit 2; }
+              io_args+=(--output "$2")
+              has_out=true
+              shift 2
+              ;;
+            --key)
+              [ $# -ge 2 ] || { echo "ERROR: --key needs a value" >&2; exit 2; }
+              key_args+=(--key "$2")
+              shift 2
+              ;;
+            --prompt)
+              shift
+              ;;
+            -h|--help)
+              vault_usage
+              exit 0
+              ;;
+            *)
+              echo "Unknown vault $action option: $1" >&2
+              vault_usage >&2
+              exit 2
+              ;;
+          esac
+        done
+        if [ "$has_in" != true ]; then
+          echo "ERROR: $action requires -i SRC" >&2
+          vault_usage >&2
+          exit 2
+        fi
+        if [ "$action" = "encrypt" ] && [ "$has_out" != true ]; then
+          echo "ERROR: encrypt requires -o DST.enc" >&2
+          vault_usage >&2
+          exit 2
+        fi
+        exec python3 "$ENV_SYNC" "$action" --prompt "${key_args[@]}" "${io_args[@]}"
+        ;;
+
       *)
-        echo "Usage: myu vault backup|restore [--force]" >&2
+        echo "Unknown vault action: $action" >&2
+        vault_usage >&2
         exit 2
         ;;
     esac
-    [ "$force" = true ] && export MY_UTILS_FORCE=1
-    exec "$VAULT_SH" "$action"
     ;;
 
   packages|links|misc|vimrc|cursor|env|vault-backup|vault-restore)
-    # Map vault-* aliases to bootstrap tools if present; env = restore
     tool="$cmd"
     case "$cmd" in
       vault-backup)  export MY_UTILS_VAULT_ACTION=backup; tool=env ;;

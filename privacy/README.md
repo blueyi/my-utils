@@ -13,6 +13,14 @@ git commit -m "Update privacy vault"
 git push
 ```
 
+**Single file:**
+
+```bash
+./myu vault encrypt -i ~/path/to/secret -o privacy/name.enc
+./myu vault decrypt -i privacy/name.enc -o ~/path/to/secret
+./myu vault decrypt -i privacy/name.enc    # print to terminal
+```
+
 **New machine (clone → restore):**
 
 ```bash
