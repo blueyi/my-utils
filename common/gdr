@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# gdr — Git dual-remote CLI (GitHub primary + GitCode fallback/mirror).
+#
+# Native `git` stays untouched. Use this command only when you want dual-remote
+# push / pull / fetch / clone (timeout → GitCode fallback, dual pushurls).
+#
+#   gdr push [git-push-args…]
+#   gdr pull [git-pull-args…]
+#   gdr fetch [git-fetch-args…]
+#   gdr clone [git-clone-args…]
+#   gdr setup [setup-args…]     # configure remotes for current/scan repos
+#   gdr help
+
+set -euo pipefail
+
+_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_root="$(cd "$_script_dir/.." && pwd)"
+
+[ -f "$HOME/.my-utils.env" ] && . "$HOME/.my-utils.env"
+[ -f "$_root/config/git-dual-remote.env" ] && . "$_root/config/git-dual-remote.env"
+
+# Force dual-remote behavior for this process (overrides default ENABLED=0).
+export GIT_DUAL_REMOTE=1
+export GIT_DUAL_REMOTE_ENABLED=1
+
+# shellcheck source=git-dual-remote-lib.sh
+. "$_script_dir/git-dual-remote-lib.sh"
+
+usage() {
+  cat <<'EOF'
+gdr — Git dual-remote (GitHub + GitCode)
+
+Native `git` is unchanged. Use gdr when you need dual-remote ops.
+
+Usage:
+  gdr <command> [args…]
+
+Commands:
+  push [args…]    Push to GitHub then GitCode (succeeds if either accepts)
+  pull [args…]    Pull from origin; on timeout, fetch+merge/rebase via gitcode
+  fetch [args…]   Fetch from origin; on timeout, try gitcode
+  clone [args…]   Clone with GitHub↔GitCode fallback; then wire dual remotes
+  setup [args…]   Configure dual remotes (same as git-dual-remote-setup.sh)
+  scan DIR        Shortcut for: gdr setup --scan DIR
+  help            Show this help
+
+Examples:
+  gdr pull -r
+  gdr push -u origin HEAD
+  gdr fetch origin
+  gdr clone git@github.com:blueyi/foo.git
+  gdr setup
+  gdr setup --scan ~/workspace/repos
+
+Env: see config/git-dual-remote.env (GIT_DUAL_REMOTE_TIMEOUT, users, …).
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+  usage
+  exit 0
+fi
+
+cmd="$1"
+shift
+
+case "$cmd" in
+  -h|--help|help)
+    usage
+    ;;
+  push)
+    git_dual_push "$@"
+    ;;
+  pull)
+    git_dual_pull "$@"
+    ;;
+  fetch)
+    git_dual_fetch "$@"
+    ;;
+  clone)
+    git_dual_clone "$@"
+    ;;
+  setup)
+    exec bash "$_script_dir/git-dual-remote-setup.sh" "$@"
+    ;;
+  scan)
+    if [[ $# -lt 1 ]]; then
+      echo "usage: gdr scan DIR" >&2
+      exit 2
+    fi
+    exec bash "$_script_dir/git-dual-remote-setup.sh" --scan "$@"
+    ;;
+  *)
+    echo "gdr: unknown command '$cmd' (try: gdr help)" >&2
+    exit 2
+    ;;
+esac

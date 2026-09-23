@@ -181,6 +181,31 @@ cmake ..
 
 **Linux (apt):** Install packages with `./bootstrap.sh --tools packages --yes`. If the terminal didn’t load your rc, run `source .../config/cmake_env.bash` before cmake.
 
+## Git dual-remote (`gdr`)
+
+By default, interactive **`git` is the real git** (no wrapper).
+
+When GitHub is slow/blocked and you keep a GitCode mirror under the same namespace (`blueyi/…`), use the dedicated CLI:
+
+```bash
+gdr pull -r                 # pull origin; on timeout → gitcode
+gdr push                    # push GitHub then GitCode (OK if either succeeds)
+gdr fetch origin
+gdr clone git@github.com:blueyi/foo.git
+gdr setup                   # wire origin + gitcode remotes for current repo
+gdr setup --scan ~/workspace/repos
+```
+
+`gdr` lives at `common/gdr` (`MY_BIN` / `common/` is on `PATH` after shell init).
+
+Opt-in legacy wrapper (wraps `git push|pull|fetch|clone` again):
+
+```bash
+export GIT_DUAL_REMOTE_ENABLED=1   # e.g. in ~/.my-utils.env
+```
+
+Defaults: `config/git-dual-remote.env`.
+
 ## Privacy vault (encrypted secrets in git)
 
 Password-encrypt machine-local secrets into [`privacy/*.enc`](privacy/), commit ciphertext to GitHub, and restore on a new machine after clone.
