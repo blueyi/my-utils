@@ -183,12 +183,13 @@ cmake ..
 
 ## Git dual-remote (`gdr`)
 
-By default, interactive **`git` is the real git** (no wrapper).
+Interactive **`git` is always the real git** (never wrapped). Dual-remote lives only in **`gdr`**.
 
-When GitHub is slow/blocked and you keep a GitCode mirror under the same namespace (`blueyi/…`), use the dedicated CLI:
+When GitHub is slow/blocked and you keep a GitCode mirror under the same namespace (`blueyi/…`):
 
 ```bash
-gdr pull -r                 # pull origin; on timeout → gitcode
+git pull -r                 # native git
+gdr pull -r                 # dual: pull origin; on timeout → gitcode
 gdr push                    # push GitHub then GitCode (OK if either succeeds)
 gdr fetch origin
 gdr clone git@github.com:blueyi/foo.git
@@ -196,15 +197,7 @@ gdr setup                   # wire origin + gitcode remotes for current repo
 gdr setup --scan ~/workspace/repos
 ```
 
-`gdr` lives at `common/gdr` (`MY_BIN` / `common/` is on `PATH` after shell init).
-
-Opt-in legacy wrapper (wraps `git push|pull|fetch|clone` again):
-
-```bash
-export GIT_DUAL_REMOTE_ENABLED=1   # e.g. in ~/.my-utils.env
-```
-
-Defaults: `config/git-dual-remote.env`.
+`gdr` lives at `common/gdr` (`MY_BIN` / `common/` is on `PATH` after shell init). Defaults: `config/git-dual-remote.env`.
 
 ## Privacy vault (encrypted secrets in git)
 

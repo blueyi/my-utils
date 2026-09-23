@@ -321,7 +321,7 @@ unset -f _path_add 2>/dev/null; unset _brew_prefix 2>/dev/null
 export ZELLIJ_SOCKET_DIR=/tmp/zellij
 
 # =============================================================================
-# SECTION: Git dual-remote helpers (default: native git; use `gdr` for dual ops)
+# SECTION: Git dual-remote helpers (native git; dual ops via `gdr` only)
 # =============================================================================
 [ -f "$MYRC_PATH/git-dual-remote.bash" ] && . "$MYRC_PATH/git-dual-remote.bash"
 

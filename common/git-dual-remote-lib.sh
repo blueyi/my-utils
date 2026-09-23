@@ -7,10 +7,9 @@
 #   git_dual_ensure_remotes, git_dual_push, git_dual_pull, git_dual_fetch
 #
 # Env (see config/git-dual-remote.env):
-#   GIT_DUAL_REMOTE_ENABLED (default 0), GIT_DUAL_REMOTE_GITHUB_USER, GIT_DUAL_REMOTE_GITCODE_USER
+#   GIT_DUAL_REMOTE_GITHUB_USER, GIT_DUAL_REMOTE_GITCODE_USER
 #   GIT_DUAL_REMOTE_TIMEOUT, GIT_DUAL_REMOTE_FALLBACK_REMOTE, GIT_DUAL_REMOTE_VERBOSE
-# Default: use native `git`. Dual-remote CLI: `gdr` (common/gdr).
-# Opt-in wrapper: GIT_DUAL_REMOTE_ENABLED=1 (wraps push/pull/fetch/clone).
+# Interactive git is never wrapped. Dual-remote CLI: `gdr` (common/gdr).
 # Push: tries GitHub then GitCode per URL; if either succeeds → exit 0 + warning
 # for the failed host (reason included). Both fail → non-zero.
 
