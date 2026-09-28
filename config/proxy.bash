@@ -1,5 +1,6 @@
 # >>> proxy setting >>>
-# alias hp="http_proxy=http://127.0.0.1:1081 https_proxy=http://127.0.0.1:1081"
+# Shell-only env proxies (http_proxy / HTTPS_PROXY). Do not write /etc/apt or other
+# system files — keep privilege surface in $HOME / current session only.
 
 # PROXY_IP=192.168.3.25:1081
 PROXY_IP=http://127.0.0.1:7897
@@ -16,8 +17,6 @@ proxy () {
         export no_proxy=127.0.0.1,localhost,local,.local,172.28.0.0/16,.aliyun.com,.tencent.com,.huawei.com
         export NO_PROXY=127.0.0.1,localhost,local,.local,172.28.0.0/16,.aliyun.com,.tencent.com,.huawei.com
 
-#        echo -e "Acquire::http::Proxy \"http://192.168.123.176:10809\";" | sudo tee -a /etc/apt/apt.conf > /dev/null
-#        echo -e "Acquire::https::Proxy \"http://192.168.123.176:10809\";" | sudo tee -a /etc/apt/apt.conf > /dev/null
         [ "${1-}" = "-q" ] || curl myip.ipip.net
         }
 
@@ -34,8 +33,6 @@ noproxy () {
         unset http_proxy
         unset https_proxy
         unset no_proxy
-#        sudo sed -i -e '/Acquire::http::Proxy/d' /etc/apt/apt.conf
-#        sudo sed -i -e '/Acquire::https::Proxy/d' /etc/apt/apt.conf
         [ "${1-}" = "-q" ] || curl myip.ipip.net
         }
 

@@ -36,3 +36,22 @@ is_wsl() {
   grep -qi microsoft /proc/version 2>/dev/null && return 0
   return 1
 }
+
+# Privilege gates (set in ~/.env.rc; survive create_links.sh):
+#   MY_UTILS_ALLOW_SUDO=off  — skip apt/yum/dnf sudo paths (macOS brew unaffected)
+#   MY_UTILS_CHSH=1          — allow misc.sh to change login shell to zsh
+my_utils_sudo_allowed() {
+  case "${MY_UTILS_ALLOW_SUDO:-on}" in
+    off|OFF|0|false|no|NO) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+# Run sudo "$@" when allowed; otherwise warn and return 1 (bash/zsh safe).
+my_utils_sudo() {
+  if ! my_utils_sudo_allowed; then
+    echo "  SKIP sudo ($*): set MY_UTILS_ALLOW_SUDO=on (default) to allow" >&2
+    return 1
+  fi
+  command sudo "$@"
+}

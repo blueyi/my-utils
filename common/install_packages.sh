@@ -62,33 +62,45 @@ install_one() {
   local pkg="$1"
   case "$PM" in
     apt)
+      if ! my_utils_sudo_allowed; then
+        echo "  SKIP $pkg (MY_UTILS_ALLOW_SUDO=off)"
+        return 0
+      fi
       if pkg_installed "$pkg"; then
         if force_mode; then
           echo "  Reinstalling $pkg..."
-          sudo apt-get install --reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+          my_utils_sudo apt-get install --reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
         else
           echo "  $pkg (already installed; use --force to reinstall)"
         fi
       else
         echo "  Installing $pkg..."
-        sudo apt-get install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+        my_utils_sudo apt-get install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
       fi
       ;;
     yum)
+      if ! my_utils_sudo_allowed; then
+        echo "  SKIP $pkg (MY_UTILS_ALLOW_SUDO=off)"
+        return 0
+      fi
       if pkg_installed "$pkg"; then
         if force_mode; then
           echo "  Reinstalling $pkg..."
           if command -v dnf &>/dev/null; then
-            sudo dnf reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+            my_utils_sudo dnf reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
           else
-            sudo yum reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+            my_utils_sudo yum reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
           fi
         else
           echo "  $pkg (already installed; use --force to reinstall)"
         fi
       else
         echo "  Installing $pkg..."
-        sudo yum install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+        if command -v dnf &>/dev/null; then
+          my_utils_sudo dnf install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+        else
+          my_utils_sudo yum install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+        fi
       fi
       ;;
     brew)
@@ -266,11 +278,17 @@ install_from_list_file() {
 
 case "$PM" in
   apt)
-    sudo apt-get update -y 2>/dev/null || true
+    # Metadata refresh only (not apt-get upgrade).
+    my_utils_sudo apt-get update -y 2>/dev/null || true
     install_from_list_file "$COMMON_DIR/deb_app_list.ini"
     ;;
   yum)
-    sudo yum update -y 2>/dev/null || true
+    # Metadata only — never full-system `yum/dnf update -y`.
+    if command -v dnf &>/dev/null; then
+      my_utils_sudo dnf makecache -q 2>/dev/null || true
+    else
+      my_utils_sudo yum makecache -q 2>/dev/null || true
+    fi
     install_from_list_file "$COMMON_DIR/rpm_app_list.ini"
     ;;
   brew)

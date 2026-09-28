@@ -357,6 +357,7 @@ run_multi_thread() {
 # =============================================================================
 if _is_linux; then
   alias wn='watch -n 1 nvidia-smi'
+  # Starts system sshd (OpenSSH server). Needs interactive sudo; macOS uses launchd instead.
   alias ess='sudo service ssh start'
   [ -d "$HOME/soft/xdm-linux-portable-x64" ] && alias exdm="cd $HOME/soft/xdm-linux-portable-x64 && ./xdman"
   [ -f "$HOME/bin/clion/bin/clion.sh" ] && alias clion='sh $HOME/bin/clion/bin/clion.sh'

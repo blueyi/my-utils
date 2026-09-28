@@ -17,13 +17,14 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 **What touches the system**
 
 - **Only `$HOME` (and standard XDG paths)** are modified by default, via **[`common/link.ini`](common/link.ini)** → **`create_links.sh`**: symlinks such as `~/.bashrc`, `~/.zshrc`, `~/.my-utils.env`, `~/.shell_init.bash`, etc. **Fish** symlinks are **commented out** in `link.ini` until you opt in.
-- **Shell env logic** lives entirely under the cloned repo (`config/resetrc.bash`, `shell_init.bash`, …). **No `/etc` patches** are required for this dotfiles layout.
-- **`common/misc.sh`** may run **`chsh` to zsh** after Oh My Zsh install—that **does** change the login shell in `/etc/passwd` (or equivalent). Remove or guard that block if you want **zero** account-level changes.
+- **Shell env logic** lives entirely under the cloned repo (`config/resetrc.bash`, `shell_init.bash`, …). **No `/etc` patches** are required for this dotfiles layout. Proxy helpers only set session env vars (never `/etc/apt`).
+- **Linux packages** (`apt` / `dnf`/`yum`) still need **sudo** inside [`common/install_packages.sh`](common/install_packages.sh). Opt out with `MY_UTILS_ALLOW_SUDO=off` in `~/.env.rc` (skips those installs; Homebrew on macOS is unaffected). Metadata refresh only — never a full-system `yum/dnf update -y`.
+- **`common/misc.sh`** does **not** invoke sudo. Missing git/fzf/node on Linux → run packages first. **`chsh` → zsh** is **opt-in**: `MY_UTILS_CHSH=1` in `~/.env.rc`.
 
 **Multi-OS**
 
-- **Packages:** [`common/install_packages.sh`](common/install_packages.sh) + [`common/deb_app_list.ini`](common/deb_app_list.ini) / [`common/Brewfile`](common/Brewfile) (macOS; falls back to [`common/mac_app_list.txt`](common/mac_app_list.txt)) / [`common/rpm_app_list.ini`](common/rpm_app_list.ini). Already-installed packages are skipped unless `--force`. Optional GUI/mas set: [`common/Brewfile.optional`](common/Brewfile.optional).
-- **Env:** [`config/resetrc.bash`](config/resetrc.bash) uses **`_is_linux` / `_is_macos`** inside sections (PATH, CUDA, brew kegs, …). Mainland mirrors: [`config/mirrors.bash`](config/mirrors.bash) (default on; `MY_UTILS_MIRRORS=off` in `~/.env.rc` to disable env mirrors).
+- **Packages:** [`common/install_packages.sh`](common/install_packages.sh) + [`common/deb_app_list.ini`](common/deb_app_list.ini) / [`common/Brewfile`](common/Brewfile) (macOS; falls back to [`common/mac_app_list.txt`](common/mac_app_list.txt)) / [`common/rpm_app_list.ini`](common/rpm_app_list.ini). Already-installed packages are skipped unless `--force`. Optional GUI/mas set: [`common/Brewfile.optional`](common/Brewfile.optional). WSL skips unavailable `linux-headers-*`.
+- **Env:** [`config/resetrc.bash`](config/resetrc.bash) uses **`_is_linux` / `_is_macos`** inside sections (PATH, CUDA, brew kegs, …). Mainland mirrors: [`config/mirrors.bash`](config/mirrors.bash) (default on; `MY_UTILS_MIRRORS=off` in `~/.env.rc` to disable env mirrors). Proxy: `MY_UTILS_PROXY=off` to skip auto-enable.
 
 **Multi-shell**
 
@@ -34,7 +35,7 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 
 - **Login-only** sessions that never source `~/.bashrc` / `~/.zshrc` won’t load my-utils unless **you** add a one-liner to `~/.profile` or `~/.zprofile` pointing at `shell_init` / `resetrc`—not linked by default to keep the installer conservative.
 
-**中文概要：** 默认 **packages** 只装 **zsh**（含 Oh My Zsh 相关），**不装 Fish**；**Fish** 相关 symlink 在 `link.ini` 里默认注释，需用时自行安装 fish 并取消注释后再跑 **links**。**misc** 里 **chsh** 可能把登录 shell 改为 zsh。
+**中文概要：** 默认 **packages** 只装 **zsh**（含 Oh My Zsh 相关），**不装 Fish**；**Fish** 相关 symlink 在 `link.ini` 里默认注释。Linux 装包才用 sudo（可用 `MY_UTILS_ALLOW_SUDO=off` 关闭）；**misc** 不 sudo；**chsh** 需 `MY_UTILS_CHSH=1` 才改登录 shell。
 
 ## Quick Start
 

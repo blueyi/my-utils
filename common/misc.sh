@@ -46,20 +46,10 @@ ensure_git() {
     echo "Installing git (Homebrew)..."
     brew install git || { echo "  WARN: brew install git failed; run packages step or install git manually"; return 1; }
   else
-    case "$(detect_package_manager)" in
-      apt)
-        echo "Installing git (apt)..."
-        sudo apt-get update -qq && sudo apt-get install -y git || { echo "  WARN: apt install git failed"; return 1; }
-        ;;
-      yum)
-        echo "Installing git (dnf/yum)..."
-        (command -v dnf &>/dev/null && sudo dnf install -y git) || sudo yum install -y git || { echo "  WARN: dnf/yum install git failed"; return 1; }
-        ;;
-      *)
-        echo "  WARN: git not found and unknown package manager; run bootstrap packages step or install git manually"
-        return 1
-        ;;
-    esac
+    # Linux/WSL: system packages need sudo — keep that in packages step only.
+    echo "  WARN: git not found; run: ./bootstrap.sh --tools packages --yes"
+    echo "        (or install git via apt/dnf; misc does not invoke sudo)"
+    return 1
   fi
 }
 
@@ -97,7 +87,7 @@ else
   install_omz_plugins
 fi
 
-# fzf (Ubuntu/WSL: apt; macOS: Homebrew)
+# fzf (Ubuntu/WSL: via packages/apt; macOS: Homebrew — no sudo here)
 if is_macos; then
   ensure_brew
   if command -v brew &>/dev/null; then
@@ -112,35 +102,32 @@ if is_macos; then
       brew install fzf || echo "  WARN: brew install fzf failed"
     fi
   fi
-else
-  case "$(detect_package_manager)" in
-    apt)
-      if command -v fzf &>/dev/null; then
-        if _misc_force; then
-          echo "Reinstalling fzf (apt, --force)..."
-          sudo apt-get install --reinstall -y fzf || echo "  WARN: apt reinstall fzf failed"
-        else
-          echo "fzf already installed (use --force to reinstall)"
-        fi
-      else
-        echo "Installing fzf (apt)..."
-        sudo apt-get update -qq && sudo apt-get install -y fzf || echo "  WARN: apt install fzf failed"
-      fi
-      ;;
-  esac
+elif ! command -v fzf &>/dev/null; then
+  echo "  WARN: fzf not found; run: ./bootstrap.sh --tools packages --yes"
+  echo "        (misc does not invoke sudo on Linux/WSL)"
 fi
 
-# Default login shell → zsh (may fail on some WSL setups without extra permissions)
-if command -v zsh &>/dev/null; then
-  _zsh_bin="$(command -v zsh)"
-  if [ -n "${SHELL:-}" ] && [ "$(basename "$SHELL")" != "zsh" ]; then
-    echo "Setting default login shell to zsh ($_zsh_bin)..."
-    chsh -s "$_zsh_bin" 2>/dev/null || echo "  WARN: chsh failed; on WSL try: chsh from a login shell or set default in /etc/passwd / wsl.conf"
-  else
-    echo "Login shell already zsh or SHELL unset; skip chsh"
-  fi
-  unset _zsh_bin
-fi
+# Default login shell → zsh (opt-in: MY_UTILS_CHSH=1 in ~/.env.rc).
+# Off by default to avoid account-level /etc/passwd changes on macOS / WSL / Linux.
+case "${MY_UTILS_CHSH:-off}" in
+  1|true|on|ON|yes|YES)
+    if command -v zsh &>/dev/null; then
+      _zsh_bin="$(command -v zsh)"
+      if [ -n "${SHELL:-}" ] && [ "$(basename "$SHELL")" != "zsh" ]; then
+        echo "Setting default login shell to zsh ($_zsh_bin)..."
+        chsh -s "$_zsh_bin" 2>/dev/null || echo "  WARN: chsh failed; on WSL try a login shell or /etc/wsl.conf"
+      else
+        echo "Login shell already zsh or SHELL unset; skip chsh"
+      fi
+      unset _zsh_bin
+    fi
+    ;;
+  *)
+    if command -v zsh &>/dev/null && [ -n "${SHELL:-}" ] && [ "$(basename "$SHELL")" != "zsh" ]; then
+      echo "Skip chsh (login shell is $(basename "$SHELL")); set MY_UTILS_CHSH=1 in ~/.env.rc to switch to zsh"
+    fi
+    ;;
+esac
 
 # uv: macOS = brew install (see Brewfile / mac_app_list.txt); Linux = official install script
 ensure_uv() {
@@ -197,24 +184,12 @@ ensure_hexo_env() {
         brew install node || echo "  WARN: brew install node failed; install manually for Hexo"
       fi
     else
-      case "$(detect_package_manager)" in
-        apt)
-          if ! command -v node &>/dev/null; then
-            echo "Installing Node.js/npm for Hexo (apt)..."
-            sudo apt-get update -qq && sudo apt-get install -y nodejs npm || echo "  WARN: apt install nodejs npm failed"
-          fi
-          ;;
-        yum)
-          if ! command -v node &>/dev/null; then
-            echo "Installing Node.js for Hexo (dnf/yum)..."
-            (command -v dnf &>/dev/null && sudo dnf install -y nodejs) || sudo yum install -y nodejs || echo "  WARN: dnf/yum install nodejs failed"
-          fi
-          ;;
-        *)
-          echo "  Skip Hexo: unknown Linux package manager; install Node.js manually"
-          return 0
-          ;;
-      esac
+      # Linux/WSL: Node via packages step (apt/dnf) — no sudo from misc.
+      if ! command -v node &>/dev/null; then
+        echo "  WARN: Node.js not found; run: ./bootstrap.sh --tools packages --yes"
+        echo "        (misc does not invoke sudo on Linux/WSL)"
+        return 0
+      fi
     fi
   fi
   # Install hexo-cli globally if not present

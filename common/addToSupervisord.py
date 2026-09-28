@@ -7,14 +7,22 @@
 # Distributed under terms of the MIT license.
 
 """
-Add cmd to supervisord
+Add a program to supervisord (legacy helper).
+
+Deprecated for bootstrap: prefer systemd --user or a user-level process manager.
+Writes under /etc/supervisor/conf.d/ may still need an elevated shell; this script
+no longer forces root execution and defaults program user to the current account.
 """
+
+from __future__ import print_function
+
+import getpass
+import os
+import sys
 
 from common import *
 
 welcomePrint('Add cmd to supervisor')
-
-runAsRoot()
 
 cmdName = ''
 cmd = ''
@@ -31,8 +39,11 @@ elif len(cmdName) == 0 or len(cmd) == 0:
 error_log_file = errLogFileName(__file__)
 error_log = open(error_log_file, 'w')
 
-# add command to supervirsord
-def addToSupervisord(cmdName, cmd) :
+# Prefer current user; override with SUPERVISOR_PROGRAM_USER=root only when intentional.
+_program_user = os.environ.get('SUPERVISOR_PROGRAM_USER') or getpass.getuser()
+
+
+def addToSupervisord(cmdName, cmd):
     ubuntu_su_conf_path = '/etc/supervisor/conf.d/'
     log_dir = '/var/log/supervisor/'
     if not os.path.exists(ubuntu_su_conf_path):
@@ -43,19 +54,19 @@ def addToSupervisord(cmdName, cmd) :
 
     configFileOpened = open(ubuntu_su_conf_path + cmdName + '.conf', 'w')
     config_content = ''
-    if '/' in cmd[:cmd.find(' ')] :
+    if '/' in cmd[:cmd.find(' ')]:
         config_content = '[program:' + cmdName + ']' + '\n' + \
                 'command = ' + cmd + '\n' + \
                 'directory = ' + cmd[:cmd.rfind('/')+1] + '\n' + \
-                'user = root' + '\n' + \
+                'user = ' + _program_user + '\n' + \
                 'autostart = true' + '\n' + \
                 'autorestart = true' + '\n' + \
                 'stdout_logfile = ' + log_dir + cmdName + '.log' + '\n' + \
                 'stderr_logfile = ' + log_dir + cmdName + '_err.log' + '\n'
-    else :
+    else:
         config_content = '[program:' + cmdName + ']' + '\n' + \
                 'command = ' + cmd + '\n' + \
-                'user = root' + '\n' + \
+                'user = ' + _program_user + '\n' + \
                 'autostart = true' + '\n' + \
                 'autorestart = true' + '\n' + \
                 'stdout_logfile = ' + log_dir + cmdName + '.log' + '\n' + \
@@ -74,6 +85,3 @@ if delBlankFile(error_log_file):
     welcomePrint('Add cmd to supervisor success!')
 else:
     welcomePrint('Add cmd to supervisor failed!')
-
-
-
