@@ -39,5 +39,9 @@ noproxy () {
         [ "${1-}" = "-q" ] || curl myip.ipip.net
         }
 
-# Auto-enable when sourced (quiet: skip curl on shell startup)
-proxy -q
+# Auto-enable when sourced (quiet: skip curl on shell startup).
+# Disable on a single machine with: export MY_UTILS_PROXY=off  # in ~/.env.rc
+case "${MY_UTILS_PROXY:-on}" in
+  off|OFF|0|false|no|NO) ;;
+  *) proxy -q ;;
+esac

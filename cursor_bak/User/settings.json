@@ -47,7 +47,6 @@
         "markdown",
         "scminput"
     ],
-    "editor.fontSize": 13,
     "terminal.integrated.fontSize": 13,
     "window.openFoldersInNewWindow": "on",
     "window.zoomLevel": 1,
@@ -66,5 +65,8 @@
     "cursor.general.disableHttp2": true,
     "cursor.composer.queueMessageDefaultBehavior": "steer",
     "terminal.integrated.mouseWheelScrollSensitivity": 3,
-    "terminal.integrated.gpuAcceleration": "off"
+    "terminal.integrated.gpuAcceleration": "off",
+    "workbench.editorAssociations": {
+        "*.xlsx": "default"
+    }
 }
