@@ -16,12 +16,16 @@ cursor_bak/projects/*/agent-tools/
 cursor_bak/projects/*/worker.log
 cursor_bak/projects/*/.workspace-trusted
 cursor_bak/projects/*/canvases/node_modules/
+cursor_bak/projects/*/canvases/.node_modules.staging*/
+# Chat/paste screenshots — not config; keep out of git
+cursor_bak/projects/*/assets/
 # Cursor auto-generates identical tsconfig per workspace canvases dir
 cursor_bak/projects/*/canvases/tsconfig.json
 cursor_bak/projects/*/mcps/
 cursor_bak/projects/.agent-data-cleanup-*
-# macOS temp workspace dirs (var-folders-*), not meaningful to version
+# macOS temp / disposable workspace dirs — not meaningful to version
 cursor_bak/projects/var-folders-*/
+cursor_bak/projects/tmp-*/
 
 # Binary files and tools
 bin/
