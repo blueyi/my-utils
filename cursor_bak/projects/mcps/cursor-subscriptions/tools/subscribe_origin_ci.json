@@ -1,0 +1,53 @@
+{
+  "name": "subscribe_origin_ci",
+  "description": "Subscribe this conversation to terminal Origin CI results on a repository, or on one branch of it. Waits until every check run on a commit is terminal, then delivers one commit-wide result: success when none failed, or failure with the failed check names. Only commits that are an open pull request's head are covered, so the branch scope matches PR head branches; CI on commits with no open PR does not produce events. Failures always deliver; a success delivers only as this subscription's first result or when it flips a previously delivered failure — repeated greens are not delivered. Subscribing to the repository's default branch (e.g. main) is one-shot: it delivers the next terminal result on that branch and then closes itself. To wait for a PR's CI, subscribe to the PR's head branch instead. After subscribing, state what you are waiting for and end your turn; the event arrives as a follow-up notification in this conversation.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "options": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "repo"
+              },
+              "repo": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "scope",
+              "repo"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "branch"
+              },
+              "repo": {
+                "type": "string"
+              },
+              "branch": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "scope",
+              "repo",
+              "branch"
+            ]
+          }
+        ]
+      },
+      "expiresInSeconds": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "options"
+    ]
+  }
+}

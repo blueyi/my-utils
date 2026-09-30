@@ -1,0 +1,1 @@
+Controls the Cursor application itself (workspace root, projects, opening resources, automations, and local task drafts, user rules, chat title). See each tool description for usage.

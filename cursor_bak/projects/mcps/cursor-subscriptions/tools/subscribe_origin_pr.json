@@ -1,0 +1,73 @@
+{
+  "name": "subscribe_origin_pr",
+  "description": "Subscribe this conversation to future Origin pull request events. Not delivered: PR lifecycle events that echo this agent's OWN actions — creator-actored events on this agent's own working branch (its own pushes/synchronize, closes; Origin agents act as their owner) — and metadata-only edits (title/body/base changes). Always delivered: all comments and reviews — including Bugbot and Agentic Security Review activity, which posts from app identities — plus lifecycle events actored by third parties or on any other branch. A PR-scoped subscription (scope: pr) closes itself once the PR is merged or closed. After subscribing, state what you are waiting for and end your turn; the event arrives as a follow-up notification in this conversation.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "options": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "pr"
+              },
+              "prUrl": {
+                "type": "string",
+                "description": "An Origin pull request URL (https://cursor.com/codebase/<owner>/<repo>/pull/<n>)."
+              }
+            },
+            "required": [
+              "scope",
+              "prUrl"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "pr"
+              },
+              "repo": {
+                "type": "string"
+              },
+              "pullNumber": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "scope",
+              "repo",
+              "pullNumber"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "repo"
+              },
+              "repo": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "scope",
+              "repo"
+            ]
+          }
+        ]
+      },
+      "expiresInSeconds": {
+        "type": "number"
+      },
+      "keepWatchingAfterClose": {
+        "type": "boolean",
+        "description": "Only for scope: pr. By default a PR subscription closes itself when the PR is merged or closed. Set true only when the user explicitly asked to keep watching this PR after it is merged or closed (e.g. for post-merge review comments). Ignored on other scopes."
+      }
+    },
+    "required": [
+      "options"
+    ]
+  }
+}

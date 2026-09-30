@@ -1,0 +1,67 @@
+{
+  "name": "subscribe_linear_issue",
+  "description": "Subscribe this conversation to Linear issue events on one team, one project, or one individual issue. Delivers exactly two kinds of event: an issue being created, and an issue's workflow state changing. It does NOT deliver any other edit — title, description, labels, assignee, priority, estimate, cycle, comments, and backlog reordering all produce no notification (Linear fires an update webhook for every one of those, so delivering them would be noise). Comments have their own subscription tool. Each delivery reports one issue's one change; it is not a digest and says nothing about the team's other issues. Project scope only matches issues that already carry that project, so an issue created without a project and filed into one later is not delivered to a project subscription. Scope ids accept the resource's linear.app URL, its UUID, or its copyable ref — an issue identifier like CHAR-661, a team key like CHAR, or a project slug — and must belong to the Linear organization your account is connected to. After subscribing, state what you are waiting for and end your turn; the event arrives as a follow-up notification in this conversation.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "options": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "team"
+              },
+              "teamId": {
+                "type": "string",
+                "description": "The team's linear.app URL, UUID, or key (e.g. CHAR)."
+              }
+            },
+            "required": [
+              "scope",
+              "teamId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "project"
+              },
+              "projectId": {
+                "type": "string",
+                "description": "The project's linear.app URL, UUID, or slug (e.g. improve-onboarding-a79f0fd1671d)."
+              }
+            },
+            "required": [
+              "scope",
+              "projectId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "const": "issue"
+              },
+              "issueId": {
+                "type": "string",
+                "description": "The issue's linear.app URL, UUID, or identifier (e.g. CHAR-661)."
+              }
+            },
+            "required": [
+              "scope",
+              "issueId"
+            ]
+          }
+        ]
+      },
+      "expiresInSeconds": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "options"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "subscribe_slack_thread",
+  "description": "Subscribe this conversation to future Slack thread messages. After subscribing, state what you are waiting for and end your turn; the event arrives as a follow-up notification in this conversation.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "channelId": {
+        "type": "string"
+      },
+      "threadTs": {
+        "type": "string"
+      },
+      "expiresInSeconds": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "channelId",
+      "threadTs"
+    ]
+  }
+}

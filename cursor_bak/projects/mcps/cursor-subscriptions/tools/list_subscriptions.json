@@ -1,0 +1,8 @@
+{
+  "name": "list_subscriptions",
+  "description": "List active event subscriptions for this conversation.",
+  "arguments": {
+    "type": "object",
+    "properties": {}
+  }
+}

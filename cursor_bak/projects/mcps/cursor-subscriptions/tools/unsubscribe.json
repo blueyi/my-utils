@@ -1,0 +1,15 @@
+{
+  "name": "unsubscribe",
+  "description": "Close one active event subscription for this conversation.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "subscriptionId": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "subscriptionId"
+    ]
+  }
+}

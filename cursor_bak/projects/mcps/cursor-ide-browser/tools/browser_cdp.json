@@ -1,0 +1,28 @@
+{
+  "name": "browser_cdp",
+  "description": "Send a Chrome DevTools Protocol command to the target browser tab. Do not use CDP Input.* methods; use dedicated browser tools for clicks, text input, key presses, scrolling, and drag-and-drop. Browser-wide, storage, cookie, permission, download, target-management, and system-level commands are denied.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "method": {
+        "type": "string",
+        "description": "CDP method name, for example Runtime.evaluate, DOM.getDocument, Profiler.start, or Performance.getMetrics."
+      },
+      "params": {
+        "type": "object",
+        "description": "CDP params object. Omit or pass {} when the command takes no params."
+      },
+      "viewId": {
+        "type": "string",
+        "description": "Target browser tab ID. If omitted, uses the last interacted tab."
+      },
+      "take_screenshot_afterwards": {
+        "type": "boolean",
+        "description": "When true, takes a screenshot after the CDP command completes. Defaults to false."
+      }
+    },
+    "required": [
+      "method"
+    ]
+  }
+}

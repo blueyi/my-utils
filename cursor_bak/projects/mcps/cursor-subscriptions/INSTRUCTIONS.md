@@ -1,0 +1,1 @@
+Manages event subscriptions for the calling local agent conversation.
