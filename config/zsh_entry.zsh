@@ -16,6 +16,8 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 [ -r "$ZSH/oh-my-zsh.sh" ] && . "$ZSH/oh-my-zsh.sh"
 
 [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
+# Cursor/VS Code: reduce p10k ghost prompt lines (see p10k-ide-overrides.zsh).
+[[ -n "${MYRC_PATH:-}" && -f "$MYRC_PATH/p10k-ide-overrides.zsh" ]] && . "$MYRC_PATH/p10k-ide-overrides.zsh"
 
 [ -n "${MYRC_PATH:-}" ] && [ -f "$MYRC_PATH/resetrc.bash" ] && . "$MYRC_PATH/resetrc.bash"
 [ -n "${MYRC_PATH:-}" ] && [ -f "$MYRC_PATH/optional_home.bash" ] && . "$MYRC_PATH/optional_home.bash"

@@ -22,6 +22,9 @@ cursor_bak/projects/*/assets/
 # Cursor auto-generates identical tsconfig per workspace canvases dir
 cursor_bak/projects/*/canvases/tsconfig.json
 cursor_bak/projects/*/mcps/
+# Non-workspace-scoped dumps (auto-backup sometimes uses projects/{canvases,mcps}/ directly)
+cursor_bak/projects/canvases/
+cursor_bak/projects/mcps/
 cursor_bak/projects/.agent-data-cleanup-*
 # macOS temp / disposable workspace dirs — not meaningful to version
 cursor_bak/projects/var-folders-*/
