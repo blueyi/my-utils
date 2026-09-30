@@ -41,10 +41,17 @@ while IFS= read -r line || [ -n "$line" ]; do
   src_full="$ROOT/$src"
   tgt_full="${tgt/#\~/$HOME}"
 
-  # Skip if source doesn't exist (e.g. optional configs)
+  # Skip if source doesn't exist (e.g. optional configs) — unless we can
+  # migrate an existing regular home file into the repo (env.rc bootstrap).
   if [ ! -e "$src_full" ]; then
-    echo "  Skip $src (not found)"
-    continue
+    if [ -f "$tgt_full" ] && [ ! -L "$tgt_full" ]; then
+      echo "  Migrate $tgt_full → $src_full"
+      mkdir -p "$(dirname "$src_full")"
+      mv "$tgt_full" "$src_full"
+    else
+      echo "  Skip $src (not found)"
+      continue
+    fi
   fi
 
   # Avoid circular link: if target parent resolves inside repo, skip.

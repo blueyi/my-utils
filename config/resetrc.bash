@@ -7,13 +7,19 @@
 export MY_CONF_PATH="${MYRC_PATH}"
 
 # =============================================================================
-# SECTION: User env secrets (~/.env.rc, manual / not in repo)
+# SECTION: User env secrets (~/.env.rc → config/env.rc via link.ini)
 # =============================================================================
-# API keys, BASH_ENV for non-interactive bash, etc. Idempotent via MY_UTILS_ENV_RC_LOADED.
-# Non-interactive bash may load this once from config/_bashrc before shell_init returns.
-if [ -z "${MY_UTILS_ENV_RC_LOADED:-}" ] && [ -f "$HOME/.env.rc" ]; then
-  . "$HOME/.env.rc"
-  export MY_UTILS_ENV_RC_LOADED=1
+# Canonical file: $MYRC_PATH/env.rc (gitignored plaintext). Symlink: ~/.env.rc.
+# Multi-device sync: privacy/env.rc.enc via ./myu vault backup|restore (public repo).
+# Idempotent via MY_UTILS_ENV_RC_LOADED. Non-interactive bash may load once from _bashrc.
+if [ -z "${MY_UTILS_ENV_RC_LOADED:-}" ]; then
+  if [ -f "$HOME/.env.rc" ]; then
+    . "$HOME/.env.rc"
+    export MY_UTILS_ENV_RC_LOADED=1
+  elif [ -f "${MYRC_PATH}/env.rc" ]; then
+    . "${MYRC_PATH}/env.rc"
+    export MY_UTILS_ENV_RC_LOADED=1
+  fi
 fi
 
 # Linux + WSL: WSL2 reports Linux in uname; extra probes match common/platform.sh is_wsl for edge cases.

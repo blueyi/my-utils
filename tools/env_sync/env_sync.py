@@ -348,7 +348,12 @@ def load_manifest(path: Path) -> List[VaultEntry]:
             fail(f"{path}:{lineno}: invalid name {name!r} (no path chars; omit .enc)")
         if mode not in {"file", "env-merge"}:
             fail(f"{path}:{lineno}: mode must be file|env-merge, got {mode!r}")
-        entries.append(VaultEntry(name=name, mode=mode, path=Path(src).expanduser()))
+        # ~ and absolute stay as-is; relative paths resolve against my-utils repo root
+        # (portable across machines that clone to different directories).
+        src_path = Path(src).expanduser()
+        if not src_path.is_absolute():
+            src_path = _REPO_ROOT / src_path
+        entries.append(VaultEntry(name=name, mode=mode, path=src_path))
     if not entries:
         fail(f"manifest has no entries: {path}")
     return entries

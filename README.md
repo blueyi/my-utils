@@ -24,7 +24,7 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 **Multi-OS**
 
 - **Packages:** [`common/install_packages.sh`](common/install_packages.sh) + [`common/deb_app_list.ini`](common/deb_app_list.ini) / [`common/Brewfile`](common/Brewfile) (macOS; falls back to [`common/mac_app_list.txt`](common/mac_app_list.txt)) / [`common/rpm_app_list.ini`](common/rpm_app_list.ini). Already-installed packages are skipped unless `--force`. Optional GUI/mas set: [`common/Brewfile.optional`](common/Brewfile.optional). WSL skips unavailable `linux-headers-*`.
-- **Env:** [`config/resetrc.bash`](config/resetrc.bash) uses **`_is_linux` / `_is_macos`** inside sections (PATH, CUDA, brew kegs, …). Mainland mirrors: [`config/mirrors.bash`](config/mirrors.bash) (default on; `MY_UTILS_MIRRORS=off` in `~/.env.rc` to disable env mirrors). Proxy: `MY_UTILS_PROXY=off` to skip auto-enable.
+- **Env:** [`config/resetrc.bash`](config/resetrc.bash) uses **`_is_linux` / `_is_macos`** inside sections (PATH, CUDA, brew kegs, …). Mainland mirrors: [`config/mirrors.bash`](config/mirrors.bash) (default on; `MY_UTILS_MIRRORS=off` in `~/.env.rc` to disable env mirrors). Proxy: [`config/proxy.bash`](config/proxy.bash) — **WSL** auto-points at the Windows host (Clash Verge mixed-port, default `7897` via default gateway); **native** Linux/macOS uses `127.0.0.1`. Per-machine knobs in `~/.env.rc` (`config/env.rc` via symlink): `MY_UTILS_PROXY=off`, `PROXY_IP=…`, `MY_UTILS_PROXY_HOST=…`, `MY_UTILS_PROXY_PORT=…` (never hardcode a host IP in tracked files). **Secrets:** `~/.env.rc` → `config/env.rc` (gitignored plaintext); sync with `privacy/env.rc.enc` via vault — **do not** commit plaintext (repo is public).
 
 **Multi-shell**
 
@@ -225,7 +225,9 @@ git add privacy/*.enc privacy/manifest && git commit -m "Update privacy vault" &
 ./myu vault restore
 ```
 
-Password: `SYNC_ENV_KEY` or interactive prompt, **≥8 characters**. Crypto: OpenSSL AES-256-CBC + PBKDF2. Edit `privacy/manifest` (`name|mode|path`). Modes: `file`, `env-merge`.
+Password: `SYNC_ENV_KEY` or interactive prompt, **≥8 characters**. Crypto: OpenSSL AES-256-CBC + PBKDF2. Edit `privacy/manifest` (`name|mode|path`). Modes: `file`, `env-merge`. Paths may be `~/…` or **repo-relative** (e.g. `config/env.rc`).
+
+**`~/.env.rc` layout:** plaintext lives at [`config/env.rc`](config/env.rc) (gitignored); [`common/link.ini`](common/link.ini) symlinks `~/.env.rc` → that file. Commit only `privacy/env.rc.enc`. New machine: `./myu vault restore` then links refresh (bootstrap does this after `env`).
 
 ## Cursor Config Backup
 

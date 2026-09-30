@@ -16,8 +16,10 @@
 #   ./myu vault restore
 #   # or: ./bootstrap.sh --tools env / ./myu setup --new-mac
 
-# Shell env secrets (optional; create ~/.env.rc on old machine if needed)
-env.rc|env-merge|~/.env.rc
+# Shell env secrets — canonical plaintext is config/env.rc (gitignored);
+# ~/.env.rc is a symlink via link.ini. Ciphertext: privacy/env.rc.enc (committed).
+# Path is repo-relative (resolved against my-utils root by env_sync).
+env.rc|file|config/env.rc
 
 # SSH
 ssh-config|file|~/.ssh/config

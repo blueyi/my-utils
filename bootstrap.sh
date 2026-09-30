@@ -224,6 +224,8 @@ run_tool() {
     cursor)        "$COMMON/cursor_config_link.sh" ;;
     env|vault-restore)
       MY_UTILS_VAULT_ACTION=restore "$COMMON/run_env_sync.sh" restore
+      # Vault may create config/env.rc after the links step; refresh symlinks.
+      "$COMMON/create_links.sh"
       ;;
     vault-backup)
       MY_UTILS_VAULT_ACTION=backup "$COMMON/run_env_sync.sh" backup
