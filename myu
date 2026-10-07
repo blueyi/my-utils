@@ -8,7 +8,7 @@
 #   ./myu vault backup|restore [--force]
 #   ./myu vault encrypt -i FILE -o FILE.enc
 #   ./myu vault decrypt -i FILE.enc [-o FILE]
-#   ./myu packages|links|misc|vimrc|cursor|env [bootstrap flags…]
+#   ./myu packages|links|misc|vimrc|cursor|env|hexo [bootstrap flags…]
 
 set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -26,14 +26,17 @@ Usage:
 
 Commands:
   help                 Show this help
-  setup | bootstrap    Run bootstrap.sh (packages, links, misc, …)
+  setup | bootstrap    Run bootstrap.sh (packages, links, misc, …; not hexo)
   vault …              Secrets encrypt / decrypt (see Vault below)
-  packages|links|misc|vimrc|cursor|env
+  packages|links|misc|vimrc|cursor|env|hexo
                        Run a single bootstrap tool (pass-through flags OK)
 
 New machine (setup flags; includes vault restore):
   --new-mac            macOS: CLT check + App Store hint + full bootstrap
   --new-linux          Linux: sudo/pkg check + full bootstrap
+
+Optional setup flags:
+  --optional           Also install Brewfile.optional (macOS packages)
 
 Vault:
   myu vault backup              Encrypt all paths in privacy/manifest → privacy/*.enc
@@ -44,7 +47,9 @@ Vault:
 Examples:
   ./myu setup --new-mac --yes              # new macOS machine
   ./myu setup --new-linux --yes            # new Linux / WSL machine
-  ./myu setup --yes                        # re-run / no vault
+  ./myu setup --yes                        # re-run / no vault / no hexo
+  ./myu hexo --yes                         # opt-in Hexo (hexo-cli)
+  ./myu setup --tools packages links misc hexo --yes
   ./myu vault backup
   ./myu vault restore
   ./myu vault restore --force
@@ -193,7 +198,7 @@ case "$cmd" in
     esac
     ;;
 
-  packages|links|misc|vimrc|cursor|env|vault-backup|vault-restore)
+  packages|links|misc|vimrc|cursor|env|hexo|vault-backup|vault-restore)
     tool="$cmd"
     case "$cmd" in
       vault-backup)  export MY_UTILS_VAULT_ACTION=backup; tool=env ;;

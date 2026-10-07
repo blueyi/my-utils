@@ -9,6 +9,7 @@
 #   ./bootstrap.sh --new-linux --yes
 #   ./bootstrap.sh --force --yes
 #   ./bootstrap.sh --tools packages --optional --yes
+#   ./bootstrap.sh --tools hexo --yes
 #   ./bootstrap.sh --tools env --yes
 # Prefer the unified CLI: ./myu help
 
@@ -46,9 +47,9 @@ Options:
   --new-mac               macOS new-machine init (CLT check + App Store hint + vault)
   --new-linux             Linux new-machine init (sudo/pkg check + vault restore)
   --optional              Also install common/Brewfile.optional (with packages)
-  --tools T [T ...]       Run only these tools (default: all except env)
+  --tools T [T ...]       Run only these tools (default: all except env / hexo)
                           packages | links | misc | vimrc | cursor | env
-                          | vault-backup | vault-restore
+                          | vault-backup | vault-restore | hexo
 
 Tools:
   packages      Install system packages (apt/yum, or macOS Brewfile / brew)
@@ -59,6 +60,7 @@ Tools:
   env           Privacy vault restore (alias of vault-restore)
   vault-restore Decrypt privacy/*.enc (prompt SYNC_ENV_KEY, ≥8 chars)
   vault-backup  Encrypt manifest sources → privacy/*.enc
+  hexo          Opt-in: Node.js + hexo-cli (\$HOME/.npm-global; not in default set)
 
 Tip: prefer the unified CLI \`./myu\` (see: ./myu help).
 
@@ -73,10 +75,12 @@ Examples:
   $0 --new-mac --yes
   $0 --new-linux --yes
   $0 --tools packages --optional --yes
+  $0 --tools hexo --yes
   $0 --tools env --yes
   $0 --tools vault-backup --yes
   ./myu setup --new-mac --yes
   ./myu setup --new-linux --yes
+  ./myu hexo --yes
   ./myu vault backup
   $0 --force --yes
 EOF
@@ -255,6 +259,7 @@ run_tool() {
     misc)          "$COMMON/run_misc.sh" ;;
     vimrc)         "$COMMON/install_vim_plugins.sh" ;;
     cursor)        "$COMMON/cursor_config_link.sh" ;;
+    hexo)          "$COMMON/run_hexo.sh" ;;
     env|vault-restore)
       MY_UTILS_VAULT_ACTION=restore "$COMMON/run_env_sync.sh" restore
       # Vault may create config/env.rc after the links step; refresh symlinks.
@@ -307,6 +312,7 @@ print_summary() {
   esac
   echo "  Secrets vault:    ./myu vault restore     # or: ./bootstrap.sh --tools env"
   echo "  Vault backup:     ./myu vault backup"
+  echo "  Hexo blog:        ./myu hexo --yes        # or: ./bootstrap.sh --tools hexo --yes"
   echo "  Reload shell:     exec \$SHELL"
 }
 

@@ -118,6 +118,8 @@ Preferred entry: **`./myu`** (short for my-utils). `bootstrap.sh` still works as
 ./myu vault restore                           # decrypt (password prompt, ≥8 chars)
 ./myu setup --new-mac --yes                   # macOS: includes vault restore
 ./myu setup --new-linux --yes                 # Linux: includes vault restore
+./myu hexo --yes                              # opt-in Hexo (not in default setup)
+./myu setup --tools packages links misc hexo --yes
 
 # Equivalent low-level:
 ./bootstrap.sh --tools env --yes
