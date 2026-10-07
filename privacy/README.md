@@ -24,7 +24,8 @@ git push
 **New machine (clone → restore):**
 
 ```bash
-./myu setup --new-mac --yes   # includes vault restore at the end
+./myu setup --new-mac --yes     # macOS: includes vault restore
+./myu setup --new-linux --yes   # Linux / WSL: includes vault restore
 # or only secrets:
 ./myu vault restore
 ./myu vault restore --force   # overwrite existing files

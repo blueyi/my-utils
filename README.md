@@ -7,7 +7,7 @@ One-click dev environment setup for Linux / macOS. Default shells: **bash** + **
 - Linux (Ubuntu / Debian / Fedora) and macOS
 - Configs managed via symlinks; edits stay in repo for backup and version control
 - One-shot or selective install; `--yes` for non-interactive mode; `--force` to re-run / reinstall
-- macOS: declarative [`common/Brewfile`](common/Brewfile) + optional [`common/Brewfile.optional`](common/Brewfile.optional); `--new-mac` for new-machine checks
+- macOS: declarative [`common/Brewfile`](common/Brewfile) + optional [`common/Brewfile.optional`](common/Brewfile.optional); `--new-mac` / `--new-linux` for new-machine checks
 - Mainland China mirrors (Go / Node / uv / npm / Cargo) via [`config/mirrors.bash`](config/mirrors.bash) + linked `~/.npmrc` / `~/.cargo/config.toml`
 - Profile presets: C++, Python, AI Infra (LLVM / MLIR); optional Triton (GPU kernel) via `config/triton.bash`
 - **One env file:** `config/resetrc.bash` holds all shared env as **`# SECTION: …`** blocks (nvm, pyenv, CUDA, LLVM, …). Edit **that file** to affect **bash, zsh, and profiles**; optional Fish uses the same file via `emit_fish_env.bash` when linked.
@@ -78,6 +78,20 @@ cd ~/workspace/my-utils
 exec $SHELL
 ```
 
+### New Linux / WSL
+
+```bash
+# Needs sudo for apt/dnf/yum (packages step)
+git clone https://github.com/blueyi/my-utils.git ~/workspace/my-utils
+cd ~/workspace/my-utils
+./myu setup --new-linux --yes
+
+# Force a full redo:
+./myu setup --new-linux --force --yes
+
+exec $SHELL
+```
+
 Edit [`common/Brewfile`](common/Brewfile) for the core macOS set; put extras in [`common/Brewfile.optional`](common/Brewfile.optional). Changing either file (when used) invalidates the `packages` stamp. Changing [`common/link.ini`](common/link.ini) invalidates the `links` stamp so new symlinks (e.g. npmrc / cargo) apply on the next `--yes`.
 
 ### Mainland China mirrors
@@ -102,7 +116,8 @@ Preferred entry: **`./myu`** (short for my-utils). `bootstrap.sh` still works as
 ./myu links --force --yes
 ./myu vault backup                            # encrypt → privacy/*.enc
 ./myu vault restore                           # decrypt (password prompt, ≥8 chars)
-./myu setup --new-mac --yes                   # includes vault restore
+./myu setup --new-mac --yes                   # macOS: includes vault restore
+./myu setup --new-linux --yes                 # Linux: includes vault restore
 
 # Equivalent low-level:
 ./bootstrap.sh --tools env --yes
@@ -210,7 +225,7 @@ Password-encrypt machine-local secrets into [`privacy/*.enc`](privacy/), commit 
 | `./myu vault restore` | Decrypt into `$HOME` (prompts if `SYNC_ENV_KEY` unset) |
 | `./myu vault encrypt -i SRC -o DST.enc` | Encrypt one file |
 | `./myu vault decrypt -i SRC.enc [-o DST]` | Decrypt one file (stdout if `-o` omitted) |
-| `./myu setup --new-mac` | Bootstrap + restore at the end |
+| `./myu setup --new-mac` / `--new-linux` | Bootstrap + restore at the end |
 
 ```bash
 # Old machine (batch)

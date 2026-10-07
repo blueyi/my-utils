@@ -6,6 +6,7 @@
 #   ./bootstrap.sh --help
 #   ./bootstrap.sh --yes
 #   ./bootstrap.sh --new-mac --yes
+#   ./bootstrap.sh --new-linux --yes
 #   ./bootstrap.sh --force --yes
 #   ./bootstrap.sh --tools packages --optional --yes
 #   ./bootstrap.sh --tools env --yes
@@ -19,6 +20,7 @@ COMMON="$MY_UTILS_ROOT/common"
 YES_MODE=false
 FORCE_MODE=false
 NEW_MAC=false
+NEW_LINUX=false
 OPTIONAL_BREW=false
 SELECTED_TOOLS=()
 
@@ -41,7 +43,8 @@ Options:
   -h, --help              Show this help and exit
   -y, --yes               Run selected tools without prompting
   -f, --force             Ignore tool stamps; reinstall packages / re-link configs
-  --new-mac               macOS-only init helper (CLT check + App Store hint)
+  --new-mac               macOS new-machine init (CLT check + App Store hint + vault)
+  --new-linux             Linux new-machine init (sudo/pkg check + vault restore)
   --optional              Also install common/Brewfile.optional (with packages)
   --tools T [T ...]       Run only these tools (default: all except env)
                           packages | links | misc | vimrc | cursor | env
@@ -68,10 +71,12 @@ Idempotency (two layers):
 Examples:
   $0 --help
   $0 --new-mac --yes
+  $0 --new-linux --yes
   $0 --tools packages --optional --yes
   $0 --tools env --yes
   $0 --tools vault-backup --yes
   ./myu setup --new-mac --yes
+  ./myu setup --new-linux --yes
   ./myu vault backup
   $0 --force --yes
 EOF
@@ -83,6 +88,7 @@ while [[ $# -gt 0 ]]; do
     --yes|-y) YES_MODE=true; shift ;;
     --force|-f) FORCE_MODE=true; shift ;;
     --new-mac) NEW_MAC=true; shift ;;
+    --new-linux) NEW_LINUX=true; shift ;;
     --optional) OPTIONAL_BREW=true; shift ;;
     --tools)
       shift
@@ -100,13 +106,18 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [ "$NEW_MAC" = true ] && [ "$NEW_LINUX" = true ]; then
+  echo "ERROR: use only one of --new-mac or --new-linux." >&2
+  exit 1
+fi
+
 # Default one-shot: everything except optional env decrypt
 ALL_TOOLS=(packages links misc vimrc cursor)
 
 if [ ${#SELECTED_TOOLS[@]} -eq 0 ]; then
   SELECTED_TOOLS=("${ALL_TOOLS[@]}")
-  # New Mac: also offer privacy vault restore after links/misc
-  if [ "$NEW_MAC" = true ]; then
+  # New machine: also offer privacy vault restore after links/misc
+  if [ "$NEW_MAC" = true ] || [ "$NEW_LINUX" = true ]; then
     SELECTED_TOOLS+=(env)
   fi
 fi
@@ -214,6 +225,28 @@ ensure_macos_new_mac() {
   echo ""
 }
 
+ensure_linux_new_machine() {
+  case "$(uname -s)" in
+    Linux*) ;;
+    *)
+      echo "ERROR: --new-linux is only supported on Linux." >&2
+      exit 1
+      ;;
+  esac
+  echo "New Linux prerequisites:"
+  echo "  - sudo for apt/dnf/yum (packages step; set MY_UTILS_ALLOW_SUDO=off to skip)"
+  echo "  - Network access for git clones / uv / npm"
+  if command -v apt-get &>/dev/null || command -v dnf &>/dev/null || command -v yum &>/dev/null; then
+    echo "  - Package manager: OK"
+  else
+    echo "  - WARN: no apt/dnf/yum detected; packages step may fail"
+  fi
+  if [ "$(id -u)" -eq 0 ]; then
+    echo "  - WARN: running as root; prefer a normal user + sudo"
+  fi
+  echo ""
+}
+
 run_tool() {
   local name="$1"
   case "$name" in
@@ -280,12 +313,16 @@ print_summary() {
 if [ "$NEW_MAC" = true ]; then
   ensure_macos_new_mac
 fi
+if [ "$NEW_LINUX" = true ]; then
+  ensure_linux_new_machine
+fi
 
 echo "=== My-Utils Bootstrap ==="
 echo "Root: $MY_UTILS_ROOT"
 echo "Tools: ${SELECTED_TOOLS[*]}"
 [ "$FORCE_MODE" = true ] && echo "Mode: force (ignore stamps; reinstall/re-link)"
 [ "$NEW_MAC" = true ] && echo "Mode: new-mac"
+[ "$NEW_LINUX" = true ] && echo "Mode: new-linux"
 [ "$OPTIONAL_BREW" = true ] && echo "Mode: optional Brewfile"
 echo "Stamps: $STAMP_DIR"
 echo ""

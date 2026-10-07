@@ -168,6 +168,24 @@ ensure_uv_python_default() {
 ensure_uv
 ensure_uv_python_default
 
+# --- npm global prefix: user dir (no sudo; works with apt/dnf node) ---
+ensure_npm_user_prefix() {
+  command -v npm &>/dev/null || return 1
+  local prefix="${HOME}/.npm-global"
+  mkdir -p "$prefix"
+  # Prefer session override when default prefix is not writable (e.g. /usr/local).
+  # Linked ~/.npmrc also sets prefix=${HOME}/.npm-global after the links step.
+  local cur
+  cur="$(npm prefix -g 2>/dev/null || npm config get prefix 2>/dev/null || true)"
+  if [ -z "$cur" ] || [ ! -w "$cur" ]; then
+    export NPM_CONFIG_PREFIX="$prefix"
+  fi
+  case ":$PATH:" in
+    *":$prefix/bin:"*) ;;
+    *) export PATH="$prefix/bin:$PATH" ;;
+  esac
+}
+
 # --- Hexo blog dependencies (Node.js + hexo-cli), Linux + macOS ---
 ensure_hexo_env() {
   # Ensure Node.js is available
@@ -192,16 +210,18 @@ ensure_hexo_env() {
       fi
     fi
   fi
+  command -v npm &>/dev/null || return 0
+  ensure_npm_user_prefix || return 0
   # Install hexo-cli globally if not present
   if command -v hexo &>/dev/null; then
-    if _misc_force && command -v npm &>/dev/null; then
+    if _misc_force; then
       echo "Reinstalling hexo-cli (npm, --force)..."
       npm install -g hexo-cli || echo "  WARN: npm reinstall hexo-cli failed"
     else
       echo "hexo-cli already installed (use --force to reinstall)"
     fi
-  elif command -v npm &>/dev/null; then
-    echo "Installing hexo-cli (npm install -g hexo-cli)..."
+  else
+    echo "Installing hexo-cli (npm install -g hexo-cli → ~/.npm-global)..."
     npm install -g hexo-cli || echo "  WARN: npm install -g hexo-cli failed; run manually if needed"
   fi
 }

@@ -4,7 +4,7 @@
 # One entry for machine setup + privacy vault + bootstrap tools.
 #
 #   ./myu help
-#   ./myu setup [--new-mac] [--yes] …
+#   ./myu setup [--new-mac|--new-linux] [--yes] …
 #   ./myu vault backup|restore [--force]
 #   ./myu vault encrypt -i FILE -o FILE.enc
 #   ./myu vault decrypt -i FILE.enc [-o FILE]
@@ -31,6 +31,10 @@ Commands:
   packages|links|misc|vimrc|cursor|env
                        Run a single bootstrap tool (pass-through flags OK)
 
+New machine (setup flags; includes vault restore):
+  --new-mac            macOS: CLT check + App Store hint + full bootstrap
+  --new-linux          Linux: sudo/pkg check + full bootstrap
+
 Vault:
   myu vault backup              Encrypt all paths in privacy/manifest → privacy/*.enc
   myu vault restore [--force]   Decrypt privacy/*.enc into \$HOME
@@ -38,7 +42,9 @@ Vault:
   myu vault decrypt -i SRC.enc [-o DST] Decrypt one file (default: stdout)
 
 Examples:
-  ./myu setup --new-mac --yes
+  ./myu setup --new-mac --yes              # new macOS machine
+  ./myu setup --new-linux --yes            # new Linux / WSL machine
+  ./myu setup --yes                        # re-run / no vault
   ./myu vault backup
   ./myu vault restore
   ./myu vault restore --force
