@@ -381,17 +381,18 @@ def _is_env_rc_entry(entry: VaultEntry) -> bool:
 
 
 ENV_RC_STUB = """\
-# config/env.rc — machine-local shell overrides (gitignored).
+# config/env.rc — machine-local overrides + Claude Code / Codex keys (gitignored).
 # Symlink: ~/.env.rc → this file (via common/link.ini).
-#
-# Auto-created because vault restore did not produce this file
-# (missing ciphertext, wrong password, or decrypt error).
 # Full template: config/env.rc.example
 #
-# Hermes API keys stay in ~/.hermes/.env (private git) — do not copy them here.
+# Auto-created because vault restore did not produce this file.
+# Hermes agent keys stay in ~/.hermes/.env (private git) — leave that tree alone.
 #
 # export MY_UTILS_PROXY=on
-# export MY_UTILS_PROXY_PORT=7897
+# export ANTHROPIC_BASE_URL='https://www.onerouter.one'
+# export ANTHROPIC_AUTH_TOKEN=''
+# export OPENAI_API_KEY=''
+# export OPENAI_BASE_URL=''
 """
 
 
