@@ -6,11 +6,12 @@
 #   - Do NOT hardcode a machine-specific host/IP here.
 #   - WSL → Windows host (Clash Verge mixed-port) via default gateway.
 #   - Native Linux/macOS → 127.0.0.1 (local Clash / ClashX / …).
-#   - Per-machine overrides in ~/.env.rc (loaded before this file by resetrc):
+#   - Per-machine overrides in config/env.rc (→ ~/.env.rc via link.ini; loaded first):
+#       export MY_UTILS_PROXY=on                  # REQUIRED to auto-enable (default: off)
 #       export PROXY_IP=http://192.168.x.x:7890   # full URL wins
 #       export MY_UTILS_PROXY_HOST=172.28.112.1   # WSL host override
 #       export MY_UTILS_PROXY_PORT=7897           # port only (default 7897)
-#       export MY_UTILS_PROXY=off                 # skip auto-enable on this machine
+#   - Manual anytime: `proxy` / `noproxy` (functions always available).
 
 _my_utils_is_wsl() {
   [ -n "${WSL_DISTRO_NAME:-}" ] && return 0
@@ -91,9 +92,9 @@ noproxy () {
         [ "${1-}" = "-q" ] || curl myip.ipip.net
         }
 
-# Auto-enable when sourced (quiet: skip curl on shell startup).
-# Disable on a single machine with: export MY_UTILS_PROXY=off  # in ~/.env.rc
-case "${MY_UTILS_PROXY:-on}" in
-  off|OFF|0|false|no|NO) ;;
-  *) proxy -q ;;
+# Opt-in auto-enable (quiet). Default off so new machines stay clean.
+# Enable on a machine that needs it: export MY_UTILS_PROXY=on  # in config/env.rc
+case "${MY_UTILS_PROXY:-off}" in
+  on|ON|1|true|yes|YES) proxy -q ;;
+  *) ;;
 esac

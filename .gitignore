@@ -17,11 +17,13 @@ cursor_bak/projects/*/worker.log
 cursor_bak/projects/*/.workspace-trusted
 cursor_bak/projects/*/canvases/node_modules/
 cursor_bak/projects/*/canvases/.node_modules.staging*/
-# Chat/paste screenshots — not config; keep out of git
+# Chat/paste screenshots & agent attachments — not config; keep out of git
 cursor_bak/projects/*/assets/
+cursor_bak/projects/*/attachments/
 # Cursor auto-generates identical tsconfig per workspace canvases dir
 cursor_bak/projects/*/canvases/tsconfig.json
 cursor_bak/projects/*/mcps/
+
 # Non-workspace-scoped dumps (auto-backup sometimes uses projects/{canvases,mcps}/ directly)
 cursor_bak/projects/canvases/
 cursor_bak/projects/mcps/

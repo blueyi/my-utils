@@ -35,4 +35,6 @@ git push
 
 Edit [`manifest`](manifest) to add/remove files. Each line is `name|mode|path`.
 
+**`env.rc`:** plaintext is `config/env.rc` (gitignored); `~/.env.rc` is a symlink. Edit the file under `config/`, not a separate home-only copy (links/restore will replace a regular `~/.env.rc`). Proxy auto-enable is **opt-in**: `export MY_UTILS_PROXY=on` in that file (default off on new machines).
+
 Crypto: OpenSSL AES-256-CBC + PBKDF2 (same as `env_sync encrypt` / Hermes sync-config).
