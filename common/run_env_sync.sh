@@ -4,6 +4,9 @@
 #   run_env_sync.sh [backup|restore]
 #   MY_UTILS_VAULT_ACTION=backup run_env_sync.sh
 # Default: restore (bootstrap --tools env)
+#
+# On restore: if env.rc cannot be decrypted / is missing, create an empty
+# config/env.rc stub and still refresh symlinks (~/.env.rc → config/env.rc).
 
 set -e
 if [ -n "${MY_UTILS_ROOT:-}" ]; then
@@ -14,9 +17,41 @@ fi
 
 ENV_SYNC="$ROOT/tools/env_sync/env_sync.py"
 MANIFEST="$ROOT/privacy/manifest"
+LINKS_SH="$ROOT/common/create_links.sh"
 ACTION="${1:-${MY_UTILS_VAULT_ACTION:-restore}}"
 FORCE_ARGS=()
 [ "${MY_UTILS_FORCE:-}" = "1" ] && FORCE_ARGS+=(--force)
+
+_myu_ensure_env_rc_stub() {
+  local f="$ROOT/config/env.rc"
+  if [ -f "$f" ]; then
+    return 0
+  fi
+  mkdir -p "$(dirname "$f")"
+  cat > "$f" <<'EOF'
+# config/env.rc — machine-local shell overrides (gitignored).
+# Symlink: ~/.env.rc → this file (via common/link.ini).
+#
+# Auto-created because vault restore did not produce this file
+# (missing ciphertext, wrong password, or decrypt error).
+#
+# Optional examples:
+#   export MY_UTILS_PROXY=on
+#   export MY_UTILS_PROXY_PORT=7897
+#   export MY_UTILS_PROXY_HOST=172.28.112.1
+EOF
+  chmod 600 "$f" 2>/dev/null || true
+  echo "  Created empty stub: $f"
+}
+
+_myu_refresh_links() {
+  if [ -x "$LINKS_SH" ] || [ -f "$LINKS_SH" ]; then
+    echo "  Refreshing symlinks (incl. ~/.env.rc → config/env.rc)…"
+    bash "$LINKS_SH" || echo "  WARN: create_links.sh reported errors"
+  else
+    echo "  WARN: missing $LINKS_SH — skip symlink refresh"
+  fi
+}
 
 case "$ACTION" in
   backup|restore) ;;
@@ -46,6 +81,10 @@ if [ -z "${SYNC_ENV_KEY:-}" ]; then
   else
     echo "  SYNC_ENV_KEY unset and no TTY — cannot prompt."
     echo "  export SYNC_ENV_KEY='…' then re-run: ./myu vault $ACTION"
+    if [ "$ACTION" = "restore" ]; then
+      _myu_ensure_env_rc_stub
+      _myu_refresh_links
+    fi
     exit 1
   fi
 fi
@@ -68,15 +107,30 @@ for f in "$ROOT"/privacy/*.enc; do
   enc_count=$((enc_count + 1))
 done
 
+restore_rc=0
 if [ "$enc_count" -eq 0 ]; then
   echo "  No privacy/*.enc in repo yet."
   echo "  On the old machine:"
   echo "    ./myu vault backup"
   echo "    git add privacy/*.enc && git commit && git push"
-  exit 0
+  echo "  Creating empty config/env.rc so ~/.env.rc can be linked."
+else
+  echo "  Found $enc_count encrypted blob(s). Restoring…"
+  set +e
+  python3 "$ENV_SYNC" vault-restore --manifest "$MANIFEST" "${FORCE_ARGS[@]}"
+  restore_rc=$?
+  set -e
 fi
 
-echo "  Found $enc_count encrypted blob(s). Restoring…"
-python3 "$ENV_SYNC" vault-restore --manifest "$MANIFEST" "${FORCE_ARGS[@]}"
+_myu_ensure_env_rc_stub
+_myu_refresh_links
+
+if [ "$restore_rc" -ne 0 ]; then
+  echo "=== Privacy vault restore finished with errors (exit $restore_rc) ==="
+  echo "  env.rc stub + symlinks are in place; fix SYNC_ENV_KEY and re-run:"
+  echo "    ./myu vault restore --force"
+  exit "$restore_rc"
+fi
+
 echo "=== Privacy vault restore done ==="
 echo "  Tip: exec \$SHELL  # reload ~/.env.rc / optional_home snippets"

@@ -261,8 +261,11 @@ run_tool() {
     cursor)        "$COMMON/cursor_config_link.sh" ;;
     hexo)          "$COMMON/run_hexo.sh" ;;
     env|vault-restore)
-      MY_UTILS_VAULT_ACTION=restore "$COMMON/run_env_sync.sh" restore
-      # Vault may create config/env.rc after the links step; refresh symlinks.
+      # On failure, run_env_sync still stubs config/env.rc and refreshes links.
+      if ! MY_UTILS_VAULT_ACTION=restore "$COMMON/run_env_sync.sh" restore; then
+        echo "  WARN: vault restore reported errors; env.rc stub + links should already be applied"
+      fi
+      # Idempotent refresh (covers older run_env_sync without built-in links).
       "$COMMON/create_links.sh"
       ;;
     vault-backup)

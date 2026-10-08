@@ -70,6 +70,10 @@ def fail(msg: str, code: int = 1) -> "None":
     raise SystemExit(code)
 
 
+class DecryptError(Exception):
+    """Wrong key / corrupt ciphertext — recoverable for per-entry vault restore."""
+
+
 def get_key(explicit: Optional[str], *, allow_prompt: bool = False) -> str:
     key = explicit or os.environ.get("SYNC_ENV_KEY")
     if not key and allow_prompt and sys.stdin.isatty():
@@ -121,8 +125,8 @@ def encrypt_bytes(plaintext: bytes, key: str) -> bytes:
     return res.stdout
 
 
-def decrypt_bytes(ciphertext_b64: bytes, key: str) -> bytes:
-    """Inverse of encrypt_bytes. Wrong key → openssl error → fail()."""
+def decrypt_bytes(ciphertext_b64: bytes, key: str, *, soft: bool = False) -> bytes:
+    """Inverse of encrypt_bytes. Wrong key → openssl error → fail() (or DecryptError if soft)."""
     openssl = _have_openssl()
     env = {**os.environ, "SYNC_ENV_KEY": key}
     res = subprocess.run(
@@ -135,7 +139,10 @@ def decrypt_bytes(ciphertext_b64: bytes, key: str) -> bytes:
     )
     if res.returncode != 0:
         err = res.stderr.decode("utf-8", "replace").strip()
-        fail(f"openssl decrypt failed (wrong key or corrupted data?): {err}")
+        msg = f"openssl decrypt failed (wrong key or corrupted data?): {err}"
+        if soft:
+            raise DecryptError(msg)
+        fail(msg)
     return res.stdout
 
 
@@ -363,6 +370,42 @@ def enc_path_for(vault_dir: Path, name: str) -> Path:
     return vault_dir / f"{name}.enc"
 
 
+def _is_env_rc_entry(entry: VaultEntry) -> bool:
+    """True for the vaulted shell env file (config/env.rc → ~/.env.rc)."""
+    if entry.name == "env.rc":
+        return True
+    try:
+        return entry.path.resolve() == (_REPO_ROOT / "config" / "env.rc").resolve()
+    except OSError:
+        return entry.path.name == "env.rc" and "config" in entry.path.parts
+
+
+ENV_RC_STUB = """\
+# config/env.rc — machine-local shell overrides (gitignored).
+# Symlink: ~/.env.rc → this file (via common/link.ini).
+#
+# Auto-created because vault restore did not produce this file
+# (missing ciphertext, wrong password, or decrypt error).
+#
+# Optional examples:
+#   export MY_UTILS_PROXY=on
+#   export MY_UTILS_PROXY_PORT=7897
+#   export MY_UTILS_PROXY_HOST=172.28.112.1
+"""
+
+
+def ensure_env_rc_stub(dest: Optional[Path] = None) -> Path:
+    """Create an empty-ish config/env.rc if missing so links can symlink ~/.env.rc."""
+    path = dest if dest is not None else (_REPO_ROOT / "config" / "env.rc")
+    if path.exists():
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(ENV_RC_STUB, encoding="utf-8")
+    _chmod_private(path)
+    print(f"  created empty stub: {path}", file=sys.stderr)
+    return path
+
+
 def _chmod_private(path: Path) -> None:
     try:
         # Private keys and env files: owner rw only
@@ -416,15 +459,25 @@ def cmd_vault_restore(args) -> None:
     manifest = Path(args.manifest).expanduser()
     vault_dir = manifest.parent
     entries = load_manifest(manifest)
-    ok = skip = 0
+    ok = skip = err = 0
+    env_rc_dest: Optional[Path] = None
     print(f"Vault restore ← {vault_dir}", file=sys.stderr)
     for e in entries:
+        if _is_env_rc_entry(e):
+            env_rc_dest = e.path
         enc = enc_path_for(vault_dir, e.name)
         if not enc.exists():
             print(f"  skip (no ciphertext): {e.name}", file=sys.stderr)
             skip += 1
             continue
-        plaintext = decrypt_bytes(enc.read_bytes(), key)
+        try:
+            plaintext = decrypt_bytes(enc.read_bytes(), key, soft=True)
+        except DecryptError as ex:
+            print(f"  ERROR decrypt {e.name}: {ex}", file=sys.stderr)
+            err += 1
+            if _is_env_rc_entry(e) and not args.dry_run:
+                ensure_env_rc_stub(e.path)
+            continue
         dest = e.path
 
         if e.mode == "env-merge":
@@ -478,9 +531,23 @@ def cmd_vault_restore(args) -> None:
         _chmod_private(dest)
         print(f"  restored: {enc.name} → {dest}", file=sys.stderr)
         ok += 1
-    print(f"Done: {ok} restored, {skip} skipped", file=sys.stderr)
-    if ok == 0 and skip == 0:
+
+    # Always leave config/env.rc in place so link.ini can symlink ~/.env.rc.
+    if not args.dry_run:
+        stub_path = env_rc_dest if env_rc_dest is not None else (_REPO_ROOT / "config" / "env.rc")
+        if not stub_path.exists():
+            print(
+                "  env.rc missing after restore — writing empty stub for symlink",
+                file=sys.stderr,
+            )
+            ensure_env_rc_stub(stub_path)
+
+    print(f"Done: {ok} restored, {skip} skipped, {err} errors", file=sys.stderr)
+    if ok == 0 and skip == 0 and err == 0:
         fail("nothing to restore")
+    if err and ok == 0:
+        # Non-zero so callers see failure, but env.rc stub (if needed) already written.
+        raise SystemExit(1)
 
 
 # ─────────────────────────── argparse ───────────────────────────

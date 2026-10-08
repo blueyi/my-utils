@@ -244,7 +244,7 @@ git add privacy/*.enc privacy/manifest && git commit -m "Update privacy vault" &
 
 Password: `SYNC_ENV_KEY` or interactive prompt, **≥8 characters**. Crypto: OpenSSL AES-256-CBC + PBKDF2. Edit `privacy/manifest` (`name|mode|path`). Modes: `file`, `env-merge`. Paths may be `~/…` or **repo-relative** (e.g. `config/env.rc`).
 
-**`~/.env.rc` layout:** plaintext lives at [`config/env.rc`](config/env.rc) (gitignored); [`common/link.ini`](common/link.ini) symlinks `~/.env.rc` → that file. Commit only `privacy/env.rc.enc`. New machine: `./myu vault restore` then links refresh (bootstrap does this after `env`).
+**`~/.env.rc` layout:** plaintext lives at [`config/env.rc`](config/env.rc) (gitignored); [`common/link.ini`](common/link.ini) symlinks `~/.env.rc` → that file. Commit only `privacy/env.rc.enc`. New machine: `./myu vault restore` refreshes links; if `env.rc` restore fails, an empty `config/env.rc` stub is created so the symlink still works.
 
 ## Cursor Config Backup
 

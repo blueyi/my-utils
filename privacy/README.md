@@ -37,4 +37,6 @@ Edit [`manifest`](manifest) to add/remove files. Each line is `name|mode|path`.
 
 **`env.rc`:** plaintext is `config/env.rc` (gitignored); `~/.env.rc` is a symlink. Edit the file under `config/`, not a separate home-only copy (links/restore will replace a regular `~/.env.rc`). Proxy auto-enable is **opt-in**: `export MY_UTILS_PROXY=on` in that file (default off on new machines).
 
+If `./myu vault restore` fails for `env.rc` (wrong password, missing `.enc`, …), an **empty stub** `config/env.rc` is created and `create_links.sh` still runs so `~/.env.rc` works; re-run restore with the correct key (`--force`) when ready.
+
 Crypto: OpenSSL AES-256-CBC + PBKDF2 (same as `env_sync encrypt` / Hermes sync-config).
