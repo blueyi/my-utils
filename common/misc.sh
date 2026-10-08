@@ -32,6 +32,35 @@ _misc_force() {
   [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]
 }
 
+# Count soft failures so run_misc.sh can exit non-zero (no bootstrap stamp).
+MY_UTILS_MISC_FAILS="${MY_UTILS_MISC_FAILS:-0}"
+_misc_fail() {
+  # Always return 0 so set -e continues remaining incremental steps.
+  MY_UTILS_MISC_FAILS=$((MY_UTILS_MISC_FAILS + 1))
+  echo "  WARN: $*" >&2
+  return 0
+}
+
+# Clone or repair incomplete checkouts (failed network leaves dirs without .git).
+_misc_git_clone() {
+  local url="$1" dest="$2"
+  shift 2
+  if [ -d "$dest" ] && [ ! -d "$dest/.git" ]; then
+    echo "  Removing incomplete clone: $dest"
+    rm -rf "$dest"
+  fi
+  if [ -d "$dest/.git" ]; then
+    return 0
+  fi
+  echo "Cloning $url → $dest ..."
+  if git clone "$@" "$url" "$dest"; then
+    return 0
+  fi
+  _misc_fail "git clone failed: $url"
+  rm -rf "$dest" 2>/dev/null || true
+  return 1
+}
+
 # Ensure git is installed before configuring (bootstrap order: packages before misc; here we install if still missing)
 ensure_git() {
   if command -v git &>/dev/null; then
@@ -44,43 +73,45 @@ ensure_git() {
   if is_macos; then
     ensure_brew
     echo "Installing git (Homebrew)..."
-    brew install git || { echo "  WARN: brew install git failed; run packages step or install git manually"; return 1; }
+    brew install git || { _misc_fail "brew install git failed"; return 1; }
   else
     # Linux/WSL: system packages need sudo — keep that in packages step only.
-    echo "  WARN: git not found; run: ./bootstrap.sh --tools packages --yes"
-    echo "        (or install git via apt/dnf; misc does not invoke sudo)"
+    _misc_fail "git not found; run: ./bootstrap.sh --tools packages --yes"
     return 1
   fi
 }
 
 # Git config (only after git is installed)
-ensure_git && {
+if ensure_git; then
   git config --global user.name "yulong"
   git config --global user.email "yl.w@outlook.com"
   git config --global core.editor "vim"
-} || true
+else
+  _misc_fail "git unavailable; skip git config / clone-dependent steps may fail"
+fi
 
 # Oh My Zsh (unattended: no chsh, no new shell; KEEP_ZSHRC preserves symlinked ~/.zshrc)
 install_omz_plugins() {
   [ -d "$HOME/.oh-my-zsh" ] || return 0
   local custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-  if [ ! -d "$custom/plugins/zsh-autosuggestions" ]; then
-    echo "Cloning zsh-autosuggestions..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$custom/plugins/zsh-autosuggestions" || true
-  fi
-  if [ ! -d "$custom/plugins/zsh-syntax-highlighting" ]; then
-    echo "Cloning zsh-syntax-highlighting..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$custom/plugins/zsh-syntax-highlighting" || true
-  fi
-  if [ ! -d "$custom/themes/powerlevel10k" ]; then
-    echo "Cloning powerlevel10k..."
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$custom/themes/powerlevel10k" || true
-  fi
+  command -v git &>/dev/null || { _misc_fail "git missing; cannot install OMZ plugins"; return 1; }
+  _misc_git_clone https://github.com/zsh-users/zsh-autosuggestions \
+    "$custom/plugins/zsh-autosuggestions" || true
+  _misc_git_clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
+    "$custom/plugins/zsh-syntax-highlighting" || true
+  _misc_git_clone https://github.com/romkatv/powerlevel10k.git \
+    "$custom/themes/powerlevel10k" --depth=1 || true
 }
 
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
+if [ ! -d "$HOME/.oh-my-zsh" ] || [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+  if [ -d "$HOME/.oh-my-zsh" ] && [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+    echo "  Removing incomplete Oh My Zsh install..."
+    rm -rf "$HOME/.oh-my-zsh"
+  fi
   echo "Installing Oh My Zsh..."
-  KEEP_ZSHRC=yes CHSH=no RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended || true
+  if ! KEEP_ZSHRC=yes CHSH=no RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended; then
+    _misc_fail "Oh My Zsh install failed (network?)"
+  fi
   install_omz_plugins
 else
   echo "Oh My Zsh already installed"
@@ -99,12 +130,11 @@ if is_macos; then
         echo "fzf already installed (use --force to reinstall)"
       fi
     else
-      brew install fzf || echo "  WARN: brew install fzf failed"
+      brew install fzf || _misc_fail "brew install fzf failed"
     fi
   fi
 elif ! command -v fzf &>/dev/null; then
-  echo "  WARN: fzf not found; run: ./bootstrap.sh --tools packages --yes"
-  echo "        (misc does not invoke sudo on Linux/WSL)"
+  _misc_fail "fzf not found; run: ./bootstrap.sh --tools packages --yes"
 fi
 
 # Default login shell → zsh (opt-in: MY_UTILS_CHSH=1 in ~/.env.rc).
@@ -143,10 +173,10 @@ ensure_uv() {
   if is_macos; then
     ensure_brew
     echo "Installing uv via Homebrew..."
-    brew install uv || { echo "  WARN: brew install uv failed; run manually: brew install uv"; return 1; }
+    brew install uv || { _misc_fail "brew install uv failed"; return 1; }
   else
     echo "Installing uv (official install script)..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh || { echo "  WARN: uv install failed; see https://docs.astral.sh/uv/getting-started/installation/"; return 1; }
+    curl -LsSf https://astral.sh/uv/install.sh | sh || { _misc_fail "uv install failed"; return 1; }
     case ":$PATH:" in
       *":$HOME/.local/bin:"*) ;;
       *) export PATH="$HOME/.local/bin:$PATH" ;;
@@ -158,14 +188,15 @@ ensure_uv_python_default() {
   command -v uv &>/dev/null || return 0
   local _py="${UV_DEFAULT_PYTHON:-3.12}"
   echo "Ensuring default Python ${_py} via uv..."
-  uv python install "$_py" --default --preview-features python-install-default 2>/dev/null || \
-    uv python install "$_py" --default || \
-    uv python install "$_py" || \
-    echo "  WARN: uv python install ${_py} failed"
+  if ! uv python install "$_py" --default --preview-features python-install-default 2>/dev/null \
+    && ! uv python install "$_py" --default 2>/dev/null \
+    && ! uv python install "$_py"; then
+    _misc_fail "uv python install ${_py} failed"
+  fi
   uv python pin --global "$_py" 2>/dev/null || true
 }
 
-ensure_uv
+ensure_uv || true
 ensure_uv_python_default
 
 # Hexo blog deps are opt-in: ./myu hexo --yes  or  ./bootstrap.sh --tools hexo --yes
@@ -252,3 +283,8 @@ ensure_rustup_default() {
 
 ensure_brew_login_path
 ensure_rustup_default
+
+if [ "${MY_UTILS_MISC_FAILS:-0}" -gt 0 ]; then
+  echo "=== Misc incomplete: ${MY_UTILS_MISC_FAILS} step(s) failed (will retry on next bootstrap) ==="
+  return 1 2>/dev/null || exit 1
+fi

@@ -21,6 +21,13 @@ force_mode() {
   [ "${MY_UTILS_FORCE:-}" = "1" ] || [ "${MY_UTILS_FORCE:-}" = "true" ]
 }
 
+# Soft failures: keep installing remaining packages; exit non-zero at end.
+PKG_FAILS=0
+_pkg_fail() {
+  PKG_FAILS=$((PKG_FAILS + 1))
+  echo "  WARN: $*" >&2
+}
+
 # Ensure Homebrew is installed on macOS
 ensure_brew() {
   if command -v brew &>/dev/null; then
@@ -63,33 +70,41 @@ install_one() {
   case "$PM" in
     apt)
       if ! my_utils_sudo_allowed; then
-        echo "  SKIP $pkg (MY_UTILS_ALLOW_SUDO=off)"
+        if pkg_installed "$pkg"; then
+          echo "  $pkg (already installed; sudo disabled)"
+        else
+          _pkg_fail "$pkg missing and MY_UTILS_ALLOW_SUDO=off"
+        fi
         return 0
       fi
       if pkg_installed "$pkg"; then
         if force_mode; then
           echo "  Reinstalling $pkg..."
-          my_utils_sudo apt-get install --reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+          my_utils_sudo apt-get install --reinstall -y "$pkg" || _pkg_fail "$pkg reinstall failed"
         else
           echo "  $pkg (already installed; use --force to reinstall)"
         fi
       else
         echo "  Installing $pkg..."
-        my_utils_sudo apt-get install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+        my_utils_sudo apt-get install -y "$pkg" || _pkg_fail "$pkg install failed"
       fi
       ;;
     yum)
       if ! my_utils_sudo_allowed; then
-        echo "  SKIP $pkg (MY_UTILS_ALLOW_SUDO=off)"
+        if pkg_installed "$pkg"; then
+          echo "  $pkg (already installed; sudo disabled)"
+        else
+          _pkg_fail "$pkg missing and MY_UTILS_ALLOW_SUDO=off"
+        fi
         return 0
       fi
       if pkg_installed "$pkg"; then
         if force_mode; then
           echo "  Reinstalling $pkg..."
           if command -v dnf &>/dev/null; then
-            my_utils_sudo dnf reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+            my_utils_sudo dnf reinstall -y "$pkg" || _pkg_fail "$pkg reinstall failed"
           else
-            my_utils_sudo yum reinstall -y "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+            my_utils_sudo yum reinstall -y "$pkg" || _pkg_fail "$pkg reinstall failed"
           fi
         else
           echo "  $pkg (already installed; use --force to reinstall)"
@@ -97,9 +112,9 @@ install_one() {
       else
         echo "  Installing $pkg..."
         if command -v dnf &>/dev/null; then
-          my_utils_sudo dnf install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+          my_utils_sudo dnf install -y "$pkg" || _pkg_fail "$pkg install failed"
         else
-          my_utils_sudo yum install -y "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+          my_utils_sudo yum install -y "$pkg" || _pkg_fail "$pkg install failed"
         fi
       fi
       ;;
@@ -107,13 +122,13 @@ install_one() {
       if pkg_installed "$pkg"; then
         if force_mode; then
           echo "  Reinstalling $pkg..."
-          brew reinstall "$pkg" || echo "  WARN: $pkg reinstall failed, continuing..."
+          brew reinstall "$pkg" || _pkg_fail "$pkg reinstall failed"
         else
           echo "  $pkg (already installed; use --force to reinstall)"
         fi
       else
         echo "  Installing $pkg..."
-        brew install "$pkg" || echo "  WARN: $pkg install failed, continuing..."
+        brew install "$pkg" || _pkg_fail "$pkg install failed"
       fi
       ;;
   esac
@@ -323,4 +338,8 @@ case "$PM" in
     ;;
 esac
 
+if [ "${PKG_FAILS:-0}" -gt 0 ]; then
+  echo "=== Packages incomplete: ${PKG_FAILS} package(s) failed (will retry on next bootstrap) ==="
+  exit 1
+fi
 echo "=== Packages installed ==="

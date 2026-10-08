@@ -47,6 +47,7 @@ Vault:
 Examples:
   ./myu setup --new-mac --yes              # new macOS machine
   ./myu setup --new-linux --yes            # new Linux / WSL machine
+  ./myu setup --new-linux --yes            # re-run: retries incomplete steps only
   ./myu setup --yes                        # re-run / no vault / no hexo
   ./myu hexo --yes                         # opt-in Hexo (hexo-cli)
   ./myu setup --tools packages links misc hexo --yes

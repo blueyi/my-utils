@@ -19,16 +19,28 @@ mkdir -p "$PLUGGED_DIR"
 mkdir -p "$(dirname "$PLUG_DIR")"
 
 # Install vim-plug
+VIMRC_FAILS=0
 if [ ! -f "$PLUG_DIR/plug.vim" ]; then
   echo "Installing vim-plug..."
-  curl -fLo "$PLUG_DIR/plug.vim" --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  if ! curl -fLo "$PLUG_DIR/plug.vim" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim; then
+    echo "  WARN: vim-plug download failed"
+    VIMRC_FAILS=$((VIMRC_FAILS + 1))
+  fi
 else
   echo "vim-plug already installed"
 fi
 
 # Install plugins via vim (batch mode: -E -s avoids "Press ENTER" prompt; pipe newline as fallback)
-echo "Installing vim plugins (this may take a while)..."
-( echo '' | vim -u "$VIMRC" -E -s -c "PlugInstall" -c "qall" 2>/dev/null ) || {
-  echo "If vim failed, run manually: vim -u $VIMRC +PlugInstall +qall"
-}
+if [ -f "$PLUG_DIR/plug.vim" ]; then
+  echo "Installing vim plugins (this may take a while)..."
+  ( echo '' | vim -u "$VIMRC" -E -s -c "PlugInstall" -c "qall" 2>/dev/null ) || {
+    echo "  WARN: PlugInstall failed; run manually: vim -u $VIMRC +PlugInstall +qall"
+    VIMRC_FAILS=$((VIMRC_FAILS + 1))
+  }
+fi
+
+if [ "$VIMRC_FAILS" -gt 0 ] || [ ! -f "$PLUG_DIR/plug.vim" ]; then
+  echo "=== vimrc incomplete (will retry on next bootstrap) ==="
+  exit 1
+fi

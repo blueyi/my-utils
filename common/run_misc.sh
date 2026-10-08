@@ -16,5 +16,7 @@ if [ ! -f "$COMMON_DIR/misc.sh" ]; then
 fi
 
 echo "=== Running misc setup ==="
+# shellcheck source=/dev/null
 source "$COMMON_DIR/misc.sh"
+# misc.sh returns/exits non-zero when MY_UTILS_MISC_FAILS > 0
 echo "=== Misc done ==="

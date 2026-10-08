@@ -64,11 +64,13 @@ Tools:
 
 Tip: prefer the unified CLI \`./myu\` (see: ./myu help).
 
-Idempotency (two layers):
+Idempotency (two layers + completeness):
   1) Per-tool stamps under \$XDG_STATE_HOME/my-utils/bootstrap/
      packages re-runs when Brewfile (+ optional) hash changes
      links re-runs when common/link.ini hash changes
-  2) Per-package: already-installed skipped unless --force
+     Stamp skip only if the tool also verifies as complete
+  2) Per-item: already-installed / already-cloned skipped; missing or
+     failed items are retried on the next ./myu setup (incremental)
 
 Examples:
   $0 --help
@@ -208,6 +210,13 @@ write_tool_stamp() {
   } > "$(stamp_path "$name")"
 }
 
+# shellcheck source=/dev/null
+. "$COMMON/bootstrap_verify.sh"
+
+clear_tool_stamp() {
+  rm -f "$(stamp_path "$1")"
+}
+
 ensure_macos_new_mac() {
   case "$(uname -s)" in
     Darwin*) ;;
@@ -305,7 +314,9 @@ print_summary() {
   echo "  Skipped (decline):${SUMMARY_SKIP_DECLINE:- (none)}"
   echo "  Failed:           ${SUMMARY_FAIL:- (none)}"
   if [ -n "${SUMMARY_FAIL// }" ]; then
-    echo "  Tip: re-run failed tools, e.g. ./bootstrap.sh --tools${SUMMARY_FAIL} --yes"
+    echo "  Tip: re-run the same command (incremental retry), or:"
+    echo "       ./bootstrap.sh --tools${SUMMARY_FAIL} --yes"
+    echo "       ./myu setup --new-linux --yes   # or --new-mac"
   fi
   case "$(uname -s)" in
     Darwin*)
@@ -343,15 +354,26 @@ for tool in "${SELECTED_TOOLS[@]}"; do
     continue
   fi
   if [ "$FORCE_MODE" != true ] && tool_stamp_valid "$tool"; then
-    echo "  Skip $tool (already done; use --force to re-run)"
-    summary_add stamp "$tool"
-    continue
+    if tool_is_complete "$tool"; then
+      echo "  Skip $tool (stamp ok + complete; use --force to re-run)"
+      summary_add stamp "$tool"
+      continue
+    fi
+    echo "  Re-run $tool (stamp present but incomplete — incremental retry)"
+    clear_tool_stamp "$tool"
   fi
   if run_tool "$tool"; then
-    write_tool_stamp "$tool"
-    summary_add ran "$tool"
+    if tool_is_complete "$tool"; then
+      write_tool_stamp "$tool"
+      summary_add ran "$tool"
+    else
+      echo "  WARN: $tool finished but still incomplete; stamp not written (retry next run)"
+      clear_tool_stamp "$tool"
+      summary_add fail "$tool"
+    fi
   else
     echo "  WARN: $tool failed; stamp not written (will retry on next run)"
+    clear_tool_stamp "$tool"
     summary_add fail "$tool"
   fi
 done
