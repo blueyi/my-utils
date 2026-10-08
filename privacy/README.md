@@ -35,8 +35,8 @@ git push
 
 Edit [`manifest`](manifest) to add/remove files. Each line is `name|mode|path`.
 
-**`env.rc`:** plaintext is `config/env.rc` (gitignored); `~/.env.rc` is a symlink. Edit the file under `config/`, not a separate home-only copy (links/restore will replace a regular `~/.env.rc`). Proxy auto-enable is **opt-in**: `export MY_UTILS_PROXY=on` in that file (default off on new machines).
+**`env.rc`:** plaintext is `config/env.rc` (gitignored); `~/.env.rc` is a symlink. Edit under `config/` (see [`config/env.rc.example`](../config/env.rc.example)). **All shell AI / BYOK keys and Claude Code `ANTHROPIC_*` settings belong here** — not in `_zshrc`. Proxy auto-enable is **opt-in**: `export MY_UTILS_PROXY=on` (default off).
 
-If `./myu vault restore` fails for `env.rc` (wrong password, missing `.enc`, …), an **empty stub** `config/env.rc` is created and `create_links.sh` still runs so `~/.env.rc` works; re-run restore with the correct key (`--force`) when ready.
+If `./myu vault restore` fails for `env.rc`, an **empty stub** is created and links still run; re-run restore with the correct key (`--force`) when ready. Hermes app runtime may still use `~/.hermes/.env` (vault `hermes-env`); shell-facing AI keys should be duplicated or moved into `config/env.rc`.
 
 Crypto: OpenSSL AES-256-CBC + PBKDF2 (same as `env_sync encrypt` / Hermes sync-config).

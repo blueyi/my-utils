@@ -1,5 +1,6 @@
 # Enable Powerlevel10k instant prompt. Must stay at the top of ~/.zshrc (zsh-only).
 # Everything else lives in config/shell_init.bash → resetrc.bash.
+# AI keys / Claude BYOK: config/env.rc (via resetrc) — not here.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -11,27 +12,6 @@ source ~/.shell_init.bash
 
 # Codex / Claude Code (user npm prefix)
 export PATH="$HOME/.local/npm-global/bin:$PATH"
-
-# Hermes BYOK keys for Codex / Claude Code
-if [ -f "$HOME/.hermes/.env" ]; then
-  set -a
-  # shellcheck disable=SC1090
-  . "$HOME/.hermes/.env"
-  set +a
-fi
-
-# Claude Code BYOK → Hermes OneRouter
-export ANTHROPIC_BASE_URL="https://www.onerouter.one"
-export ANTHROPIC_AUTH_TOKEN="${HERMES_ONEROUTER_API_KEY:-}"
-export ANTHROPIC_API_KEY=""
-export ANTHROPIC_MODEL="claude-opus-5"
-export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-5"
-export ANTHROPIC_SMALL_FAST_MODEL="claude-haiku-4-5-20251001"
-export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
-export ANTHROPIC_CUSTOM_MODEL_OPTION="gpt-6-astra"
-export ANTHROPIC_CUSTOM_MODEL_OPTION_NAME="GPT-6 Astra (OneRouter)"
-export ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION="OneRouter alternate model gpt-6-astra"
-
 
 # ppt-master venv
 export PATH="$HOME/.ppt-master/bin:$PATH"

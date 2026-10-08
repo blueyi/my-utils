@@ -64,7 +64,20 @@ common/ssServerInstall.py
 tools/env_sync/tmp/
 *.env.rc.enc
 *.envrc.enc
-# Plaintext secrets — live in working tree + ~/.env.rc symlink; commit only privacy/env.rc.enc
+# ---------------------------------------------------------------------------
+# NEVER commit plaintext secrets (public repo). Only privacy/*.enc is OK.
+# ---------------------------------------------------------------------------
 config/env.rc
+config/env.rc.bak*
+.env.rc
+**/.env.rc
+# Local copies / mistakes
+*.pem
+*.p12
+id_rsa
+id_rsa.pub
+**/auth.json
 # Vault ciphertext is intentionally tracked:
 #   privacy/*.enc
+# Tracked template only:
+#   config/env.rc.example

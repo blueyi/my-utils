@@ -381,16 +381,17 @@ def _is_env_rc_entry(entry: VaultEntry) -> bool:
 
 
 ENV_RC_STUB = """\
-# config/env.rc — machine-local shell overrides (gitignored).
+# config/env.rc — machine-local shell overrides + AI keys (gitignored).
 # Symlink: ~/.env.rc → this file (via common/link.ini).
 #
 # Auto-created because vault restore did not produce this file
 # (missing ciphertext, wrong password, or decrypt error).
+# Full template: config/env.rc.example
 #
-# Optional examples:
-#   export MY_UTILS_PROXY=on
-#   export MY_UTILS_PROXY_PORT=7897
-#   export MY_UTILS_PROXY_HOST=172.28.112.1
+# export MY_UTILS_PROXY=on
+# export HERMES_ONEROUTER_API_KEY=''
+# export ANTHROPIC_BASE_URL='https://www.onerouter.one'
+# export ANTHROPIC_AUTH_TOKEN=\"${HERMES_ONEROUTER_API_KEY:-}\"
 """
 
 
